@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.active{
+    text-decoration: underline;
+    color: #00afba;
+}
