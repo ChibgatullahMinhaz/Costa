@@ -1,7 +1,12 @@
 import React from "react";
+import Content from "./overview/Content";
 
 const AdminDashboard = () => {
-  return <>outlet contenr</>;
+  return (
+    <>
+      <Content />
+    </>
+  );
 };
 
 export default AdminDashboard;

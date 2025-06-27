@@ -1,11 +1,24 @@
 import { Link } from "react-router";
 import UserDropdown from "../Components/UserDropdown/UserDropdown";
 import NotificationDropdown from "../Components/NotificationDropdown/NotificationDropdown";
+import { Car, Menu } from "lucide-react";
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white ">
       <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4">
+        <button
+          onClick={onToggleSidebar}
+          className="md:hidden text-gray-700 hover:text-black focus:outline-none"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <div className="flex items-center space-x-2">
+          <Car className="h-6 w-6" />
+          <span className="block text-xl font-bold">Admin</span>
+        </div>
+
         {/* Search Bar */}
         <div className="hidden lg:block flex-grow max-w-xl">
           <form>
