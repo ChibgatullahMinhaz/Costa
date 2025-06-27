@@ -59,6 +59,7 @@ const BookingForm = () => {
       [field]: value,
     }));
   };
+  
   const handleQuoteSubmit = () => {
     if (!formData.from || !formData.to || !formData.date || !formData.time) {
       toast({
