@@ -3,12 +3,12 @@ import UserDropdown from "../Components/UserDropdown/UserDropdown";
 import NotificationDropdown from "../Components/NotificationDropdown/NotificationDropdown";
 import { Car, Menu } from "lucide-react";
 
-const Header = ({ onToggleSidebar }) => {
+const Header = ({ setSidebarOpen, sidebarOpen }) => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white ">
+    <header className=" z-50 w-full border-b bg-white ">
       <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4">
         <button
-          onClick={onToggleSidebar}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
           className="md:hidden text-gray-700 hover:text-black focus:outline-none"
           aria-label="Toggle sidebar"
         >

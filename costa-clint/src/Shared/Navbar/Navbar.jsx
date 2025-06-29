@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Menu, X, Plane, Phone, Mail, User } from "lucide-react";
-import { NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import Button from "../../components/UI/Button/Button";
 
 const Navbar = () => {
@@ -63,27 +63,6 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            {/* <NavLink
-             to={`/`}
-              className="text-gray-700 hover:text-tropical-600 transition-colors"
-            >
-              Home
-            </NavLink>
-            <NavLink
-              // onClick={() => goToPage("/about")}
-              to={`/`}
-              className="text-gray-700 hover:text-tropical-600 transition-colors"
-            >
-              About
-            </NavLink>
-            <NavLink
-              onClick={() => goToPage("/services")}
-              className="text-gray-700 hover:text-tropical-600 transition-colors"
-            >
-              Services
-            </NavLink>
-          
-            */}
             <NavLink
               to="/"
               className={({ isActive }) =>
@@ -132,9 +111,9 @@ const Navbar = () => {
                 }`
               }
             >
-             Destinations
+              Destinations
             </NavLink>
-            <NavLink
+            <Link
               to="/"
               onClick={() => scrollToSection("contact")}
               className={({ isActive }) =>
@@ -146,15 +125,31 @@ const Navbar = () => {
               }
             >
               Contact
+            </Link>
+            <NavLink
+              to="/beDriver"
+              className={({ isActive }) =>
+                `text-gray-700 transition-colors hover:text-tropical-600 ${
+                  isActive
+                    ? "underline underline-offset-4 text-tropical-600 font-semibold"
+                    : ""
+                }`
+              }
+            >
+              Be Driver
             </NavLink>
-
-
-
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1 text-sm">
                 <Phone className="h-4 w-4 text-tropical-600" />
                 <span className="text-gray-700">+506 2222-3333</span>
               </div>
+
+              <button
+                onClick={handleBookNowClick}
+                className="text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-[#00afb9] dark:shadow-lg dark:shadow-[#00afb9] font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
+              >
+                Book Now
+              </button>
 
               <button
                 variant="outline"
@@ -164,12 +159,6 @@ const Navbar = () => {
               >
                 <User className="h-4 w-4 mr-1" />
                 Dashboard
-              </button>
-              <button
-                onClick={handleBookNowClick}
-                className="text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-[#00afb9] dark:shadow-lg dark:shadow-[#00afb9] font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
-              >
-                Book Now
               </button>
             </div>
           </div>

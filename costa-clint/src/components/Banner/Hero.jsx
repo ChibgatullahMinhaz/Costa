@@ -2,7 +2,8 @@ import React from "react";
 import Button from "../UI/Button/Button";
 import { Plane, MapPin, Calendar, ArrowRight } from "lucide-react";
 import BookingForm from "../Booking/BookingForm";
-const Hero = () => {
+import { BookingFormProvider } from "../../Service/Context/Provider/BookingFormProvider";
+const Hero = ({ onBooking }) => {
   return (
     <section
       id="home"
@@ -67,7 +68,6 @@ const Hero = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                // onClick={scrollToBooking}
                 className="rounded-xl p-3 bg-[#00b0bb] hover:bg-[#00afb9]  transition-all duration-200 flex items-center cursor-pointer"
               >
                 Book Your Transfer
@@ -84,32 +84,12 @@ const Hero = () => {
 
           {/* Right Content - Booking Form */}
           <div className="lg:block animate-slide-in-right" data-booking-form>
-            <BookingForm />
+            <BookingForm onBooking={onBooking} />
           </div>
         </div>
       </div>
 
-      {/* Floating Stats */}
-      {/* <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden lg:block">
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-6">
-          <div className="flex items-center space-x-8 text-white text-center">
-            <div>
-              <p className="text-2xl font-bold">1000+</p>
-              <p className="text-sm">Happy Travelers</p>
-            </div>
-            <div className="h-12 w-px bg-white/20"></div>
-            <div>
-              <p className="text-2xl font-bold">24/7</p>
-              <p className="text-sm">Customer Support</p>
-            </div>
-            <div className="h-12 w-px bg-white/20"></div>
-            <div>
-              <p className="text-2xl font-bold">$30</p>
-              <p className="text-sm">Starting Price</p>
-            </div>
-          </div>
-        </div>
-      </div> */}
+     
     </section>
   );
 };

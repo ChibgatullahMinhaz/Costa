@@ -1,87 +1,113 @@
-import { Home, Users, Car, Settings, Menu } from "lucide-react";
-import { Link } from "react-router";
+// src/components/Sidebar.jsx
+import React from "react";
+import { NavLink, Link } from "react-router";
 import {
-  BookingOperations,
-  Communication,
-  FleetManagement,
-  UserManagement,ReportsAndFinance
-} from "../../../Dashboard/Admin/Components/SidebarDropdown/sidebarOperation";
+  LayoutDashboard,
+  Users,
+  Car,
+  MapPin,
+  BookOpen,
+  Settings,
+  DollarSign,
+  BarChart3,
+  Bell,
+} from "lucide-react";
+
+const menuItems = [
+  {
+    name: "Dashboard",
+    Icon: LayoutDashboard,
+    path: "/admin-dashboard",
+    useNavLink: true,
+  },
+  {
+    name: "Users",
+    Icon: Users,
+    path: "/admin-dashboard/userManagement",
+    useNavLink: true,
+  },
+  {
+    name: "Drivers",
+    Icon: Car,
+    path: "/admin-dashboard/driverManagement",
+    useNavLink: true,
+  },
+  {
+    name: "Vehicles",
+    Icon: MapPin,
+    path: "/admin-dashboard/vehicles",
+    useNavLink: true,
+  },
+  {
+    name: "Bookings",
+    Icon: BookOpen,
+    path: "/admin-dashboard/bookingManagement",
+    useNavLink: true,
+  },
+  {
+    name: "Earnings",
+    Icon: DollarSign,
+    path: "/admin-dashboard/earning",
+    useNavLink: true,
+  },
+  {
+    name: "Reports",
+    Icon: BarChart3,
+    path: "/admin-dashboard/reports",
+    useNavLink: true,
+  },
+  {
+    name: "Notifications",
+    Icon: Bell,
+    path: "/admin-dashboard/pushNotification",
+    useNavLink: true,
+  },
+  {
+    name: "Settings",
+    Icon: Settings,
+    path: "/admin-dashboard/setting",
+    useNavLink: true,
+  },
+];
 
 const Sidebar = () => {
   return (
-    <div className=" min-h-screen mb-5 p-4 transition-all duration-300 ease-in-out ">
-      <div className="flex flex-col space-y-6">
-        <nav className="flex flex-col space-y-4 mt-6">
-          <Link
-            to="/admin-dashboard"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Home className="h-5 w-5" />
-            <span className="hidden sm:block">Dashboard</span>
-          </Link>
+    <div className="sticky top-0 min-h-screen p-4">
+      <h1 className="text-xl font-bold mb-6">Costa Rica Admin</h1>
+      <nav className="flex flex-col space-y-4">
+        {menuItems.map(({ name, Icon, path, useNavLink }) => {
+          const baseClasses =
+            "inline-flex items-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-sm transition";
+          const activeClasses = "bg-white text-gray-900 shadow-sm";
+          const inactiveClasses =
+            "text-gray-500 hover:bg-white hover:text-gray-900";
 
-          <Link
-            to="/admin-dashboard/userManagement"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Users className="h-5 w-5" />
-            <span className="hidden sm:block">Users</span>
-          </Link>
-
-          <Link
-            to="/admin-dashboard/vehicles"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Car className="h-5 w-5" />
-            <span className="hidden sm:block">Vehicles</span>
-          </Link>
-
-          
-          <Link
-            to="/admin-dashboard/bookingManagement"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="hidden sm:block">Booking Management</span>
-          </Link>
-          <Link
-            to="/admin-dashboard/reports&earning"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="hidden sm:block">Report&Earnings</span>
-          </Link>
-          <Link
-            to="/admin-dashboard/priceManagement"
-            className="flex items-center space-x-2 hover:text-blue-400"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="hidden sm:block">Price</span>
-          </Link>
-          <UserManagement></UserManagement>
-          <FleetManagement></FleetManagement>
-          <BookingOperations></BookingOperations>
-          <Communication></Communication>
-          <ReportsAndFinance></ReportsAndFinance>
-        </nav>
-      </div>
+          return useNavLink ? (
+            <NavLink
+              key={path}
+              to={path}
+              end
+              className={({ isActive }) =>
+                `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`
+              }
+            >
+              <Icon className="h-5 w-5" />
+              <span className="hidden sm:block">{name}</span>
+            </NavLink>
+          ) : (
+            <Link
+              key={path}
+              to={path}
+              className={`${baseClasses} ${inactiveClasses}`}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="hidden sm:block">{name}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 };
 
 export default Sidebar;
-
-//  Dashboard
-// - User Management
-//     - Users
-//     - Driver Management
-// - Fleet Management
-//     - Vehicles
-//     - Price
-// - Booking Operations
-//     - Booking Management
-//     - Manual Assignment
-// - Communication Tools
-//     - Push Notifications
-// - Reports & Finance
-//     - Report & Earnings

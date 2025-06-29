@@ -6,29 +6,12 @@ import Sidebar from "./Sidebar/Sidebar";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const sidebarRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        sidebarOpen &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target)
-      ) {
-        setSidebarOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [sidebarOpen]);
+  
 
   return (
     <>
-      <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+    
       <div className="grid grid-cols-12">
         {/* side bar */}
         <div
@@ -42,6 +25,7 @@ const AdminLayout = () => {
           <Sidebar />
         </div>
         <main className="col-span-12 sm:col-span-10">
+          <Header setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}></Header>
           <Outlet></Outlet>
         </main>
       </div>

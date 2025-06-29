@@ -127,41 +127,7 @@ export function FleetManagement() {
   );
 }
 
-export function Communication() {
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const handleNavigate = (path) => {
-    navigate(path);
-    setOpen(false);
-  };
-
-  return (
-    <div className="relative inline-block text-left">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center space-x-2 hover:text-blue-500 focus:outline-none"
-      >
-        <Settings className="w-5 h-5" />
-        <span className="hidden sm:inline">Dispatch Tools</span>
-        <ChevronDown
-          className={`w-4 h-4 transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-2 ml-5  bg-white border border-gray-200 rounded shadow-md z-50">
-          <div
-            onClick={() => handleNavigate("/admin-dashboard/pushNotification")}
-            className="px-4 py-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100"
-          >
-            Push Notification
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 export function ReportsAndFinance() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();

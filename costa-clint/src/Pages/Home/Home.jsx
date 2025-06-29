@@ -1,14 +1,18 @@
-import React from 'react';
-import Navbar from '../../Shared/Navbar/Navbar';
-import Hero from '../../components/Banner/Hero';
+import React, { useState } from "react";
+import Navbar from "../../Shared/Navbar/Navbar";
+import Hero from "../../components/Banner/Hero";
+import BookingFlow from "../../components/Booking/BookingFlow";
 
 const Home = () => {
-  
-    return (
-        <>
-          <Hero />  
-        </>
-    );
+  const [stepPhase, setStepPhase] = useState("initial");
+
+  return (
+    <>
+      {stepPhase === "initial" && <Hero onBooking={setStepPhase} />}
+
+      {stepPhase === "booking" && <BookingFlow />}
+    </>
+  );
 };
 
 export default Home;
