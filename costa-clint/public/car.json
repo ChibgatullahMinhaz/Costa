@@ -1,0 +1,186 @@
+[
+  {
+    "id": "veh_sedan_camry",
+    "type": "Sedan",
+    "title": "Comfort Sedan",
+    "subtitle": "Toyota Camry or similar",
+    "price": 216.00,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/033ed0b8-fa2d-47c5-7586-0d43e422ce6c.jpg",
+    "capacity": {
+      "passengers": 3,
+      "luggage": 3
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Comfort", "Airport", "AC"]
+  },
+  {
+    "id": "veh_sedan_ev",
+    "type": "Sedan",
+    "title": "EV Sedan",
+    "subtitle": "Chevy Bolt EUV or similar",
+    "price": 221.49,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/feda6b9f-e80f-4efc-138d-fa44c6bfe86e.jpg",
+    "capacity": {
+      "passengers": 3,
+      "luggage": 2
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": false,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Electric", "Eco", "Airport"]
+  },
+  {
+    "id": "veh_sedan_business",
+    "type": "Sedan",
+    "title": "Business Sedan",
+    "subtitle": "Lincoln Continental or similar",
+    "price": 233.10,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/d5df21fe-7544-41e7-ae35-1af546087a12.jpg",
+    "capacity": {
+      "passengers": 3,
+      "luggage": 3
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": false,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Business", "Premium", "Black"]
+  },
+  {
+    "id": "veh_first_class",
+    "type": "Sedan",
+    "title": "First Class",
+    "subtitle": "Mercedes S550 or similar",
+    "price": 763.42,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/1e06f65f-f4e8-4869-4f6d-839a14fc83b7.jpg",
+    "capacity": {
+      "passengers": 3,
+      "luggage": 2
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": false,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Luxury", "Executive", "VIP"]
+  },
+  {
+    "id": "veh_minivan_xl",
+    "type": "Minivan",
+    "title": "Minivan XL",
+    "subtitle": "Chrysler Pacifica or similar",
+    "price": 250.00,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/6-minivan.jpg",
+    "capacity": {
+      "passengers": 6,
+      "luggage": 5
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Family", "Spacious", "Comfort"]
+  },
+  {
+    "id": "veh_black_suv",
+    "type": "Black",
+    "title": "Black SUV",
+    "subtitle": "Cadillac Escalade or similar",
+    "price": 290.00,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/7-black.jpg",
+    "capacity": {
+      "passengers": 5,
+      "luggage": 5
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Black", "Luxury", "VIP"]
+  },
+  {
+    "id": "veh_suv_standard",
+    "type": "SUV",
+    "title": "Standard SUV",
+    "subtitle": "Toyota Highlander or similar",
+    "price": 275.00,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/8-suv.jpg",
+    "capacity": {
+      "passengers": 4,
+      "luggage": 4
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["SUV", "Spacious", "Comfort"]
+  },
+  {
+    "id": "veh_minibus_city",
+    "type": "Minibus",
+    "title": "City Minibus",
+    "subtitle": "Ford Transit or similar",
+    "price": 491.22,
+    "imageUrl": "https://storage.googleapis.com/a1aa/image/9-minibus.jpg",
+    "capacity": {
+      "passengers": 10,
+      "luggage": 8
+    },
+    "features": {
+      "flightTracking": true,
+      "multiLingualDriver": true,
+      "childSeatAvailable": true,
+      "refundPolicy": "Full refund if cancelled 24 hours before the service",
+      "waitingTime": {
+        "airport": 60,
+        "others": 15
+      }
+    },
+    "tags": ["Group", "Minibus", "Transit"]
+  }
+]

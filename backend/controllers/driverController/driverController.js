@@ -1,56 +1,132 @@
-import Driver from "../models/Driver.js";
+const { ObjectId } = require("mongodb");
+const { getDB } = require("../../Config/db");
 
-export const getDrivers = async (req, res) => {
-  const drivers = await Driver.find();
-  res.json(drivers);
+// GET /drivers
+exports.getDrivers = async (req, res) => {
+  try {
+    const db = getDB();
+    const drivers = await db.collection("drivers").find().toArray();
+    res.json(drivers);
+  } catch (error) {
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const getDriverById = async (req, res) => {
-  const driver = await Driver.findById(req.params.id);
-  if (!driver) return res.status(404).json({ message: "Driver not found" });
-  res.json(driver);
+// GET /drivers/:id
+exports.getDriverById = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+
+    const driver = await db.collection("drivers").findOne({ _id: new ObjectId(id) });
+    if (!driver) return res.status(404).json({ message: "Driver not found" });
+
+    res.json(driver);
+  } catch (error) {
+    console.error("Error fetching driver by ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const createDriver = async (req, res) => {
-  const {
-    name,
-    phone,
-    email,
-    licenseNumber,
-    vehicleType,
-    vehicleNumber,
-    location,
-  } = req.body;
+// POST /drivers
+exports.createDriver = async (req, res) => {
+  try {
+    const db = getDB();
+    const {
+      name,
+      phone,
+      email,
+      licenseNumber,
+      vehicleType,
+      vehicleNumber,
+      location,
+    } = req.body;
 
-  const driver = new Driver({
-    name,
-    phone,
-    email,
-    licenseNumber,
-    vehicleType,
-    vehicleNumber,
-    location,
-  });
+    if (!name || !phone || !licenseNumber) {
+      return res.status(400).json({ message: "Name, phone, and license number are required" });
+    }
 
-  await driver.save();
-  res.status(201).json(driver);
+    const newDriver = {
+      name,
+      phone,
+      email,
+      licenseNumber,
+      vehicleType,
+      vehicleNumber,
+      location,
+      createdAt: new Date(),
+    };
+
+    const result = await db.collection("drivers").insertOne(newDriver);
+    res.status(201).json({ _id: result.insertedId, ...newDriver });
+  } catch (error) {
+    console.error("Error creating driver:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const updateDriver = async (req, res) => {
-  const updated = await Driver.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if (!updated) return res.status(404).json({ message: "Driver not found" });
-  res.json(updated);
+// PUT /drivers/:id
+exports.updateDriver = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+
+    const result = await db.collection("drivers").findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: req.body },
+      { returnDocument: "after" }
+    );
+
+    if (!result.value) return res.status(404).json({ message: "Driver not found" });
+    res.json(result.value);
+  } catch (error) {
+    console.error("Error updating driver:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const deleteDriver = async (req, res) => {
-  const deleted = await Driver.findByIdAndDelete(req.params.id);
-  if (!deleted) return res.status(404).json({ message: "Driver not found" });
-  res.json({ message: "Driver deleted" });
+// DELETE /drivers/:id
+exports.deleteDriver = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+
+    const result = await db.collection("drivers").deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) return res.status(404).json({ message: "Driver not found" });
+
+    res.json({ message: "Driver deleted" });
+  } catch (error) {
+    console.error("Error deleting driver:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const updateDriverStatus = async (req, res) => {
-  const { status } = req.body;
-  const updated = await Driver.findByIdAndUpdate(req.params.id, { status }, { new: true });
-  if (!updated) return res.status(404).json({ message: "Driver not found" });
-  res.json(updated);
+// PATCH /drivers/:id/status
+exports.updateDriverStatus = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+
+    const result = await db.collection("drivers").findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { status } },
+      { returnDocument: "after" }
+    );
+
+    if (!result.value) return res.status(404).json({ message: "Driver not found" });
+    res.json(result.value);
+  } catch (error) {
+    console.error("Error updating driver status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

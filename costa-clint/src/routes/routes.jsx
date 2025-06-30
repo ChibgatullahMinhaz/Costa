@@ -7,7 +7,6 @@ import DriverLayouts from "../Layouts/DriverLayout/DriverLayouts";
 import CustomerLayouts from "../Layouts/CustomerLayout/CustomerLayouts";
 import AdminDashboard from "../Dashboard/Admin/AdminDashboard";
 import Profile from "../Dashboard/Admin/Pages/Profile";
-import AccountSetting from "../Dashboard/Admin/Pages/AccountSetting";
 import UserManagement from "../Dashboard/Admin/Pages/UserManagement";
 import BookingManagement from "../Dashboard/Admin/Pages/BookingManagement";
 import DriverManagement from "../Dashboard/Admin/Pages/DriverManagement";
@@ -23,9 +22,9 @@ import ManualAssignment from "../Dashboard/Admin/Components/vehiclsemanagment/Ma
 import PriceManagement from "../Dashboard/Admin/Components/vehiclsemanagment/PriceManagement";
 import Earnings from "../Dashboard/Admin/Pages/Earning";
 import EarningOverview from "../Dashboard/Admin/Components/Earnings/EarningOverview";
-import PricingRoles from "../Dashboard/Admin/Components/Earnings/PricingRoles";
 import Reports from "../Dashboard/Admin/Pages/Reports";
 import Settings from "../Dashboard/Admin/Pages/Settings";
+
 
 const routers = createBrowserRouter([
   {

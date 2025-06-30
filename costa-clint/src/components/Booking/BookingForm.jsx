@@ -4,16 +4,23 @@ import { useState } from "react";
 import { Plane } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card/Card";
 import ByTheHourForm from "./ByTheHourForm";
+import useStep from "../../Hooks/useStep";
 
 const airportList = ["Istanbul Airport", "Heathrow Airport", "JFK Airport"];
-const hotelList   = ["Hilton Hotel", "Grand Hyatt", "Radisson Blu"];
+const hotelList = ["Hilton Hotel", "Grand Hyatt", "Radisson Blu"];
 
 const BookingForm = ({ onBooking }) => {
-  const [flowType, setFlowType]             = useState("oneWay");
-  const { register, setValue, watch, formState: { errors } } = useFormContext();
+  const { step, setStep } = useStep();
+  console.log(step, setStep)
+  const [flowType, setFlowType] = useState("oneWay");
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   const formData = watch();
 
-  // Only need suggestions for the One‑Way From/To fields
   const [suggestions, setSuggestions] = useState({ from: [], to: [] });
 
   const handleInputChange = (field, value) => {
@@ -29,23 +36,28 @@ const BookingForm = ({ onBooking }) => {
     if (field === "from" || field === "to") {
       const options =
         formData.transferType === "airport-hotel"
-          ? (field === "from" ? airportList : hotelList)
+          ? field === "from"
+            ? airportList
+            : hotelList
           : hotelList;
 
-      setSuggestions(prev => ({
+      setSuggestions((prev) => ({
         ...prev,
-        [field]: options.filter(item =>
+        [field]: options.filter((item) =>
           item.toLowerCase().includes(value.toLowerCase())
-        )
+        ),
       }));
     }
   };
 
   const handleSuggestionClick = (field, value) => {
     setValue(field, value);
-    setSuggestions(prev => ({ ...prev, [field]: [] }));
+    setSuggestions((prev) => ({ ...prev, [field]: [] }));
   };
-
+  const handleClick = () => {
+    onBooking("booking");
+    setStep(2);
+  };
   return (
     <>
       {/* Tabs */}
@@ -85,7 +97,7 @@ const BookingForm = ({ onBooking }) => {
               <select
                 {...register("transferType")}
                 className="w-full border p-2 rounded"
-                onChange={e =>
+                onChange={(e) =>
                   handleInputChange("transferType", e.target.value)
                 }
               >
@@ -103,11 +115,11 @@ const BookingForm = ({ onBooking }) => {
                     <input
                       className="w-full border p-2 rounded"
                       {...register(field, { required: true })}
-                      onChange={e => handleInputChange(field, e.target.value)}
+                      onChange={(e) => handleInputChange(field, e.target.value)}
                     />
                     {suggestions[field].length > 0 && (
                       <ul className="absolute bg-white border w-full z-10">
-                        {suggestions[field].map(item => (
+                        {suggestions[field].map((item) => (
                           <li
                             key={item}
                             onMouseDown={() =>
@@ -151,9 +163,11 @@ const BookingForm = ({ onBooking }) => {
                   <select
                     {...register("passengers")}
                     className="w-full border p-2 rounded"
-                    onChange={e => handleInputChange("passengers", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("passengers", e.target.value)
+                    }
                   >
-                    {[...Array(8).keys()].map(num => (
+                    {[...Array(8).keys()].map((num) => (
                       <option key={num + 1} value={num + 1}>
                         {num + 1} {num === 0 ? "Passenger" : "Passengers"}
                       </option>
@@ -175,7 +189,7 @@ const BookingForm = ({ onBooking }) => {
               {/* Next */}
               <button
                 type="button"
-                onClick={() => onBooking("booking")}
+                onClick={handleClick}
                 className="w-full bg-gradient-to-r from-[#00b0bb] to-[#00afb9] text-white text-lg font-semibold py-4 rounded hover:scale-105 transition"
               >
                 Choose Vehicle

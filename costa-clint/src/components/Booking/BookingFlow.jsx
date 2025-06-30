@@ -3,12 +3,13 @@ import { Check } from "lucide-react";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 import TravelSummury from "./TravelSummury";
 
+import CustomizeRide from "./CustomizeRide";
+import BookingDetails from "./BookingDetails";
+
 const BookingFlow = () => {
-  const {methods} = useContext(BookingFormContext);
-  console.log(methods);
+  const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
-  console.log(allValues);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
 
   const steps = ["Trip Info", "Choose Vehicle", "Confirm", "Done"];
 
@@ -18,7 +19,7 @@ const BookingFlow = () => {
       <div className="flex justify-between mb-6">
         {steps.map((label, index) => {
           const stepNumber = index + 1;
-          const isCompleted = stepNumber === 1 || stepNumber < step;
+          const isCompleted = stepNumber < step;
           const isActive = stepNumber === step;
           return (
             <div
@@ -51,11 +52,20 @@ const BookingFlow = () => {
       </div>
 
       {/* Step content */}
-      {step === 1 && <div>
+      {/* {step === 1 && <div>
         <TravelSummury methods={methods}></TravelSummury>
-        </div>}
-      {step === 2 && <div>Step 2 content: Vehicle List</div>}
-      {step === 3 && <div>Step 3 content: Confirm Page</div>}
+        </div>} */}
+
+      {step === 2 && (
+        <div>
+          <CustomizeRide />
+        </div>
+      )}
+      {step === 3 && (
+        <div>
+          <BookingDetails />
+        </div>
+      )}
       {step === 4 && <div>Step 4 content: Thank you / Done</div>}
 
       {/* Navigation */}

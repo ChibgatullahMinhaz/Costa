@@ -3,6 +3,7 @@ import Button from "../UI/Button/Button";
 import { Plane, MapPin, Calendar, ArrowRight } from "lucide-react";
 import BookingForm from "../Booking/BookingForm";
 import { BookingFormProvider } from "../../Service/Context/Provider/BookingFormProvider";
+import BookingStepProvider from "../../Service/Context/Provider/BookingStepProvider";
 const Hero = ({ onBooking }) => {
   return (
     <section
@@ -67,9 +68,7 @@ const Hero = ({ onBooking }) => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                className="rounded-xl p-3 bg-[#00b0bb] hover:bg-[#00afb9]  transition-all duration-200 flex items-center cursor-pointer"
-              >
+              <button className="rounded-xl p-3 bg-[#00b0bb] hover:bg-[#00afb9]  transition-all duration-200 flex items-center cursor-pointer">
                 Book Your Transfer
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
@@ -83,13 +82,13 @@ const Hero = ({ onBooking }) => {
           </div>
 
           {/* Right Content - Booking Form */}
-          <div className="lg:block animate-slide-in-right" data-booking-form>
-            <BookingForm onBooking={onBooking} />
-          </div>
+          <BookingStepProvider>
+            <div className="lg:block animate-slide-in-right" data-booking-form>
+              <BookingForm onBooking={onBooking} />
+            </div>
+          </BookingStepProvider>
         </div>
       </div>
-
-     
     </section>
   );
 };
