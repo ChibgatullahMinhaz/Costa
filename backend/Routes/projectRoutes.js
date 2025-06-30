@@ -1,7 +1,7 @@
 const express = require('express');
 const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus } = require('../controllers/UserController/userController');
 const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, updateDriverStatus } = require('../controllers/driverController/driverController');
-const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle } = require('../controllers/vehicleController/vehicleController');
+const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
 const { getServer } = require('../controllers/projectController');
 const router = express.Router();
@@ -16,7 +16,6 @@ router.put("/api/user/update:id", updateUser);
 router.delete("/api/user/delete:id", deleteUser);
 router.patch("/api/user/update:id/status", updateStatus);
 
-// // driver management routes => Admin
 
 // Drivers
 router.get("/api/driver", getDrivers);
@@ -37,5 +36,11 @@ router.delete("/api/vehicle/delete/:id", deleteVehicle);
 // Notifications
 router.post("/api/notification/send", sendNotification);
 router.get("/api/notification", getAllNotifications);
+
+// General apis for all user => Users
+router.get("/api/getAllCarByType", getVehiclesByType);
+router.get("/api/getAllCarTypeWithPrices", getVehicleTypesWithPrices);
+
+
 
 module.exports = router;

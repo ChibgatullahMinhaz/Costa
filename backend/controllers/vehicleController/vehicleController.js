@@ -97,3 +97,35 @@ exports.deleteVehicle = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+
+// Get vehicles by type query param
+exports.getVehiclesByType = async (req, res) => {
+  try {
+    const db = getDB();
+    const { type } = req.query;
+console.log(type)
+    if (!type) {
+      return res.status(400).json({ message: "Type query parameter is required" });
+    }
+
+    const vehicles = await db.collection("cars").find({ type }).toArray();
+    res.json(vehicles);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get vehicles", error });
+  }
+};
+
+
+exports.getVehicleTypesWithPrices = async (req, res) => {
+  try {
+    const db = getDB();
+    const result = await db.collection("carType").find().toArray();
+
+    res.json(result); 
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get vehicle types with prices", error });
+  }
+};

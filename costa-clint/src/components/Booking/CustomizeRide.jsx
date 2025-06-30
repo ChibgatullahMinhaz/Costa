@@ -1,5 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useState } from "react";
+import instance from "../../Service/APIs/AxiosSecure";
+import useStep from "../../Hooks/useStep";
 
 const vehiclesData = [
   {
@@ -81,9 +84,33 @@ const vehiclesData = [
 
 const CustomizeRide = () => {
   const [selectedType, setSelectedType] = useState("Sedan");
-  const vehicleTypes = ["Sedan", "Minivan", "Black", "SUV", "Minibus", "Buses"];
+  const { step, setStep } = useStep();
+  const {
+    data: types = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["vehicles"],
+    queryFn: () =>
+      instance.get("/api/getAllCarTypeWithPrices").then((res) => res.data),
+    keepPreviousData: true,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const filteredVehicles = vehiclesData.filter((v) => v.type === selectedType);
+  const {
+    data: vehicles = [],
+    isLoading: loading,
+    isError: ifError,
+  } = useQuery({
+    queryKey: ["vehicles", selectedType],
+    queryFn: () =>
+      instance
+        .get(`api/getAllCarByType?type=${selectedType}`)
+        .then((res) => res.data),
+    keepPreviousData: true,
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a]  font-[Inter]">
@@ -170,35 +197,31 @@ const CustomizeRide = () => {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-7">
-     
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
           <div className="flex-1">
             <div className="flex text-xs text-gray-600 border border-gray-200 rounded-t-md bg-white select-none overflow-x-auto scrollbar-hide">
-              {vehicleTypes.map((type) => (
+              {types.map((item, idx) => (
                 <button
-                  key={type}
+                  key={idx}
                   className={`flex-1 py-2 px-3 whitespace-nowrap ${
-                    selectedType === type
+                    selectedType === item?.type
                       ? "border-b-2 border-[#1a1a1a] font-semibold text-[#1a1a1a]"
                       : "hover:text-[#1a1a1a]"
                   }`}
                   type="button"
-                  onClick={() => setSelectedType(type)}
+                  onClick={() => setSelectedType(item?.type)}
                 >
-                  {type}
+                  {item?.type}
                   <br />
                   <span className="text-[10px] text-gray-400">
-                    From $
-                    {vehiclesData
-                      .find((v) => v.type === type)
-                      ?.price?.toFixed(2) || "--"}
+                    From ${item?.price.toFixed(2)}
                   </span>
                 </button>
               ))}
             </div>
 
             <div className="space-y-4 bg-white border border-t-0 border-gray-200 rounded-b-md p-4">
-              {filteredVehicles.map((car, idx) => (
+              {vehicles.map((car, idx) => (
                 <div
                   key={idx}
                   className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-md p-4"
@@ -233,15 +256,23 @@ const CustomizeRide = () => {
                       USD {car.price.toFixed(2)}
                     </p>
                     <p className="text-xs text-gray-400 mb-2">All inclusive</p>
-                    <button
-                      className="bg-[#f97316] text-white text-xs font-semibold px-4 py-1 rounded hover:bg-[#ea7c2d] transition"
-                      type="button"
-                    >
-                      Select <i className="fas fa-arrow-right ml-1"></i>
-                    </button>
+                    {step < 4 && (
+                      <button
+                        onClick={() => setStep(step + 1)}
+                        className="bg-[#f97316] text-white text-xs font-semibold px-4 py-1 rounded hover:bg-[#ea7c2d] transition"
+                        type="button"
+                      >
+                        Select <i className="fas fa-arrow-right ml-1"></i>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
+              {vehicles.length === 0 && (
+                <>
+                  <p>not available</p>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ let db;
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
-        strict: true,
+        strict: false,
         deprecationErrors: true,
     },
 });
@@ -15,7 +15,7 @@ const client = new MongoClient(uri, {
 
 async function connectDB() {
     try {
-        db = client.db('portfolio');
+        db = client.db('costaRica');
         console.log('MongoDB connected with Native driver ✅');
     } catch (err) {
         console.error('MongoDB connection failed:', err);

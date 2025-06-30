@@ -5,11 +5,12 @@ import TravelSummury from "./TravelSummury";
 
 import CustomizeRide from "./CustomizeRide";
 import BookingDetails from "./BookingDetails";
+import useStep from "../../Hooks/useStep";
 
 const BookingFlow = () => {
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
-  const [step, setStep] = useState(2);
+  const {step, setStep } = useStep();
 
   const steps = ["Trip Info", "Choose Vehicle", "Confirm", "Done"];
 
