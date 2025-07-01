@@ -1,66 +1,57 @@
-// BookingForm.jsx
 import { useFormContext } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plane } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card/Card";
 import ByTheHourForm from "./ByTheHourForm";
 import useStep from "../../Hooks/useStep";
-
-const airportList = ["Istanbul Airport", "Heathrow Airport", "JFK Airport"];
-const hotelList = ["Hilton Hotel", "Grand Hyatt", "Radisson Blu"];
+import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
 
 const BookingForm = ({ onBooking }) => {
   const { step, setStep } = useStep();
-  console.log(step, setStep)
   const [flowType, setFlowType] = useState("oneWay");
+
   const {
     register,
     setValue,
     watch,
     formState: { errors },
   } = useFormContext();
+
   const formData = watch();
 
-  const [suggestions, setSuggestions] = useState({ from: [], to: [] });
+  const PET_FEE = 10;
 
-  const handleInputChange = (field, value) => {
-    setValue(field, value);
+  const [subtotal, setSubtotal] = useState(0);
 
-    // Recalculate price when passengers change
-    if (field === "passengers") {
-      const extra = Math.max(0, parseInt(value) - 3);
-      setValue("estimatedPrice", 30 + extra * 5);
+  useEffect(() => {
+    let basePrice = 30;
+    const passengers = parseInt(formData.adults || 0) + parseInt(formData.children || 0);
+    const extraPassengers = Math.max(0, passengers - 3);
+    let total = basePrice + extraPassengers * 5;
+
+    if (formData.pet === "yes") {
+      total += PET_FEE;
     }
+    setSubtotal(total);
+  }, [formData.adults, formData.children, formData.pet]);
 
-    // Autocomplete for From & To
-    if (field === "from" || field === "to") {
-      const options =
-        formData.transferType === "airport-hotel"
-          ? field === "from"
-            ? airportList
-            : hotelList
-          : hotelList;
-
-      setSuggestions((prev) => ({
-        ...prev,
-        [field]: options.filter((item) =>
-          item.toLowerCase().includes(value.toLowerCase())
-        ),
-      }));
-    }
-  };
-
-  const handleSuggestionClick = (field, value) => {
-    setValue(field, value);
-    setSuggestions((prev) => ({ ...prev, [field]: [] }));
-  };
   const handleClick = () => {
     onBooking("booking");
     setStep(2);
   };
+
+  const isDisabled =
+    !formData.from ||
+    !formData.to ||
+    !formData.date ||
+    !formData.time ||
+    !formData.adults ||
+    formData.children === undefined ||
+    formData.bags === undefined ||
+    !formData.pet;
+
   return (
     <>
-      {/* Tabs */}
       <div className="flex space-x-4 mb-4">
         <button
           type="button"
@@ -93,106 +84,123 @@ const BookingForm = ({ onBooking }) => {
         <CardContent className="space-y-6">
           {flowType === "oneWay" ? (
             <>
-              {/* Transfer Type */}
-              <select
-                {...register("transferType")}
-                className="w-full border p-2 rounded"
-                onChange={(e) =>
-                  handleInputChange("transferType", e.target.value)
-                }
-              >
-                <option value="airport-hotel">Airport ↔ Hotel</option>
-                <option value="hotel-hotel">Hotel ↔ Hotel</option>
-              </select>
-
-              {/* From & To with Autocomplete */}
               <div className="grid md:grid-cols-2 gap-4">
                 {["from", "to"].map((field) => (
-                  <div key={field} className="relative">
-                    <label className="text-sm font-medium">
-                      {field === "from" ? "From *" : "To *"}
+                  <div key={field}>
+                    <label className="text-sm font-medium capitalize">
+                      {field === "from" ? "Pickup Location" : "Destination"} *
                     </label>
-                    <input
-                      className="w-full border p-2 rounded"
-                      {...register(field, { required: true })}
-                      onChange={(e) => handleInputChange(field, e.target.value)}
+                    <GoogleAutocompleteInput
+                      value={formData[field] || ""}
+                      onPlaceSelect={(place) => setValue(field, place)}
+                      placeholder={`Enter ${field}`}
                     />
-                    {suggestions[field].length > 0 && (
-                      <ul className="absolute bg-white border w-full z-10">
-                        {suggestions[field].map((item) => (
-                          <li
-                            key={item}
-                            onMouseDown={() =>
-                              handleSuggestionClick(field, item)
-                            }
-                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
+                    {errors[field] && (
+                      <p className="text-red-500 text-sm mt-1">
+                        This field is required
+                      </p>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* Date & Time */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Date *</label>
+                  <label className="text-sm font-medium">Pickup Date *</label>
                   <input
                     type="date"
                     className="w-full border p-2 rounded"
                     {...register("date", { required: true })}
                   />
+                  {errors.date && <p className="text-red-500 text-sm mt-1">Date is required</p>}
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Time *</label>
+                  <label className="text-sm font-medium">Pickup Time *</label>
                   <input
                     type="time"
                     className="w-full border p-2 rounded"
                     {...register("time", { required: true })}
                   />
+                  {errors.time && <p className="text-red-500 text-sm mt-1">Time is required</p>}
                 </div>
               </div>
 
-              {/* Passengers & Flight Number */}
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Passengers</label>
-                  <select
-                    {...register("passengers")}
-                    className="w-full border p-2 rounded"
-                    onChange={(e) =>
-                      handleInputChange("passengers", e.target.value)
-                    }
-                  >
-                    {[...Array(8).keys()].map((num) => (
-                      <option key={num + 1} value={num + 1}>
-                        {num + 1} {num === 0 ? "Passenger" : "Passengers"}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">
-                    Flight Number (Optional)
-                  </label>
+                  <label className="text-sm font-medium">Number of Adults *</label>
                   <input
-                    type="text"
+                    type="number"
+                    min={1}
+                    {...register("adults", { required: true, min: 1 })}
                     className="w-full border p-2 rounded"
-                    {...register("flightNumber")}
                   />
+                  {errors.adults && (
+                    <p className="text-red-500 text-sm mt-1">Adults count is required (min 1)</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Number of Children *</label>
+                  <input
+                    type="number"
+                    min={0}
+                    {...register("children", { required: true, min: 0 })}
+                    className="w-full border p-2 rounded"
+                  />
+                  {errors.children && (
+                    <p className="text-red-500 text-sm mt-1">Children count is required (min 0)</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Number of Bags *</label>
+                  <input
+                    type="number"
+                    min={0}
+                    {...register("bags", { required: true, min: 0 })}
+                    className="w-full border p-2 rounded"
+                  />
+                  {errors.bags && (
+                    <p className="text-red-500 text-sm mt-1">Bags count is required (min 0)</p>
+                  )}
                 </div>
               </div>
 
-              {/* Next */}
+              <div>
+                <label className="text-sm font-medium">Will you bring a pet? *</label>
+                <div className="flex space-x-4 mt-1">
+                  <label>
+                    <input type="radio" value="yes" {...register("pet", { required: true })} /> Yes
+                  </label>
+                  <label>
+                    <input type="radio" value="no" {...register("pet", { required: true })} /> No
+                  </label>
+                </div>
+                {errors.pet && (
+                  <p className="text-red-500 text-sm mt-1">Please select pet option</p>
+                )}
+              </div>
+
+              <div className="text-right font-semibold mt-2">
+                Subtotal: ${subtotal}
+                {formData.pet === "yes" && (
+                  <span className="text-sm text-green-600 ml-2">
+                    (Includes ${PET_FEE} pet fee)
+                  </span>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={handleClick}
-                className="w-full bg-gradient-to-r from-[#00b0bb] to-[#00afb9] text-white text-lg font-semibold py-4 rounded hover:scale-105 transition"
+                disabled={isDisabled}
+                className={`w-full text-white text-lg font-semibold py-4 rounded hover:scale-105 transition ${
+                  isDisabled
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#00b0bb] to-[#00afb9]"
+                }`}
               >
-                Choose Vehicle
+                Continue
               </button>
             </>
           ) : (

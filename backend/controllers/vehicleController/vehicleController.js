@@ -106,7 +106,6 @@ exports.getVehiclesByType = async (req, res) => {
   try {
     const db = getDB();
     const { type } = req.query;
-console.log(type)
     if (!type) {
       return res.status(400).json({ message: "Type query parameter is required" });
     }

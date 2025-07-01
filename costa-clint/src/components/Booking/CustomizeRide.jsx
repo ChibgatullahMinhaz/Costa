@@ -1,96 +1,53 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import instance from "../../Service/APIs/AxiosSecure";
 import useStep from "../../Hooks/useStep";
-
-const vehiclesData = [
-  {
-    type: "Sedan",
-    title: "Sedan",
-    subtitle: "Toyota Camry or similar",
-    price: 202.5,
-    image:
-      "https://storage.googleapis.com/a1aa/image/1605796e-92e9-4489-c6d0-e2ed627a7f6a.jpg",
-  },
-  {
-    type: "Sedan",
-    title: "Comfort Sedan",
-    subtitle: "Toyota Camry or similar",
-    price: 216.0,
-    image:
-      "https://storage.googleapis.com/a1aa/image/033ed0b8-fa2d-47c5-7586-0d43e422ce6c.jpg",
-  },
-  {
-    type: "Sedan",
-    title: "EV Sedan",
-    subtitle: "Chevy Bolt EUV or similar",
-    price: 221.49,
-    image:
-      "https://storage.googleapis.com/a1aa/image/feda6b9f-e80f-4efc-138d-fa44c6bfe86e.jpg",
-  },
-  {
-    type: "Sedan",
-    title: "Business Sedan",
-    subtitle: "Lincoln Continental or similar",
-    price: 233.1,
-    image:
-      "https://storage.googleapis.com/a1aa/image/d5df21fe-7544-41e7-ae35-1af546087a12.jpg",
-  },
-  {
-    type: "Sedan",
-    title: "First Class",
-    subtitle: "Mercedes S550 or similar",
-    price: 763.42,
-    image:
-      "https://storage.googleapis.com/a1aa/image/1e06f65f-f4e8-4869-4f6d-839a14fc83b7.jpg",
-  },
-  {
-    type: "Minivan",
-    title: "Minivan XL",
-    subtitle: "Chrysler Pacifica or similar",
-    price: 250.0,
-    image: "https://storage.googleapis.com/a1aa/image/6-minivan.jpg",
-  },
-  {
-    type: "Black",
-    title: "Black SUV",
-    subtitle: "Cadillac Escalade or similar",
-    price: 290.0,
-    image: "https://storage.googleapis.com/a1aa/image/7-black.jpg",
-  },
-  {
-    type: "SUV",
-    title: "Standard SUV",
-    subtitle: "Toyota Highlander or similar",
-    price: 275.0,
-    image: "https://storage.googleapis.com/a1aa/image/8-suv.jpg",
-  },
-  {
-    type: "Minibus",
-    title: "City Minibus",
-    subtitle: "Ford Transit or similar",
-    price: 491.22,
-    image: "https://storage.googleapis.com/a1aa/image/9-minibus.jpg",
-  },
-  {
-    type: "Buses",
-    title: "Luxury Bus",
-    subtitle: "Volvo 9700 or similar",
-    price: 1468.12,
-    image: "https://storage.googleapis.com/a1aa/image/10-bus.jpg",
-  },
-];
+import {
+  GoogleMap,
+  DirectionsRenderer,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
+import { Baby, Briefcase, CalendarDays, User } from "lucide-react";
 
 const CustomizeRide = () => {
+  const { methods } = useContext(BookingFormContext);
+  const allValues = methods.getValues();
   const [selectedType, setSelectedType] = useState("Sedan");
   const { step, setStep } = useStep();
-  const {
-    data: types = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+
+  // Hardcoded locations for now
+  const origin = allValues?.from;
+  const destination = allValues?.to;
+  console.log(allValues);
+  const [directions, setDirections] = useState(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const directionsService = new window.google.maps.DirectionsService();
+    directionsService.route(
+      {
+        origin,
+        destination,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === "OK") {
+          setDirections(result);
+        } else {
+          console.error("Directions request failed", status);
+        }
+      }
+    );
+  }, [isLoaded, destination, origin]);
+
+  const { data: types = [] } = useQuery({
     queryKey: ["vehicles"],
     queryFn: () =>
       instance.get("/api/getAllCarTypeWithPrices").then((res) => res.data),
@@ -98,11 +55,7 @@ const CustomizeRide = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const {
-    data: vehicles = [],
-    isLoading: loading,
-    isError: ifError,
-  } = useQuery({
+  const { data: vehicles = [] } = useQuery({
     queryKey: ["vehicles", selectedType],
     queryFn: () =>
       instance
@@ -113,10 +66,10 @@ const CustomizeRide = () => {
   });
 
   return (
-    <div className="bg-[#f9f9f9] flex text-[#1a1a1a]  font-[Inter]">
+    <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
-        <div className="flex flex-col items-center  bg-gray-100 min-h-screen">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">
+        <div className="flex flex-col items-center bg-gray-100 min-h-screen">
+          <h1 className="text-2xl font-bold text-gray-800 mb-8">
             Customize Your Ride
           </h1>
 
@@ -131,40 +84,57 @@ const CustomizeRide = () => {
             </div>
 
             <div className="flex justify-between text-gray-600 text-sm mb-4">
-              <span>2025-07-02, Wed</span>
-              <span>👥 3</span>
-              <span>👜 3</span>
+              <span className="flex items-center gap-1">
+                <CalendarDays className="w-4 h-4" />
+                {allValues?.date}
+              </span>
+              <span className="flex items-center gap-1">
+                <User className="w-4 h-4" />
+                {allValues?.adults}
+              </span>
+              <span className="flex items-center gap-1">
+                <Briefcase className="w-4 h-4" />
+                {allValues?.bags}
+              </span>
+              <span className="flex items-center gap-1">
+                <Baby className="w-4 h-4" />
+                {allValues?.children}
+              </span>
             </div>
 
-            {/* Map Container - Replace with your actual map image or map component */}
+            {/* Live Google Map */}
             <div className="w-full h-48 bg-gray-200 rounded-md overflow-hidden mb-4 flex items-center justify-center">
-              <img
-                src="https://via.placeholder.com/400x200?text=Map+Goes+Here"
-                alt="Ride Map"
-                className="w-full h-full object-cover"
-              />
+              {isLoaded ? (
+                <GoogleMap
+                  center={{ lat: 40.7128, lng: -74.006 }}
+                  zoom={10}
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                >
+                  {directions && <DirectionsRenderer directions={directions} />}
+                </GoogleMap>
+              ) : (
+                <p>Loading map...</p>
+              )}
             </div>
 
             <div className="text-gray-700 text-sm space-y-2">
               <p className="flex items-center">
-                <span className="mr-2 text-gray-500">⏰</span> 04:04 AM
+                <span className="mr-2 text-gray-500">⏰</span> {allValues?.time}
               </p>
               <p className="flex items-center">
-                <span className="mr-2 text-gray-500">📍</span> John F. Kennedy
-                International Airport
+                <span className="mr-2 text-gray-500">📍</span> {origin}
               </p>
               <p className="flex items-center">
-                <span className="mr-2 text-gray-500">📍</span> Newark Liberty
-                International Airport
+                <span className="mr-2 text-gray-500">📍</span> {destination}
               </p>
               <p className="flex items-center">
-                <span className="mr-2 text-gray-500">🚗</span> Estimated at 37.1
-                miles and 58 minutes
+                <span className="mr-2 text-gray-500">🚗</span> Estimated route
+                based on Google Maps
               </p>
             </div>
           </div>
 
-          {/* Vehicle Features Card */}
+          {/* Vehicle Features */}
           <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">
               All our vehicles include:
@@ -180,22 +150,22 @@ const CustomizeRide = () => {
               </li>
               <li className="flex items-center">
                 <span className="mr-3 text-gray-500 text-lg">🗣️</span>{" "}
-                Multi-lingual Driver
+                Multilingual Driver
               </li>
               <li className="flex items-center">
                 <span className="mr-3 text-gray-500 text-lg">💰</span> Full
-                refund if cancelled 24 hours before the service, online
-                cancellation available.
+                refund if cancelled 24 hours in advance
               </li>
               <li className="flex items-center">
                 <span className="mr-3 text-gray-500 text-lg">⏰</span> Free 60
-                minutes waiting time for airport pickups, 15 minutes for all
-                others.
+                min wait at airport pickups
               </li>
             </ul>
           </div>
         </div>
       </div>
+
+      {/* Vehicle Selection */}
       <div className="max-w-7xl mx-auto mt-7">
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
           <div className="flex-1">
@@ -268,11 +238,7 @@ const CustomizeRide = () => {
                   </div>
                 </div>
               ))}
-              {vehicles.length === 0 && (
-                <>
-                  <p>not available</p>
-                </>
-              )}
+              {vehicles.length === 0 && <p>Not available</p>}
             </div>
           </div>
         </div>

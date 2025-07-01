@@ -3,7 +3,7 @@ import { NavLink, Outlet } from 'react-router';
 
 export default function Users() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
         <p className="text-gray-600">Manage user accounts and analytics</p>

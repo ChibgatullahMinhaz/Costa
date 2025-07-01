@@ -11,11 +11,12 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BookingStepProvider>
-        <BookingFormProvider>
-          <RouterProvider router={routers} />
-        </BookingFormProvider>
-      </BookingStepProvider>
+    
+        <BookingStepProvider>
+          <BookingFormProvider>
+            <RouterProvider router={routers} />
+          </BookingFormProvider>
+        </BookingStepProvider>
     </QueryClientProvider>
   </StrictMode>
 );

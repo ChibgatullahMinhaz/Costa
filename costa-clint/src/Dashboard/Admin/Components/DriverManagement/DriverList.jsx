@@ -1,66 +1,83 @@
-import React, { useState } from 'react';
-import { Search, MoreHorizontal } from 'lucide-react';
+import React, { useState } from "react";
+import { Search, MoreHorizontal } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import instance from "../../../../Service/APIs/AxiosSecure";
 
 export default function DriversList() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const drivers = [
     {
       id: 1,
-      name: 'Ahmed Hassan',
-      email: 'ahmed@example.com',
-      phone: '+8801711234567',
-      avatar: 'AH',
-      vehicle: 'Toyota Corolla',
-      licenseNo: 'DH-12345',
+      name: "Ahmed Hassan",
+      email: "ahmed@example.com",
+      phone: "+8801711234567",
+      avatar: "AH",
+      vehicle: "Toyota Corolla",
+      licenseNo: "DH-12345",
       rating: 4.8,
       totalTrips: 234,
-      status: 'Active'
+      status: "Active",
     },
     {
       id: 2,
-      name: 'Mahmud Rahman',
-      email: 'mahmud@example.com',
-      phone: '+8801811234568',
-      avatar: 'MR',
-      vehicle: 'Honda Civic',
-      licenseNo: 'DH-12346',
+      name: "Mahmud Rahman",
+      email: "mahmud@example.com",
+      phone: "+8801811234568",
+      avatar: "MR",
+      vehicle: "Honda Civic",
+      licenseNo: "DH-12346",
       rating: 4.6,
       totalTrips: 189,
-      status: 'Inactive'
+      status: "Inactive",
     },
     {
       id: 3,
-      name: 'Karim Uddin',
-      email: 'karim@example.com',
-      phone: '+8801911234569',
-      avatar: 'KU',
-      vehicle: 'Nissan Sunny',
-      licenseNo: 'DH-12347',
+      name: "Karim Uddin",
+      email: "karim@example.com",
+      phone: "+8801911234569",
+      avatar: "KU",
+      vehicle: "Nissan Sunny",
+      licenseNo: "DH-12347",
       rating: 4.9,
       totalTrips: 298,
-      status: 'Active'
-    }
+      status: "Active",
+    },
   ];
 
-  const filteredDrivers = drivers.filter(driver =>
-    driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    driver.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const { data: users = [], refetch } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => instance.get("api/user").then((res) => res.data),
+  });
+
+  const filteredDrivers = drivers.filter(
+    (driver) =>
+      driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      driver.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status) => {
-    const baseClasses = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
-    if (status === 'Active') {
-      return <span className={`${baseClasses} bg-green-100 text-green-800`}>Active</span>;
+    const baseClasses =
+      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
+    if (status === "Active") {
+      return (
+        <span className={`${baseClasses} bg-green-100 text-green-800`}>
+          Active
+        </span>
+      );
     }
-    return <span className={`${baseClasses} bg-red-100 text-red-800`}>Inactive</span>;
+    return (
+      <span className={`${baseClasses} bg-red-100 text-red-800`}>Inactive</span>
+    );
   };
 
   return (
     <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
       <div className="flex flex-col space-y-1.5 p-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Driver List</h3>
+          <h3 className="text-2xl font-semibold leading-none tracking-tight">
+            Driver List
+          </h3>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -78,18 +95,35 @@ export default function DriversList() {
           <table className="w-full caption-bottom text-sm">
             <thead className="[&_tr]:border-b">
               <tr className="border-b transition-colors hover:bg-gray-50/50">
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Driver</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Contact</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Vehicle</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Rating</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Total Trips</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Status</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">Actions</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Driver
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Contact
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Vehicle
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Rating
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Total Trips
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Status
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
               {filteredDrivers.map((driver) => (
-                <tr key={driver.id} className="border-b transition-colors hover:bg-gray-50">
+                <tr
+                  key={driver.id}
+                  className="border-b transition-colors hover:bg-gray-50"
+                >
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-3">
                       <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
@@ -98,7 +132,9 @@ export default function DriversList() {
                         </div>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{driver.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {driver.name}
+                        </p>
                         <p className="text-sm text-gray-500">{driver.email}</p>
                       </div>
                     </div>
@@ -109,7 +145,9 @@ export default function DriversList() {
                   <td className="p-4 align-middle">
                     <div>
                       <p className="font-medium">{driver.vehicle}</p>
-                      <p className="text-sm text-gray-500">{driver.licenseNo}</p>
+                      <p className="text-sm text-gray-500">
+                        {driver.licenseNo}
+                      </p>
                     </div>
                   </td>
                   <td className="p-4 align-middle">

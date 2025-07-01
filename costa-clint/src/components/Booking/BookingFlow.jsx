@@ -52,10 +52,7 @@ const BookingFlow = () => {
         })}
       </div>
 
-      {/* Step content */}
-      {/* {step === 1 && <div>
-        <TravelSummury methods={methods}></TravelSummury>
-        </div>} */}
+     
 
       {step === 2 && (
         <div>

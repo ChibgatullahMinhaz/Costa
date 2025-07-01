@@ -1,9 +1,6 @@
-// src/components/BookingSteps/ByTheHourForm.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-
-const airportList = ["Istanbul Airport", "Heathrow Airport", "JFK Airport"];
-const hotelList   = ["Hilton Hotel", "Grand Hyatt", "Radisson Blu"];
+import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
 
 const ByTheHourForm = ({ onBooking }) => {
   const {
@@ -13,151 +10,199 @@ const ByTheHourForm = ({ onBooking }) => {
     formState: { errors },
   } = useFormContext();
 
-  const [suggestions, setSuggestions] = useState([]);
-  const fromValue = watch("from") || "";
+  const formData = watch();
+  const PET_FEE = 10;
+  const BASE_HOURLY_RATE = 50;
 
-  // Autocomplete only for pickup ("from")
-  const handleFromChange = (val) => {
-    setValue("from", val);
-    const options =
-      watch("transferType") === "airport-hotel" ? airportList : hotelList;
-    const matches = options.filter((loc) =>
-      loc.toLowerCase().includes(val.toLowerCase())
-    );
-    setSuggestions(matches);
-  };
+  const [subtotal, setSubtotal] = useState(0);
 
-  const handleSuggestionClick = (loc) => {
-    setValue("from", loc);
-    setSuggestions([]);
-  };
+  useEffect(() => {
+    const duration = parseInt(formData.duration || 0);
+    const adults = parseInt(formData.adults || 0);
+    const children = parseInt(formData.children || 0);
+    const passengers = adults + children;
+    const extraPassengers = Math.max(0, passengers - 3);
+
+    let total = duration * BASE_HOURLY_RATE + extraPassengers * 5;
+
+    if (formData.pet === "yes") {
+      total += PET_FEE;
+    }
+
+    setSubtotal(isNaN(total) ? 0 : total);
+  }, [formData.duration, formData.adults, formData.children, formData.pet]);
+
+  const isDisabled =
+    !formData.from ||
+    !formData.date ||
+    !formData.time ||
+    !formData.duration ||
+    !formData.adults ||
+    formData.children === undefined ||
+    formData.bags === undefined ||
+    !formData.pet;
 
   return (
     <div className="space-y-6">
       {/* Pickup Location */}
-      <div className="relative">
-        <label className="block text-sm font-medium mb-1">Pickup *</label>
-        <input
-          {...register("from", { required: "Pickup location is required" })}
-          value={fromValue}
-          onChange={(e) => handleFromChange(e.target.value)}
+      <div>
+        <label className="text-sm font-medium">Pickup Location *</label>
+        <GoogleAutocompleteInput
+          value={formData.from || ""}
+          onPlaceSelect={(place) => setValue("from", place)}
           placeholder="Enter pickup location"
-          className="w-full border p-2 rounded"
         />
         {errors.from && (
-          <p className="text-red-500 text-sm mt-1">{errors.from.message}</p>
-        )}
-        {suggestions.length > 0 && (
-          <ul className="absolute bg-white border w-full z-10 mt-1 max-h-40 overflow-auto">
-            {suggestions.map((loc) => (
-              <li
-                key={loc}
-                onMouseDown={() => handleSuggestionClick(loc)}
-                className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
-              >
-                {loc}
-              </li>
-            ))}
-          </ul>
+          <p className="text-red-500 text-sm mt-1">Pickup location is required</p>
         )}
       </div>
 
-      {/* Date */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Date *</label>
-        <input
-          type="date"
-          {...register("date", { required: "Date is required" })}
-          className="w-full border p-2 rounded"
-        />
-        {errors.date && (
-          <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>
-        )}
-      </div>
-
-      {/* Time */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Time *</label>
-        <input
-          type="time"
-          {...register("time", { required: "Time is required" })}
-          className="w-full border p-2 rounded"
-        />
-        {errors.time && (
-          <p className="text-red-500 text-sm mt-1">{errors.time.message}</p>
-        )}
-      </div>
-
-      {/* Passengers */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Passengers</label>
-        <select
-          {...register("passengers")}
-          className="w-full border p-2 rounded"
-        >
-          {[...Array(8).keys()].map((num) => (
-            <option key={num + 1} value={num + 1}>
-              {num + 1} {num === 0 ? "Passenger" : "Passengers"}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Luggage */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Luggage (bags)</label>
-        <select
-          {...register("luggage")}
-          className="w-full border p-2 rounded"
-        >
-          {[...Array(6).keys()].map((num) => (
-            <option key={num} value={num}>
-              {num} {num === 1 ? "bag" : "bags"}
-            </option>
-          ))}
-        </select>
+      {/* Date and Time */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium">Pickup Date *</label>
+          <input
+            type="date"
+            {...register("date", { required: true })}
+            className="w-full border p-2 rounded"
+          />
+          {errors.date && (
+            <p className="text-red-500 text-sm mt-1">Date is required</p>
+          )}
+        </div>
+        <div>
+          <label className="text-sm font-medium">Pickup Time *</label>
+          <input
+            type="time"
+            {...register("time", { required: true })}
+            className="w-full border p-2 rounded"
+          />
+          {errors.time && (
+            <p className="text-red-500 text-sm mt-1">Time is required</p>
+          )}
+        </div>
       </div>
 
       {/* Duration */}
       <div>
-        <label className="block text-sm font-medium mb-1">Duration (hours) *</label>
+        <label className="text-sm font-medium">Duration (hours) *</label>
         <input
           type="number"
           min="1"
           {...register("duration", {
-            required: "Duration is required",
-            min: { value: 1, message: "At least 1 hour" },
+            required: true,
+            min: 1,
           })}
           className="w-full border p-2 rounded"
         />
         {errors.duration && (
-          <p className="text-red-500 text-sm mt-1">{errors.duration.message}</p>
+          <p className="text-red-500 text-sm mt-1">Minimum 1 hour required</p>
         )}
       </div>
 
-      {/* Flight Number */}
+      {/* Adults, Children, Bags */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <div>
+          <label className="text-sm font-medium">Adults *</label>
+          <input
+            type="number"
+            min="1"
+            {...register("adults", { required: true, min: 1 })}
+            className="w-full border p-2 rounded"
+          />
+          {errors.adults && (
+            <p className="text-red-500 text-sm mt-1">Min 1 adult required</p>
+          )}
+        </div>
+        <div>
+          <label className="text-sm font-medium">Children *</label>
+          <input
+            type="number"
+            min="0"
+            {...register("children", { required: true, min: 0 })}
+            className="w-full border p-2 rounded"
+          />
+          {errors.children && (
+            <p className="text-red-500 text-sm mt-1">Required (min 0)</p>
+          )}
+        </div>
+        <div>
+          <label className="text-sm font-medium">Bags *</label>
+          <input
+            type="number"
+            min="0"
+            {...register("bags", { required: true, min: 0 })}
+            className="w-full border p-2 rounded"
+          />
+          {errors.bags && (
+            <p className="text-red-500 text-sm mt-1">Required (min 0)</p>
+          )}
+        </div>
+      </div>
+
+      {/* Pet Option */}
       <div>
-        <label className="block text-sm font-medium mb-1">
-          Flight Number (Optional)
-        </label>
+        <label className="text-sm font-medium">Will you bring a pet? *</label>
+        <div className="flex space-x-4 mt-1">
+          <label>
+            <input
+              type="radio"
+              value="yes"
+              {...register("pet", { required: true })}
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="no"
+              {...register("pet", { required: true })}
+            />{" "}
+            No
+          </label>
+        </div>
+        {errors.pet && (
+          <p className="text-red-500 text-sm mt-1">Please select pet option</p>
+        )}
+      </div>
+
+      {/* Optional: Flight Number */}
+      <div>
+        <label className="text-sm font-medium">Flight Number (optional)</label>
         <input
           type="text"
           {...register("flightNumber")}
           className="w-full border p-2 rounded"
-          placeholder="e.g. AA1234"
         />
       </div>
 
-      {/* Continue / Choose Vehicle */}
+      {/* Subtotal */}
+      <div className="text-right font-semibold">
+        Subtotal: ${subtotal}
+        {formData.pet === "yes" && (
+          <span className="text-sm text-green-600 ml-2">
+            (Includes ${PET_FEE} pet fee)
+          </span>
+        )}
+      </div>
+
+      {/* Continue Button */}
       <button
         type="button"
         onClick={() => onBooking("booking")}
-        className="w-full bg-gradient-to-r from-[#00b0bb] to-[#00afb9] 
-                   text-white font-semibold py-3 rounded-lg 
-                   hover:scale-105 transition-all duration-200"
+        disabled={isDisabled}
+        className={`w-full text-white text-lg font-semibold py-4 rounded hover:scale-105 transition ${
+          isDisabled
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-[#00b0bb] to-[#00afb9]"
+        }`}
       >
-        Choose Vehicle
+        Continue
       </button>
+
+      <p className="text-xs text-gray-500 text-center mt-2">
+        * Final price may vary based on actual distance and time
+      </p>
     </div>
   );
 };
