@@ -3,7 +3,7 @@ import { BookingFormContext } from "../CreateContext/BookingFormContex";
 
 // Default form values
 const defaultValues = {
-  transferType: "airport-hotel",
+  transferType: "one way",
   from: "",
   to: "",
   date: "",

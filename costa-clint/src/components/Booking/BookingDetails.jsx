@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
+import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 
 const BookingDetails = () => {
+    const { methods } = useContext(BookingFormContext);
+    const allValues = methods.getValues();
+    console.log(allValues)
   return (
     <div className="bg-white font-sans text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">

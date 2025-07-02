@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
 
-const ByTheHourForm = ({ onBooking }) => {
+const ByTheHourForm = ({ onBooking,setStep }) => {
   const {
     register,
     setValue,
@@ -41,7 +41,10 @@ const ByTheHourForm = ({ onBooking }) => {
     formData.children === undefined ||
     formData.bags === undefined ||
     !formData.pet;
-
+  const handleNext = () => {
+    onBooking("booking");
+    setStep(2);
+  };
   return (
     <div className="space-y-6">
       {/* Pickup Location */}
@@ -53,7 +56,9 @@ const ByTheHourForm = ({ onBooking }) => {
           placeholder="Enter pickup location"
         />
         {errors.from && (
-          <p className="text-red-500 text-sm mt-1">Pickup location is required</p>
+          <p className="text-red-500 text-sm mt-1">
+            Pickup location is required
+          </p>
         )}
       </div>
 
@@ -166,15 +171,6 @@ const ByTheHourForm = ({ onBooking }) => {
         )}
       </div>
 
-      {/* Optional: Flight Number */}
-      <div>
-        <label className="text-sm font-medium">Flight Number (optional)</label>
-        <input
-          type="text"
-          {...register("flightNumber")}
-          className="w-full border p-2 rounded"
-        />
-      </div>
 
       {/* Subtotal */}
       <div className="text-right font-semibold">
@@ -189,7 +185,7 @@ const ByTheHourForm = ({ onBooking }) => {
       {/* Continue Button */}
       <button
         type="button"
-        onClick={() => onBooking("booking")}
+        onClick={handleNext}
         disabled={isDisabled}
         className={`w-full text-white text-lg font-semibold py-4 rounded hover:scale-105 transition ${
           isDisabled
@@ -197,12 +193,9 @@ const ByTheHourForm = ({ onBooking }) => {
             : "bg-gradient-to-r from-[#00b0bb] to-[#00afb9]"
         }`}
       >
-        Continue
+        Choose Vehicles
       </button>
 
-      <p className="text-xs text-gray-500 text-center mt-2">
-        * Final price may vary based on actual distance and time
-      </p>
     </div>
   );
 };

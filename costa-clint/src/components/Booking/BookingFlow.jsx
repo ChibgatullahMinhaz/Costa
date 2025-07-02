@@ -1,13 +1,12 @@
 import { useContext, useState } from "react";
 import { Check } from "lucide-react";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
-import TravelSummury from "./TravelSummury";
 
 import CustomizeRide from "./CustomizeRide";
 import BookingDetails from "./BookingDetails";
 import useStep from "../../Hooks/useStep";
 
-const BookingFlow = () => {
+const BookingFlow = ({setStepPhase}) => {
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
   const {step, setStep } = useStep();
@@ -56,11 +55,16 @@ const BookingFlow = () => {
 
       {step === 2 && (
         <div>
-          <CustomizeRide />
+           <h1 className="text-2xl font-bold text-gray-800 mb-8">
+            Customize Your Ride
+          </h1>
+          <CustomizeRide setStepPhase={setStepPhase} />
         </div>
       )}
       {step === 3 && (
         <div>
+         
+
           <BookingDetails />
         </div>
       )}
@@ -68,8 +72,8 @@ const BookingFlow = () => {
 
       {/* Navigation */}
       <div className="mt-6 ">
-        {step < 4 && (
-          <button onClick={() => setStep(step + 1)} className="btn-primary">
+        {step >1 && (
+          <button onClick={() => setStep(step - 1)} className="btn-primary">
             Next
           </button>
         )}

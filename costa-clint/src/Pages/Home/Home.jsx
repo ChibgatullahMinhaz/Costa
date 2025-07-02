@@ -10,7 +10,7 @@ const Home = () => {
     <>
       {stepPhase === "initial" && <Hero onBooking={setStepPhase} />}
 
-      {stepPhase === "booking" && <BookingFlow />}
+      {stepPhase === "booking" && <BookingFlow setStepPhase={setStepPhase} />}
     </>
   );
 };

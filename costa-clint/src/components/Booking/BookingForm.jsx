@@ -1,12 +1,38 @@
 import { useFormContext } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { Plane } from "lucide-react";
+import { Plane, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../UI/Card/Card";
 import ByTheHourForm from "./ByTheHourForm";
 import useStep from "../../Hooks/useStep";
 import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
+import StepperInput from "../UI/StepperInput/StepperInput";
+
+const getDistanceInKm = async (origin, destination) => {
+  return new Promise((resolve, reject) => {
+    const service = new window.google.maps.DistanceMatrixService();
+    service.getDistanceMatrix(
+      {
+        origins: [origin],
+        destinations: [destination],
+        travelMode: window.google.maps.TravelMode.DRIVING,
+        unitSystem: window.google.maps.UnitSystem.METRIC,
+      },
+      (response, status) => {
+        if (status === "OK") {
+          const distanceText = response.rows[0].elements[0].distance.text; // e.g. "12.3 km"
+          const distanceValue = response.rows[0].elements[0].distance.value; // in meters
+          resolve(distanceValue / 1000); // return in kilometers
+        } else {
+          reject("Distance fetch failed: " + status);
+        }
+      }
+    );
+  });
+};
 
 const BookingForm = ({ onBooking }) => {
+  const [distanceKm, setDistanceKm] = useState(null);
+
   const { step, setStep } = useStep();
   const [flowType, setFlowType] = useState("oneWay");
 
@@ -18,22 +44,44 @@ const BookingForm = ({ onBooking }) => {
   } = useFormContext();
 
   const formData = watch();
-
+  const transferType = watch("transferType");
   const PET_FEE = 10;
 
   const [subtotal, setSubtotal] = useState(0);
-
   useEffect(() => {
-    let basePrice = 30;
-    const passengers = parseInt(formData.adults || 0) + parseInt(formData.children || 0);
-    const extraPassengers = Math.max(0, passengers - 3);
-    let total = basePrice + extraPassengers * 5;
+    const calculatePrice = async () => {
+      let basePrice = 30;
+      const passengers =
+        parseInt(formData.adults || 0) + parseInt(formData.children || 0);
+      const extraPassengers = Math.max(0, passengers - 3);
+      let total = basePrice + extraPassengers * 5;
 
-    if (formData.pet === "yes") {
-      total += PET_FEE;
-    }
-    setSubtotal(total);
-  }, [formData.adults, formData.children, formData.pet]);
+      if (formData.from && formData.to) {
+        try {
+          const distance = await getDistanceInKm(formData.from, formData.to);
+          setDistanceKm(distance.toFixed(1));
+          total += distance * 2;
+        } catch (err) {
+          console.error(err);
+          setDistanceKm(null);
+        }
+      }
+
+      if (formData.pet === "yes") {
+        total += PET_FEE;
+      }
+
+      setSubtotal(Math.round(total));
+    };
+
+    calculatePrice();
+  }, [
+    formData.from,
+    formData.to,
+    formData.adults,
+    formData.children,
+    formData.pet,
+  ]);
 
   const handleClick = () => {
     onBooking("booking");
@@ -50,12 +98,25 @@ const BookingForm = ({ onBooking }) => {
     formData.bags === undefined ||
     !formData.pet;
 
+  const adults = watch("adults");
+  const children = watch("children");
+  const [count, setCount] = useState(adults || 1);
+  const [childrenCount, setChildrenCount] = useState(children || 0);
+
+  useEffect(() => {
+    setValue("adults", count);
+    setChildrenCount("children", childrenCount);
+  }, [count, setValue, childrenCount]);
+
   return (
     <>
       <div className="flex space-x-4 mb-4">
         <button
           type="button"
-          onClick={() => setFlowType("oneWay")}
+          onClick={() => {
+            setFlowType("oneWay");
+            setValue("transferType", "one way")
+          }}
           className={`px-4 py-2 rounded ${
             flowType === "oneWay" ? "bg-blue-600 text-white" : "bg-gray-200"
           }`}
@@ -64,7 +125,10 @@ const BookingForm = ({ onBooking }) => {
         </button>
         <button
           type="button"
-          onClick={() => setFlowType("hourly")}
+          onClick={() => {
+            setFlowType("hourly")
+            setValue("transferType", "hourly")
+          }}
           className={`px-4 py-2 rounded ${
             flowType === "hourly" ? "bg-blue-600 text-white" : "bg-gray-200"
           }`}
@@ -112,7 +176,11 @@ const BookingForm = ({ onBooking }) => {
                     className="w-full border p-2 rounded"
                     {...register("date", { required: true })}
                   />
-                  {errors.date && <p className="text-red-500 text-sm mt-1">Date is required</p>}
+                  {errors.date && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Date is required
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="text-sm font-medium">Pickup Time *</label>
@@ -121,26 +189,43 @@ const BookingForm = ({ onBooking }) => {
                     className="w-full border p-2 rounded"
                     {...register("time", { required: true })}
                   />
-                  {errors.time && <p className="text-red-500 text-sm mt-1">Time is required</p>}
+                  {errors.time && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Time is required
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Number of Adults *</label>
-                  <input
-                    type="number"
-                    min={1}
-                    {...register("adults", { required: true, min: 1 })}
-                    className="w-full border p-2 rounded"
-                  />
+                  <label className="text-sm font-medium block mb-1">
+                    Passengers *
+                  </label>
+                  <div className="flex items-center border rounded overflow-hidden">
+                    {/* 👈 Left icon */}
+                    <div className="bg-gray-100 px-3 flex items-center">
+                      <User className="w-5 h-5 text-gray-500" />
+                    </div>
+
+                    {/* Input box (readonly to prevent manual edits) */}
+                    <input
+                      type="number"
+                      defaultValue={1}
+                      className="w-full text-center border-l border-r px-2 py-2 outline-none"
+                      {...register("adults", { required: true, min: 1 })}
+                    />
+                  </div>
+
                   {errors.adults && (
-                    <p className="text-red-500 text-sm mt-1">Adults count is required (min 1)</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      Adults count is required (min 1)
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Number of Children *</label>
+                  <label className="text-sm font-medium">Children *</label>
                   <input
                     type="number"
                     min={0}
@@ -148,12 +233,14 @@ const BookingForm = ({ onBooking }) => {
                     className="w-full border p-2 rounded"
                   />
                   {errors.children && (
-                    <p className="text-red-500 text-sm mt-1">Children count is required (min 0)</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      Children count is required (min 0)
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Number of Bags *</label>
+                  <label className="text-sm font-medium">Luggage *</label>
                   <input
                     type="number"
                     min={0}
@@ -161,35 +248,55 @@ const BookingForm = ({ onBooking }) => {
                     className="w-full border p-2 rounded"
                   />
                   {errors.bags && (
-                    <p className="text-red-500 text-sm mt-1">Bags count is required (min 0)</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      Bags count is required (min 0)
+                    </p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium">Will you bring a pet? *</label>
+                <label className="text-sm font-medium">
+                  Will you bring a pet? *
+                </label>
                 <div className="flex space-x-4 mt-1">
                   <label>
-                    <input type="radio" value="yes" {...register("pet", { required: true })} /> Yes
+                    <input
+                      type="radio"
+                      value="yes"
+                      {...register("pet", { required: true })}
+                    />{" "}
+                    Yes
                   </label>
                   <label>
-                    <input type="radio" value="no" {...register("pet", { required: true })} /> No
+                    <input
+                      type="radio"
+                      value="no"
+                      {...register("pet", { required: true })}
+                    />{" "}
+                    No
                   </label>
                 </div>
                 {errors.pet && (
-                  <p className="text-red-500 text-sm mt-1">Please select pet option</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    Please select pet option
+                  </p>
                 )}
               </div>
 
               <div className="text-right font-semibold mt-2">
                 Subtotal: ${subtotal}
+                {distanceKm && (
+                  <span className="text-sm text-gray-600 ml-2">
+                    ({distanceKm} km distance)
+                  </span>
+                )}
                 {formData.pet === "yes" && (
                   <span className="text-sm text-green-600 ml-2">
                     (Includes ${PET_FEE} pet fee)
                   </span>
                 )}
               </div>
-
               <button
                 type="button"
                 onClick={handleClick}
@@ -200,11 +307,11 @@ const BookingForm = ({ onBooking }) => {
                     : "bg-gradient-to-r from-[#00b0bb] to-[#00afb9]"
                 }`}
               >
-                Continue
+                Choose Vehicles
               </button>
             </>
           ) : (
-            <ByTheHourForm onBooking={onBooking} />
+            <ByTheHourForm onBooking={onBooking} setStep={setStep} />
           )}
 
           <p className="text-xs text-gray-500 text-center mt-2">

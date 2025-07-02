@@ -9,8 +9,9 @@ import {
 } from "@react-google-maps/api";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 import { Baby, Briefcase, CalendarDays, User } from "lucide-react";
+import TimelineInfo from "./TimelineInfo";
 
-const CustomizeRide = () => {
+const CustomizeRide = ({ setStepPhase }) => {
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
   const [selectedType, setSelectedType] = useState("Sedan");
@@ -64,20 +65,20 @@ const CustomizeRide = () => {
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
-
+  console.log(vehicles);
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
         <div className="flex flex-col items-center bg-gray-100 min-h-screen">
-          <h1 className="text-2xl font-bold text-gray-800 mb-8">
-            Customize Your Ride
-          </h1>
-
           {/* Ride Info Card */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-700">Ride Info</h2>
-              <button className="text-orange-600 font-bold flex items-center space-x-1 hover:text-orange-700">
+
+              <button
+                onClick={() => setStepPhase("initial")}
+                className="text-orange-600 font-bold flex items-center space-x-1 hover:text-orange-700"
+              >
                 <span className="text-sm">✏️</span>
                 <span>Modify</span>
               </button>
@@ -103,35 +104,48 @@ const CustomizeRide = () => {
             </div>
 
             {/* Live Google Map */}
-            <div className="w-full h-48 bg-gray-200 rounded-md overflow-hidden mb-4 flex items-center justify-center">
-              {isLoaded ? (
-                <GoogleMap
-                  center={{ lat: 40.7128, lng: -74.006 }}
-                  zoom={10}
-                  mapContainerStyle={{ width: "100%", height: "100%" }}
-                >
-                  {directions && <DirectionsRenderer directions={directions} />}
-                </GoogleMap>
-              ) : (
-                <p>Loading map...</p>
-              )}
-            </div>
-
-            <div className="text-gray-700 text-sm space-y-2">
-              <p className="flex items-center">
-                <span className="mr-2 text-gray-500">⏰</span> {allValues?.time}
-              </p>
-              <p className="flex items-center">
-                <span className="mr-2 text-gray-500">📍</span> {origin}
-              </p>
-              <p className="flex items-center">
-                <span className="mr-2 text-gray-500">📍</span> {destination}
-              </p>
-              <p className="flex items-center">
-                <span className="mr-2 text-gray-500">🚗</span> Estimated route
-                based on Google Maps
-              </p>
-            </div>
+            {allValues?.transferType === "hourly" ? (
+              <>
+                <TimelineInfo
+                  from={allValues?.from}
+                  duration={allValues?.duration}
+                />
+              </>
+            ) : (
+              <>
+                <div className="w-full h-48 bg-gray-200 rounded-md overflow-hidden mb-4 flex items-center justify-center">
+                  {isLoaded ? (
+                    <GoogleMap
+                      center={{ lat: 40.7128, lng: -74.006 }}
+                      zoom={10}
+                      mapContainerStyle={{ width: "100%", height: "100%" }}
+                    >
+                      {directions && (
+                        <DirectionsRenderer directions={directions} />
+                      )}
+                    </GoogleMap>
+                  ) : (
+                    <p>Loading map...</p>
+                  )}
+                </div>
+                <div className="text-gray-700 text-sm space-y-2">
+                  <p className="flex items-center">
+                    <span className="mr-2 text-gray-500">⏰</span>{" "}
+                    {allValues?.time}
+                  </p>
+                  <p className="flex items-center">
+                    <span className="mr-2 text-gray-500">📍</span> {origin}
+                  </p>
+                  <p className="flex items-center">
+                    <span className="mr-2 text-gray-500">📍</span> {destination}
+                  </p>
+                  <p className="flex items-center">
+                    <span className="mr-2 text-gray-500">🚗</span> Estimated
+                    route based on Google Maps
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Vehicle Features */}
@@ -228,7 +242,11 @@ const CustomizeRide = () => {
                     <p className="text-xs text-gray-400 mb-2">All inclusive</p>
                     {step < 4 && (
                       <button
-                        onClick={() => setStep(step + 1)}
+                        onClick={() => {
+                          methods.setValue("selectedCarId", car._id);
+                          methods.setValue("vehicleType", selectedType);
+                          setStep(step + 1);
+                        }}
                         className="bg-[#f97316] text-white text-xs font-semibold px-4 py-1 rounded hover:bg-[#ea7c2d] transition"
                         type="button"
                       >
