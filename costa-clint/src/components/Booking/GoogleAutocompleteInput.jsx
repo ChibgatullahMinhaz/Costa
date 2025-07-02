@@ -2,38 +2,71 @@ import React, { useState, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 
 const allowedAirports = [
-  { name: "Juan Santamaría International", code: "SJO" },
-  { name: "Daniel Oduber Quirós International", code: "LIR" },
-  { name: "Tobías Bolaños Domestic", code: "SYQ" },
+  { name: "Juan Santamaría International", code: "SJO", aliases: ["Alajuela"] },
+  { name: "Daniel Oduber Quirós International", code: "LIR", aliases: ["Liberia", "Guanacaste"] },
+  { name: "Tobías Bolaños Domestic", code: "SYQ", aliases: ["San José"] },
 ];
 
-// Check if input contains an allowed airport name or code, returns matched code or null
-const getAirportCodeFromInput = (input) => {
+
+
+// Helper: Check if airport is allowed and return airport object or null
+const getAllowedAirportFromInput = (input) => {
   const lowerInput = input.toLowerCase();
-  for (const airport of allowedAirports) {
-    if (
+  return allowedAirports.find(
+    (airport) =>
       lowerInput.includes(airport.name.toLowerCase()) ||
       lowerInput.includes(airport.code.toLowerCase())
-    ) {
-      return airport.code;
-    }
-  }
-  return null;
+  ) || null;
 };
 
-const isAllowedPlace = (description) => {
-  const airportMatch = allowedAirports.some(
-    (airport) =>
-      description.toLowerCase().includes(airport.name.toLowerCase()) ||
-      description.toLowerCase().includes(airport.code.toLowerCase())
+// Helper: Check if description is hotel/resort/lodge type place (simplified)
+const isHotelOrResort = (description) => {
+  const desc = description.toLowerCase();
+  return (
+    desc.includes("hotel") ||
+    desc.includes("resort") ||
+    desc.includes("lodge")
   );
+};
 
-  const hotelMatch =
-    description.toLowerCase().includes("hotel") ||
-    description.toLowerCase().includes("resort") ||
-    description.toLowerCase().includes("lodge");
+// New: Validate if hotel is within Costa Rica's 7 provinces (simplified)
+// In real case, you'd check Google Places API address components
+// Here, just a dummy check for demo (can be extended)
+const isValidCostaRicaProvince = (description) => {
+  // List of provinces in Costa Rica (in lowercase)
+  const provinces = [
+    "san josé",
+    "alajuela",
+    "cartago",
+    "heredia",
+    "guanacaste",
+    "puntarenas",
+    "limón",
+  ];
+  const desc = description.toLowerCase();
+  return provinces.some((prov) => desc.includes(prov));
+};
 
-  return airportMatch || hotelMatch;
+// isAllowedPlace function update
+const isAllowedPlace = (description) => {
+  const descLower = description.toLowerCase();
+
+  return allowedAirports.some((airport) => {
+    const inNameOrCode =
+      descLower.includes(airport.name.toLowerCase()) ||
+      descLower.includes(airport.code.toLowerCase());
+
+    const inAliases = airport.aliases.some((alias) =>
+      descLower.includes(alias.toLowerCase())
+    );
+
+    const hotelMatch =
+      descLower.includes("hotel") ||
+      descLower.includes("resort") ||
+      descLower.includes("lodge");
+
+    return (inNameOrCode || inAliases) || hotelMatch;
+  });
 };
 
 const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
@@ -44,7 +77,6 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [suggestions, setSuggestions] = useState([]);
   const serviceRef = useRef(null);
-
   // Flight related states for second input field
   const [flightSuggestions, setFlightSuggestions] = useState([]);
   const [isFlightField, setIsFlightField] = useState(false);
@@ -75,8 +107,9 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
 
     try {
       const response = await fetch(
-        `https://aviation-edge.com/v2/public/flights?key=YOUR_API_KEY&arrIata=${airportCode}`
+        `https://aviation-edge.com/v2/public/flights?key=123abc456xyz&arrIata=${airportCode}`
       );
+      console.log(response)
       const data = await response.json();
       if (!Array.isArray(data)) {
         if (isDepartureField) setFlightSuggestions([]);
@@ -102,6 +135,7 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
       else setFlightSuggestions(flights);
     } catch (error) {
       console.error("Error fetching flight data:", error);
+      console.log(error)
       if (isDepartureField) setFlightSuggestions([]);
       else setFlightSuggestions([]);
     }
@@ -128,10 +162,21 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
           status === window.google.maps.places.PlacesServiceStatus.OK &&
           predictions.length > 0
         ) {
+          // **Filter suggestions to allow only valid airport or hotel/resort in Costa Rica**
           const filtered = predictions.filter((p) =>
             isAllowedPlace(p.description)
           );
+
           setSuggestions(filtered);
+
+          // **If user input looks like airport, check if allowed, else show toast**
+          const airportCheck = getAllowedAirportFromInput(input);
+          if (!airportCheck && allowedAirports.some(a => input.toLowerCase().includes("airport") || input.toLowerCase().includes("aeropuerto"))) {
+            alert(
+              "Selected airport is not supported. Please select from SJO, LIR, or SYQ airports."
+            );
+            setSuggestions([]); // clear invalid airport suggestions
+          }
         } else {
           setSuggestions([]);
         }
@@ -145,10 +190,11 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
     setSelectedPlace(null);
     onPlaceSelect(val);
 
-    const detectedAirportCode = getAirportCodeFromInput(val);
-    if (detectedAirportCode) {
+    const detectedAirport = getAllowedAirportFromInput(val);
+
+    if (detectedAirport) {
       setIsFlightField(true);
-      fetchFlightData(detectedAirportCode);
+      fetchFlightData(detectedAirport.code);
     } else {
       setIsFlightField(false);
       fetchSuggestions(val);
@@ -156,6 +202,14 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
   };
 
   const handleSelect = (description) => {
+    // **Validate selection again on select**
+    if (!isAllowedPlace(description)) {
+      alert(
+        "Selected place is not allowed. Airports must be SJO, LIR, or SYQ. Hotels must be in Costa Rica provinces."
+      );
+      return;
+    }
+
     setInputValue(description);
     setSuggestions([]);
     setSelectedPlace(description);
@@ -182,9 +236,9 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
 
   const handleDepartureFocus = () => {
     if (!selectedPlace) return;
-    const airportCode = getAirportCodeFromInput(selectedPlace);
-    if (airportCode) {
-      fetchFlightData(airportCode, true);
+    const airport = getAllowedAirportFromInput(selectedPlace);
+    if (airport) {
+      fetchFlightData(airport.code, true);
       setShowDepartureSuggestions(true);
     }
   };

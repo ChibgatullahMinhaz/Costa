@@ -65,7 +65,7 @@ const BookingFlow = ({setStepPhase}) => {
         <div>
          
 
-          <BookingDetails />
+          <BookingDetails  setStepPhase={setStepPhase}/>
         </div>
       )}
       {step === 4 && <div>Step 4 content: Thank you / Done</div>}

@@ -17,10 +17,8 @@ const CustomizeRide = ({ setStepPhase }) => {
   const [selectedType, setSelectedType] = useState("Sedan");
   const { step, setStep } = useStep();
 
-  // Hardcoded locations for now
   const origin = allValues?.from;
   const destination = allValues?.to;
-  console.log(allValues);
   const [directions, setDirections] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
@@ -65,7 +63,7 @@ const CustomizeRide = ({ setStepPhase }) => {
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
-  console.log(vehicles);
+  
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
@@ -243,7 +241,7 @@ const CustomizeRide = ({ setStepPhase }) => {
                     {step < 4 && (
                       <button
                         onClick={() => {
-                          methods.setValue("selectedCarId", car._id);
+                          methods.setValue("selectedCar", car);
                           methods.setValue("vehicleType", selectedType);
                           setStep(step + 1);
                         }}
