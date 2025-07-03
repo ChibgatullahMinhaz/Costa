@@ -4,6 +4,7 @@ const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, upd
 const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
 const { getServer } = require('../controllers/projectController');
+const { processPayment } = require('../controllers/payment/payment');
 const router = express.Router();
 
 
@@ -41,6 +42,7 @@ router.get("/api/notification", getAllNotifications);
 router.get("/api/getAllCarByType", getVehiclesByType);
 router.get("/api/getAllCarTypeWithPrices", getVehicleTypesWithPrices);
 
-
+// payments
+router.post('/api/create-checkout-session', processPayment)
 
 module.exports = router;

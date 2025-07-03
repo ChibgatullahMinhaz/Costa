@@ -7,18 +7,24 @@ import { BookingFormProvider } from "./Service/Context/Provider/BookingFormProvi
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import BookingStepProvider from "./Service/Context/Provider/BookingStepProvider";
 import GoogleMapsLoader from "./Maps/GoogleMapsLoader";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
 const queryClient = new QueryClient();
+const stripePromise = loadStripe(import.meta.env.VITE_STRIP_PUBLISH_KEY || "");
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <GoogleMapsLoader>
-        <BookingStepProvider>
-          <BookingFormProvider>
-            <RouterProvider router={routers} />
-          </BookingFormProvider>
-        </BookingStepProvider>
-      </GoogleMapsLoader>
-    </QueryClientProvider>
+    <Elements stripe={stripePromise}>
+      <QueryClientProvider client={queryClient}>
+        <GoogleMapsLoader>
+          <BookingStepProvider>
+            <BookingFormProvider>
+              <RouterProvider router={routers} />
+            </BookingFormProvider>
+          </BookingStepProvider>
+        </GoogleMapsLoader>
+      </QueryClientProvider>
+    </Elements>
   </StrictMode>
 );

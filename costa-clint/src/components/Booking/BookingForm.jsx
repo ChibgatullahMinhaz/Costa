@@ -85,7 +85,9 @@ const BookingForm = ({ onBooking }) => {
 
   const handleClick = () => {
     onBooking("booking");
+    setValue("totalPrice", subtotal)
     setStep(2);
+
   };
 
   const isDisabled =

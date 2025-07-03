@@ -30,6 +30,7 @@ const CustomizeRide = ({ setStepPhase }) => {
     if (!isLoaded) return;
 
     const directionsService = new window.google.maps.DirectionsService();
+
     directionsService.route(
       {
         origin,
@@ -64,6 +65,8 @@ const CustomizeRide = ({ setStepPhase }) => {
     staleTime: 5 * 60 * 1000,
   });
   
+
+
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
@@ -210,7 +213,7 @@ const CustomizeRide = ({ setStepPhase }) => {
                 >
                   <div className="flex items-center space-x-4 mb-3 sm:mb-0 sm:flex-1">
                     <img
-                      src={car.image}
+                      src={car.imageUrl}
                       alt={car.subtitle}
                       className="w-20 h-auto"
                     />
