@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus } = require('../controllers/UserController/userController');
+const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail } = require('../controllers/UserController/userController');
 const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, updateDriverStatus } = require('../controllers/driverController/driverController');
 const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
@@ -12,6 +12,7 @@ const router = express.Router();
 // user management routes => Admin
 router.get("/", getServer);
 router.get("/api/user", getUsers);
+router.get("/api/userByEmail", getUserByEmail);
 router.get("/api/userById/:id", getUserById);
 router.post("/api/user/create", createUser);
 router.put("/api/user/update/:id", updateUser);

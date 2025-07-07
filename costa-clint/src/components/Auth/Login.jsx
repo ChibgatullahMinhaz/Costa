@@ -1,10 +1,13 @@
-// components/Login.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Lottie from "lottie-react";
 import loginAnimation from "../../assets/login.json";
 import SocialLogin from "../../Shared/socialLogin/SocialLogin";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
+import useAuth from "../../Hooks/useAuth";
+import { Eye, EyeOff } from "lucide-react"; // Add these icons from lucide-react or any icon lib you use
 
 const Login = () => {
   const {
@@ -12,11 +15,48 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = (data) => {
-    console.log("Login Data:", data);
-    // handle login logic here
-    console.log(data);
+  const { userLogin, setUserRole, user } = useAuth();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/"; // fallback to home if undefined
+
+  // Toggle state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      await userLogin(data.email, data.password);
+
+      const res = await axiosSecurePublic.get(
+        `api/userByEmail?email=${user?.email}`
+      );
+
+      if (res.data) {
+        const userData = res.data;
+        setUserRole(userData);
+        navigate(from, { replace: true });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: "User not found in database.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.message || "Invalid email or password.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,15 +88,23 @@ const Login = () => {
             )}
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               {...register("password", { required: "Password is required" })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-10 text-gray-600 hover:text-gray-900"
+              tabIndex={-1} // so that button not tab focusable inside form submit
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.password.message}
@@ -74,7 +122,7 @@ const Login = () => {
             type="submit"
             className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Sign In
+            {loading ? "login......" : " Sign In"}
           </button>
         </form>
 

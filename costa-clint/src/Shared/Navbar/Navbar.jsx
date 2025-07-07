@@ -8,8 +8,7 @@ import useAuth from "../../Hooks/useAuth";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
-
+  const { user, userRole, logout } = useAuth();
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -28,9 +27,21 @@ const Navbar = () => {
       }
     }, 500);
   };
-
+  console.log(userRole);
+  // Dynamic dashboard navigation based on user role
   const goToDashboard = () => {
-    navigate("/admin-dashboard");
+    if (!user) return;
+    if (!userRole) return;
+    
+    if (userRole.role === "admin") {
+      navigate("/admin-dashboard");
+    } else if (user.role === "user") {
+      navigate("/user-dashboard");
+    } else if (user.role === "driver") {
+      navigate("/driver-dashboard");
+    } else {
+      navigate("/dashboard");
+    }
     setIsMenuOpen(false);
   };
 
@@ -43,9 +54,18 @@ const Navbar = () => {
     navigate(path);
     setIsMenuOpen(false);
   };
-const handleAuth = ()=>{
-  navigate('/auth/login')
-}
+  const handleAuth = () => {
+    navigate("/auth/login");
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/"); // redirect to homepage or login
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <nav className="bg-white/95 backdrop-blur-sm shadow-lg fixed w-full z-50 top-0">
       <div className="container mx-auto px-4">
@@ -156,15 +176,23 @@ const handleAuth = ()=>{
                 Book Now
               </button>
               {user && (
-                <button
-                  variant="outline"
-                  size="sm"
-                  onClick={goToDashboard}
-                  className="flex items-center text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-lg  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
-                >
-                  <User className="h-4 w-4 mr-1" />
-                  Dashboard
-                </button>
+                <>
+                  <button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToDashboard}
+                    className="flex items-center text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-lg  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    Logout
+                  </button>
+                </>
               )}
 
               {!user && (

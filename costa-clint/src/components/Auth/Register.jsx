@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Lottie from "lottie-react";
 import registerAnimation from "../../assets/register.json";
@@ -7,17 +7,27 @@ import { Link, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import useAuth from "../../Hooks/useAuth";
+import { uploadImageToImgBB } from "../../utilities/uploadImageToImgBB";
+import { Eye, EyeOff } from "lucide-react"; // or any icon lib
 
 const Register = () => {
-  const { createUser, logout } = useAuth();
+  const { createUser } = useAuth();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
+
+  // Toggle states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword((prev) => !prev);
 
   const onSubmit = async (data) => {
     if (data.password !== data.confirmPassword) {
@@ -30,19 +40,22 @@ const Register = () => {
     }
 
     try {
+      setLoading(true);
+      const imageFile = data.photo?.[0];
+      let imageUrl = "";
+      if (imageFile) {
+        imageUrl = await uploadImageToImgBB(imageFile);
+      }
 
-
-        
       const result = await createUser(data.email, data.password);
       const user = result.user;
 
       const saveUser = {
-        name: data.name ,
+        name: data.name,
         email: data.email,
-        photo: data.photo?.[0]?.name || "",
+        photo: imageUrl,
         role: "user",
       };
-
       const res = await axiosSecurePublic.post("api/user/create", saveUser);
 
       if (res.status === 201 || res.data?.insertedId) {
@@ -64,6 +77,8 @@ const Register = () => {
         title: "Registration Failed",
         text: error.message || "Something went wrong",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,15 +137,23 @@ const Register = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               {...register("password", { required: "Password is required" })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-10 text-gray-600 hover:text-gray-900"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.password.message}
@@ -138,17 +161,25 @@ const Register = () => {
             )}
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Confirm Password
             </label>
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               {...register("confirmPassword", {
                 required: "Please confirm your password",
               })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            <button
+              type="button"
+              onClick={toggleConfirmPasswordVisibility}
+              className="absolute right-3 top-10 text-gray-600 hover:text-gray-900"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
             {errors.confirmPassword && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.confirmPassword.message}
@@ -177,7 +208,7 @@ const Register = () => {
             type="submit"
             className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Register
+            {loading ? "Creating" : "Register"}
           </button>
         </form>
 

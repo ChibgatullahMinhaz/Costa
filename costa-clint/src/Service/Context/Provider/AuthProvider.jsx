@@ -11,6 +11,7 @@ import { AuthContext } from "../CreateContext/Auth/AuthContext";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Create user with email and password
@@ -54,6 +55,8 @@ const AuthProvider = ({ children }) => {
     signInWithProvider,
     logout,
     setLoading,
+    userRole,
+    setUserRole,
   };
 
   return (
