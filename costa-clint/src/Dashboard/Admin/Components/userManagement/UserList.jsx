@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { Search, MoreHorizontal, Eye, Edit, Ban, Trash } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import instance from "../../../../Service/APIs/AxiosSecure";
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 export default function UsersList() {
+  const [openMenuUserId, setOpenMenuUserId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const { data: users = [], refetch } = useQuery({
     queryKey: ["users"],
@@ -16,13 +20,13 @@ export default function UsersList() {
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  console.log(users);
+
   const handleView = (user) => {
-    console.log("Viewing user:", user);
+    navigate(`/admin-dashboard/userManagement/details/${user?._id}`);
   };
 
   const handleEdit = (user) => {
-    console.log("Editing user:", user);
+    navigate(`/admin-dashboard/userManagement/userUpdate/${user?._id}`);
   };
 
   const handleBan = (user) => {
@@ -30,22 +34,39 @@ export default function UsersList() {
     console.log(`Trying to ${action} user:`, user);
   };
 
-  const handleDelete = (user) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this user?"
-    );
-    if (confirmed) {
-      console.log("Deleting user:", user);
+  const handleDelete = async (user) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to delete ${user.name}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await instance.delete(`api/user/delete/${user._id}`);
+        Swal.fire("Deleted!", "User has been deleted.", "success");
+        refetch();
+      } catch (error) {
+        Swal.fire("Error!", "Something went wrong.", "error");
+      }
     }
   };
 
+  const toggleDropdown = (userId) => {
+    setOpenMenuUserId((prevId) => (prevId === userId ? null : userId));
+  };
+  const handleAddNewUSer = () => {
+    navigate(`/admin-dashboard/userManagement/addUser`);
+  };
   return (
     <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
       <div className="flex flex-col space-y-1.5 p-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">
-            User List
-          </h3>
+          <h3 className="text-2xl font-semibold">User List</h3>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -53,113 +74,114 @@ export default function UsersList() {
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
       </div>
 
       <div className="p-6 pt-0">
+        <button
+          onClick={handleAddNewUSer}
+          className="text-shadow-green-400 bg-amber-300 p-3 rounded-full"
+        >
+          add new User
+        </button>
         <div className="relative w-full overflow-auto">
-          <table className="w-full caption-bottom text-sm">
-            <thead className="[&_tr]:border-b">
-              <tr className="border-b transition-colors hover:bg-gray-50/50">
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="h-12 px-4 text-left font-medium text-gray-500">
                   User
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                <th className="h-12 px-4 text-left font-medium text-gray-500">
                   Contact
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                <th className="h-12 px-4 text-left font-medium text-gray-500">
                   Join Date
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                <th className="h-12 px-4 text-left font-medium text-gray-500">
                   Status
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                <th className="h-12 px-4 text-left font-medium text-gray-500">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
+            <tbody>
               {filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b transition-colors hover:bg-gray-50"
-                >
-                  <td className="p-4 align-middle">
+                <tr key={user._id} className="border-b hover:bg-gray-50">
+                  <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full bg-blue-100">
-                        <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-100 text-blue-700">
-                          {typeof user.avatar === "string" ? (
-                            <img
-                              src={user.avatar}
-                              alt={`${user.name} avatar`}
-                              className="h-10 w-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-lg font-semibold">
-                              {user.name.charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
+                      <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden">
+                        {typeof user.avatar === "string" ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="h-10 w-10 object-cover rounded-full"
+                          />
+                        ) : (
+                          <span className="flex items-center justify-center h-full w-full text-blue-700 font-semibold">
+                            {user.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{user.name}</p>
+                        <p className="font-medium">{user.name}</p>
                         <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 align-middle">
-                    <p className="text-gray-900">{user.phone}</p>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <span className="font-medium">{user?.join_date}</span>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <span className="font-medium">{user?.status}</span>
-                  </td>
-                  <td className="p-2 align-middle relative">
-                    <div className="group relative inline-block">
-                      <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 w-9">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                      <div className="absolute right-0 mt-1 hidden w-40 rounded-md border border-gray-200 bg-white shadow-lg group-hover:block z-10">
+                  <td className="p-4">{user.phone}</td>
+                  <td className="p-4">{user.join_date}</td>
+                  <td className="p-4">{user.status}</td>
+                  <td className="p-2 relative">
+                    <button
+                      onClick={() => toggleDropdown(user._id)}
+                      className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
+
+                    {openMenuUserId === user._id && (
+                      <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border border-gray-200 bg-white shadow-lg">
                         <button
                           onClick={() => handleView(user)}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                          className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
                         >
                           <Eye className="h-4 w-4" /> View Details
                         </button>
                         <button
                           onClick={() => handleEdit(user)}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                          className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
                         >
                           <Edit className="h-4 w-4" /> Edit
                         </button>
                         <button
                           onClick={() => handleBan(user)}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left text-sm hover:bg-gray-100 text-red-600"
+                          className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-600 hover:bg-gray-100"
                         >
-                          <Ban className="h-4 w-4" />{" "}
+                          <Ban className="h-4 w-4" />
                           {user.isBanned ? "Unban" : "Ban"}
                         </button>
                         <button
                           onClick={() => handleDelete(user)}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left text-sm hover:bg-red-100 text-red-700"
+                          className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
                         >
                           <Trash className="h-4 w-4" /> Delete
                         </button>
                       </div>
-                    </div>
+                    )}
                   </td>
                 </tr>
               ))}
 
               {filteredUsers.length === 0 && (
-                <>
-                  <p>Not Found</p>
-                </>
+                <tr>
+                  <td colSpan="5" className="text-center p-4 text-gray-500">
+                    No users found.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

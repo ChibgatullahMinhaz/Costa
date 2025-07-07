@@ -9,6 +9,7 @@ import BookingStepProvider from "./Service/Context/Provider/BookingStepProvider"
 import GoogleMapsLoader from "./Maps/GoogleMapsLoader";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import AuthProvider from "./Service/Context/Provider/AuthProvider";
 
 const queryClient = new QueryClient();
 const stripePromise = loadStripe(import.meta.env.VITE_STRIP_PUBLISH_KEY || "");
@@ -18,11 +19,13 @@ createRoot(document.getElementById("root")).render(
     <Elements stripe={stripePromise}>
       <QueryClientProvider client={queryClient}>
         <GoogleMapsLoader>
-          <BookingStepProvider>
-            <BookingFormProvider>
-              <RouterProvider router={routers} />
-            </BookingFormProvider>
-          </BookingStepProvider>
+          <AuthProvider>
+            <BookingStepProvider>
+              <BookingFormProvider>
+                <RouterProvider router={routers} />
+              </BookingFormProvider>
+            </BookingStepProvider>
+          </AuthProvider>
         </GoogleMapsLoader>
       </QueryClientProvider>
     </Elements>

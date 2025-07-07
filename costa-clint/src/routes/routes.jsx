@@ -24,6 +24,12 @@ import Earnings from "../Dashboard/Admin/Pages/Earning";
 import EarningOverview from "../Dashboard/Admin/Components/Earnings/EarningOverview";
 import Reports from "../Dashboard/Admin/Pages/Reports";
 import Settings from "../Dashboard/Admin/Pages/Settings";
+import UserUpdated from "../Dashboard/Admin/Components/userManagement/UserUpdated";
+import UserDetails from "../Dashboard/Admin/Components/userManagement/UserDetails";
+import UserAddForm from "../Dashboard/Admin/Components/userManagement/UserAddForm";
+import AuthLayout from "../Layouts/Auth/AuthLayout";
+import Login from "../components/Auth/Login";
+import Register from "../components/Auth/Register";
 
 
 
@@ -70,6 +76,18 @@ const routers = createBrowserRouter([
           {
             index: true,
             element: <UserList></UserList>,
+          },
+          {
+            path: "userUpdate/:id",
+            element: <UserUpdated></UserUpdated>,
+          },
+          {
+            path: "details/:id",
+            element: <UserDetails></UserDetails>,
+          },
+          {
+            path: "addUser",
+            element: <UserAddForm></UserAddForm>,
           },
           {
             path: "analytics",
@@ -144,6 +162,20 @@ const routers = createBrowserRouter([
   {
     path: "/driver-dashboard",
     element: <DriverLayouts></DriverLayouts>,
+  },
+  {
+    path: "auth",
+    element: <AuthLayout></AuthLayout>,
+    children:[
+      {
+        path:'login',
+        Component: Login
+      },
+      {
+        path:'register',
+        Component: Register
+      }
+    ]
   },
 
   {

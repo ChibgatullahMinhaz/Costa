@@ -5,16 +5,17 @@ const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehi
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
 const { getServer } = require('../controllers/projectController');
 const { processPayment } = require('../controllers/payment/payment');
+const { createBooking } = require('../controllers/Bookings/Bookings');
 const router = express.Router();
 
 
 // user management routes => Admin
 router.get("/", getServer);
 router.get("/api/user", getUsers);
-router.get("/api/userById:id", getUserById);
+router.get("/api/userById/:id", getUserById);
 router.post("/api/user/create", createUser);
-router.put("/api/user/update:id", updateUser);
-router.delete("/api/user/delete:id", deleteUser);
+router.put("/api/user/update/:id", updateUser);
+router.delete("/api/user/delete/:id", deleteUser);
 router.patch("/api/user/update:id/status", updateStatus);
 
 
@@ -44,5 +45,9 @@ router.get("/api/getAllCarTypeWithPrices", getVehicleTypesWithPrices);
 
 // payments
 router.post('/api/create-checkout-session', processPayment)
+
+// make bookings
+router.post('/api/createBooking', createBooking)
+
 
 module.exports = router;

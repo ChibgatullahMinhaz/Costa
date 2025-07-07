@@ -3,10 +3,13 @@ import { useState } from "react";
 import { Menu, X, Plane, Phone, Mail, User } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router";
 import Button from "../../components/UI/Button/Button";
+import useAuth from "../../Hooks/useAuth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -40,7 +43,9 @@ const Navbar = () => {
     navigate(path);
     setIsMenuOpen(false);
   };
-
+const handleAuth = ()=>{
+  navigate('/auth/login')
+}
   return (
     <nav className="bg-white/95 backdrop-blur-sm shadow-lg fixed w-full z-50 top-0">
       <div className="container mx-auto px-4">
@@ -150,16 +155,23 @@ const Navbar = () => {
               >
                 Book Now
               </button>
+              {user && (
+                <button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToDashboard}
+                  className="flex items-center text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-lg  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
+                >
+                  <User className="h-4 w-4 mr-1" />
+                  Dashboard
+                </button>
+              )}
 
-              <button
-                variant="outline"
-                size="sm"
-                onClick={goToDashboard}
-                className="flex items-center text-white bg-gradient-to-r from-[#00b0bb] via-[#00afb8] to-[#00afb9] hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-lg  font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
-              >
-                <User className="h-4 w-4 mr-1" />
-                Dashboard
-              </button>
+              {!user && (
+                <button onClick={handleAuth} className="btn">
+                  <User className="h-4 w-4 mr-1" />
+                </button>
+              )}
             </div>
           </div>
 

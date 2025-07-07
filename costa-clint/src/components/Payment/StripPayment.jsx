@@ -10,55 +10,60 @@ function PaymentForm({ onSuccess }) {
   const allValues = methods.getValues();
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  if (!stripe || !elements) return;
+    if (!stripe || !elements) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  const card = elements.getElement(CardElement);
-  if (!card) return;
+    const card = elements.getElement(CardElement);
+    if (!card) return;
 
-  try {
-    // Get payment intent from backend
-    const amount = parseFloat(allValues.totalPrice) * 100;
+    try {
+      // Get payment intent from backend
+      const amount = parseFloat(allValues.totalPrice) * 100;
+      const res = await instance.post("api/create-checkout-session", {
+        amount,
+        currency: "usd",
+        // bookingData: allValues,
+      });
 
-    const res = await instance.post("api/create-checkout-session", {
-      amount,
-      currency: "usd",
-      // bookingData: allValues,
-    });
-
-    const clientSecret = res.data.clientSecret;
-
-    // Confirm the payment with card
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: card,
-        billing_details: {
-          name: "Guest",
-          email: "unknown@example.com",
+      const clientSecret = res.data.clientSecret;
+      // Confirm the payment with card
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: card,
+          billing_details: {
+            name: "Guest",
+            email: "unknown@example.com",
+          },
         },
-      },
-    });
+      });
 
-    console.log(result)
-    if (result.error) {
-      console.error("[Payment Error]", result.error.message);
-      alert("❌ " + result.error.message);
-    } else if (result.paymentIntent.status === "succeeded") {
-      alert("✅ Payment successful!");
-      onSuccess?.();
+      if (result.error) {
+        console.error("[Payment Error]", result.error.message);
+        alert("❌ " + result.error.message);
+      } else if (result.paymentIntent.status === "succeeded") {
+        alert("✅ Payment successful!");
+        const bookingHistory = {
+          allValues,
+          result,
+        };
+        const response = await instance.post(
+          "api/createBooking",
+          bookingHistory
+        );
+        console.log(response.data);
+        onSuccess?.();
+      }
+    } catch (error) {
+      console.error("Server error:", error.message);
+      alert("❌ Server error: " + error.message);
     }
-  } catch (error) {
-    console.error("Server error:", error.message);
-    alert("❌ Server error: " + error.message);
-  }
 
-  setLoading(false);
-};
-
+    setLoading(false);
+  };
 
   return (
     <form
