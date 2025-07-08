@@ -35,6 +35,9 @@ import PrivateRoute from "./PrivateRoute";
 import DriverRoute from "./DriverRoutes";
 import Unauthorized from "../Pages/Unauthorized/Unauthorized";
 import UserRoutes from "./UserRoutes";
+import About from "../Pages/About/About";
+import Destinations from "../Pages/Destinations/Destinations";
+import Services from "../Pages/Services/Services";
 
 const routers = createBrowserRouter([
   {
@@ -48,6 +51,18 @@ const routers = createBrowserRouter([
       {
         path: "beDriver",
         Component: BeADriver,
+      },
+      {
+        path: "/aboutUs",
+        Component: About,
+      },
+      {
+        path: "/destination",
+        Component: Destinations,
+      },
+      {
+        path: "/ourServices",
+        Component: Services,
       },
     ],
   },
@@ -202,6 +217,7 @@ const routers = createBrowserRouter([
       </PrivateRoute>
     ),
   },
+
   {
     path: "*",
     Component: NotFound,
