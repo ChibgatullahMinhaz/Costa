@@ -30,18 +30,21 @@ const Navbar = () => {
   console.log(userRole);
   // Dynamic dashboard navigation based on user role
   const goToDashboard = () => {
-    if (!user) return;
-    if (!userRole) return;
-    
-    if (userRole.role === "admin") {
-      navigate("/admin-dashboard");
-    } else if (user.role === "user") {
-      navigate("/user-dashboard");
-    } else if (user.role === "driver") {
-      navigate("/driver-dashboard");
-    } else {
-      navigate("/dashboard");
+    if (!user || !userRole?.role) return;
+
+    const role = userRole.role.toLowerCase();
+
+    switch (role) {
+      case "admin":
+        navigate("/admin-dashboard");
+        break;
+      case "driver":
+        navigate("/driver-dashboard");
+        break;
+      default:
+        navigate("/dashboard"); 
     }
+
     setIsMenuOpen(false);
   };
 

@@ -30,9 +30,11 @@ import UserAddForm from "../Dashboard/Admin/Components/userManagement/UserAddFor
 import AuthLayout from "../Layouts/Auth/AuthLayout";
 import Login from "../components/Auth/Login";
 import Register from "../components/Auth/Register";
-
-
-
+import AdminRoutes from "./AdminRoutes";
+import PrivateRoute from "./PrivateRoute";
+import DriverRoute from "./DriverRoutes";
+import Unauthorized from "../Pages/Unauthorized/Unauthorized";
+import UserRoutes from "./UserRoutes";
 
 const routers = createBrowserRouter([
   {
@@ -51,7 +53,12 @@ const routers = createBrowserRouter([
   },
   {
     path: "/admin-dashboard",
-    element: <AdminLayout></AdminLayout>,
+    element: (
+      <AdminRoutes>
+        {" "}
+        <AdminLayout></AdminLayout>
+      </AdminRoutes>
+    ),
     children: [
       {
         index: true,
@@ -157,27 +164,44 @@ const routers = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <CustomerLayouts></CustomerLayouts>,
+    element: (
+      <PrivateRoute>
+        <UserRoutes>
+          <CustomerLayouts></CustomerLayouts>
+        </UserRoutes>
+      </PrivateRoute>
+    ),
   },
   {
     path: "/driver-dashboard",
-    element: <DriverLayouts></DriverLayouts>,
+    element: (
+      <DriverRoute>
+        <DriverLayouts></DriverLayouts>
+      </DriverRoute>
+    ),
   },
   {
     path: "auth",
     element: <AuthLayout></AuthLayout>,
-    children:[
+    children: [
       {
-        path:'login',
-        Component: Login
+        path: "login",
+        Component: Login,
       },
       {
-        path:'register',
-        Component: Register
-      }
-    ]
+        path: "register",
+        Component: Register,
+      },
+    ],
   },
-
+  {
+    path: "/unauthorized",
+    element: (
+      <PrivateRoute>
+        <Unauthorized />,
+      </PrivateRoute>
+    ),
+  },
   {
     path: "*",
     Component: NotFound,

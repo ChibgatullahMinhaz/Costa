@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../Firebase/firebase.init";
 import { AuthContext } from "../CreateContext/Auth/AuthContext";
+import axiosSecurePublic from "../../APIs/AxiosPublic";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -39,14 +40,39 @@ const AuthProvider = ({ children }) => {
   };
 
   // Monitor auth state
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  //     setUser(currentUser);
+  //     setLoading(false);
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser?.email) {
+        try {
+          const res = await axiosSecurePublic.get(
+            `/api/userByEmail?email=${currentUser.email}`
+          );
+          if (res.data) {
+            setUserRole(res.data);
+            localStorage.setItem("userRole", JSON.stringify(res.data)); // Save
+          }
+        } catch (err) {
+          console.error("Error fetching user role:", err);
+        }
+      } else {
+        setUserRole(null);
+        localStorage.removeItem("userRole");
+      }
       setLoading(false);
     });
-    return () => unsubscribe(); 
-  }, []);
 
+    return () => unsubscribe();
+  }, []);
+  console.log(userRole);
   const userInfo = {
     user,
     loading,
@@ -56,13 +82,10 @@ const AuthProvider = ({ children }) => {
     logout,
     setLoading,
     userRole,
-    setUserRole,
   };
 
   return (
-    <AuthContext.Provider value={userInfo}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>
   );
 };
 

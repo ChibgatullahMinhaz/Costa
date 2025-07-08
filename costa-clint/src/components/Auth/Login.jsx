@@ -5,9 +5,8 @@ import loginAnimation from "../../assets/login.json";
 import SocialLogin from "../../Shared/socialLogin/SocialLogin";
 import { Link, useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import useAuth from "../../Hooks/useAuth";
-import { Eye, EyeOff } from "lucide-react"; // Add these icons from lucide-react or any icon lib you use
+import { Eye, EyeOff } from "lucide-react"; 
 
 const Login = () => {
   const {
@@ -17,7 +16,7 @@ const Login = () => {
   } = useForm();
   const [loading, setLoading] = useState(false);
 
-  const { userLogin, setUserRole, user } = useAuth();
+  const { userLogin } = useAuth();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/"; // fallback to home if undefined
 
@@ -32,22 +31,14 @@ const Login = () => {
     try {
       setLoading(true);
       await userLogin(data.email, data.password);
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
-      const res = await axiosSecurePublic.get(
-        `api/userByEmail?email=${user?.email}`
-      );
-
-      if (res.data) {
-        const userData = res.data;
-        setUserRole(userData);
-        navigate(from, { replace: true });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Login Failed",
-          text: "User not found in database.",
-        });
-      }
+      navigate(from, { replace: true });
     } catch (error) {
       Swal.fire({
         icon: "error",
