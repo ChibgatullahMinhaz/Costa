@@ -24,7 +24,7 @@ const AdminLayout = () => {
         >
           <Sidebar />
         </div>
-        <main className="col-span-12 sm:col-span-10">
+        <main className="col-span-12 sm:col-span-10 ">
           <Header setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}></Header>
           <Outlet></Outlet>
         </main>

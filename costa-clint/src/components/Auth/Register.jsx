@@ -8,10 +8,11 @@ import Swal from "sweetalert2";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import useAuth from "../../Hooks/useAuth";
 import { uploadImageToImgBB } from "../../utilities/uploadImageToImgBB";
-import { Eye, EyeOff } from "lucide-react"; // or any icon lib
+import { Eye, EyeOff, Phone } from "lucide-react"; // or any icon lib
+import { updateProfile } from "firebase/auth";
 
 const Register = () => {
-  const { createUser } = useAuth();
+  const { createUser, user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const {
@@ -44,18 +45,30 @@ const Register = () => {
       const imageFile = data.photo?.[0];
       let imageUrl = "";
       if (imageFile) {
-        imageUrl = await uploadImageToImgBB(imageFile);
+        // imageUrl = await uploadImageToImgBB(imageFile);
       }
 
       const result = await createUser(data.email, data.password);
-      const user = result.user;
+      const firebaseUser = result.user;
+
+      // ✅ Step 2: Firebase profile update (name + photoURL)
+      await updateProfile(firebaseUser, {
+        displayName: data.name,
+        photoURL: imageUrl,
+      });
 
       const saveUser = {
+        firebaseUID: firebaseUser.uid,
         name: data.name,
-        email: data.email,
-        photo: imageUrl,
+        email: data.email || "",
+        photoURL: imageUrl || "",
+        isVerified: firebaseUser.emailVerified,
         role: "user",
+        createdAt: new Date(Number(firebaseUser.metadata?.createdAt)),
+        updatedAt: new Date(),
+        lastLoginAt: new Date(Number(firebaseUser.metadata?.lastLoginAt)),
       };
+
       const res = await axiosSecurePublic.post("api/user/create", saveUser);
 
       if (res.status === 201 || res.data?.insertedId) {

@@ -17,7 +17,6 @@ exports.getUsers = async (req, res) => {
 exports.getUserByEmail = async (req, res) => {
   try {
     const email = req.query?.email?.toLowerCase();
-    console.log(email)
     if (!email) {
       return res.status(400).json({ message: "Email query parameter is required" });
     }
@@ -60,7 +59,12 @@ exports.createUser = async (req, res) => {
     const user = req.body;
     const { name, role } = user;
     const email = user?.email?.toLowerCase();
-
+    const userDoc = {
+      ...user,
+      status: "active",
+      deleted: false,
+    }
+    console.log(userDoc)
     if (!name || !email) {
       return res.status(400).json({ message: "Name and email are required" });
     }
@@ -76,7 +80,7 @@ exports.createUser = async (req, res) => {
     }
 
     // If not, save the user
-    const result = await db.collection("users").insertOne(user);
+    const result = await db.collection("users").insertOne(userDoc);
     res.status(201).json(result);
 
   } catch (error) {

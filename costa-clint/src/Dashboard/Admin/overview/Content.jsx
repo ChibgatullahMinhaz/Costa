@@ -10,7 +10,53 @@ import {
   UserCheck,
   MapPin,
 } from "lucide-react";
+import axiosSecurePublic from "../../../Service/APIs/AxiosPublic";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchTotalBookings = async () => {
+  const { data } = await axiosSecurePublic.get("api/totalBookings");
+  return data.totalBookings;
+};
+
+const getTotalCustomers = async () => {
+  const res = await axiosSecurePublic.get("api/booking/total-customers");
+  return res.data.totalCustomers;
+};
+
+const fetchActiveDriversCount = async () => {
+  const res = await axiosSecurePublic.get("api/drivers/total/active");
+  return res.data.activeDriversCount; // assuming backend returns { activeDriversCount: number }
+};
+
 const Content = () => {
+  const {
+    data: totalBookings,
+    isPending,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["total-bookings"],
+    queryFn: fetchTotalBookings,
+  });
+
+  const {
+    data: totalCustomers,
+    isPending: customerLoading,
+    isError: customerError,
+  } = useQuery({
+    queryKey: ["total-customers"],
+    queryFn: getTotalCustomers,
+  });
+  const {
+    data: activeDriversCount,
+    isLoading: activeDriversLoading,
+    isError: activeDriversError,
+    error: activeDriversErrorMsg,
+  } = useQuery({
+    queryKey: ["activeDriversCount"],
+    queryFn: fetchActiveDriversCount,
+  });
+
   return (
     <>
       {/* Content */}
@@ -22,7 +68,17 @@ const Content = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Total Bookings</p>
-                  <p className="text-2xl font-bold">1,247</p>
+                  {isPending ? (
+                    <p className="text-2xl font-semibold text-gray-500">
+                      Loading...
+                    </p>
+                  ) : isError ? (
+                    <p className="text-2xl font-semibold text-red-500">
+                      Failed to load
+                    </p>
+                  ) : (
+                    <p className="text-2xl font-bold">{totalBookings}</p>
+                  )}
                 </div>
                 <BarChart3 className="h-8 w-8 text-blue-600" />
               </div>
@@ -33,7 +89,17 @@ const Content = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Active Drivers</p>
-                  <p className="text-2xl font-bold">8</p>
+                  {activeDriversLoading ? (
+                    <p className="text-2xl font-semibold text-gray-500">
+                      Loading...
+                    </p>
+                  ) : activeDriversError ? (
+                    <p className="text-2xl font-semibold text-red-500">
+                      Failed to load: {activeDriversErrorMsg.message}
+                    </p>
+                  ) : (
+                    <p className="text-2xl font-bold">{activeDriversCount}</p>
+                  )}
                 </div>
                 <Car className="h-8 w-8 text-green-600" />
               </div>
@@ -55,7 +121,15 @@ const Content = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Customers</p>
-                  <p className="text-2xl font-bold">892</p>
+                  {customerLoading ? (
+                    <p className="text-2xl font-semibold text-gray-500">
+                      Loading...
+                    </p>
+                  ) : customerError ? (
+                    <p className="text-2xl font-semibold text-red-500">Error</p>
+                  ) : (
+                    <p className="text-2xl font-bold">{totalCustomers}</p>
+                  )}
                 </div>
                 <Users className="h-8 w-8 text-purple-600" />
               </div>

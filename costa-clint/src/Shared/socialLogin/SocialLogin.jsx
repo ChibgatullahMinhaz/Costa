@@ -18,15 +18,23 @@ const SocialLogin = () => {
       const result = await signInWithProvider(provider);
       const user = result.user;
 
-      const saveUser = {
-        name: user.displayName,
-        email: user.email,
-        photo: user.photoURL,
-        role: "user",
-      };
+      if (user) {
+        const saveUser = {
+          firebaseUID: user.uid,
+          name: user.displayName,
+          email: user.email || "",
+          photoURL: user.photoURL || "",
+          isVerified: user.emailVerified,
+          role: "user",
+          createdAt: new Date(Number(user.metadata?.createdAt)),
+          updatedAt: new Date(),
+          lastLoginAt: new Date(Number(user.metadata?.lastLoginAt)),
+        };
 
-      await axiosSecurePublic.post("/api/user/create", saveUser);
+        await axiosSecurePublic.post("/api/user/create", saveUser);
+      }
 
+      
       Swal.fire({
         icon: "success",
         title: "Login Successful",

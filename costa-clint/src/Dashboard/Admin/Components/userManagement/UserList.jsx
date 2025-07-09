@@ -59,9 +59,7 @@ export default function UsersList() {
   const toggleDropdown = (userId) => {
     setOpenMenuUserId((prevId) => (prevId === userId ? null : userId));
   };
-  const handleAddNewUSer = () => {
-    navigate(`/admin-dashboard/userManagement/addUser`);
-  };
+ 
   return (
     <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
       <div className="flex flex-col space-y-1.5 p-6">
@@ -81,12 +79,7 @@ export default function UsersList() {
       </div>
 
       <div className="p-6 pt-0">
-        <button
-          onClick={handleAddNewUSer}
-          className="text-shadow-green-400 bg-amber-300 p-3 rounded-full"
-        >
-          add new User
-        </button>
+       
         <div className="relative w-full overflow-auto">
           <table className="w-full text-sm">
             <thead>

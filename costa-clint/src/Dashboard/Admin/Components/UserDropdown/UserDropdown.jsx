@@ -1,14 +1,16 @@
 import React from 'react';
 
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Dropdown } from '../Dropdown/Dropdown';
 import { DropdownItem } from '../DropdownItem/DropdownItem';
+import useAuth from '../../../../Hooks/useAuth';
 
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-
+const navigate = useNavigate();
+  const { logout } = useAuth();
   function toggleDropdown() {
     setIsOpen(!isOpen);
   }
@@ -16,6 +18,15 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
+ 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <div className="relative">
       <button
@@ -138,8 +149,8 @@ export default function UserDropdown() {
             </DropdownItem>
           </li>
         </ul>
-        <Link
-          to="/admin-dashboard/signin"
+        <button
+         onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
@@ -158,7 +169,7 @@ export default function UserDropdown() {
             />
           </svg>
           Sign out
-        </Link>
+        </button>
       </Dropdown>
     </div>
   );

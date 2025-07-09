@@ -6,7 +6,7 @@ import useAuth from "../../Hooks/useAuth";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, userRole, logout } = useAuth();
+  const { user, userRole } = useAuth();
 
   const navLinks = [
     { path: "/", label: "Home", type: "route" },
@@ -50,15 +50,6 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   const handleAuth = () => {
     navigate("/auth/login");
   };
@@ -76,7 +67,9 @@ const Navbar = () => {
               <Plane className="h-6 w-6 text-[#00afba]" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Pura Vida Transfers</h1>
+              <h1 className="text-xl font-bold text-gray-800">
+                Pura Vida Transfers
+              </h1>
               <p className="text-xs text-gray-600">Costa Rica</p>
             </div>
           </div>
@@ -90,7 +83,9 @@ const Navbar = () => {
                   to={link.path}
                   className={({ isActive }) =>
                     `text-gray-700 transition-colors hover:text-tropical-600 ${
-                      isActive ? "underline underline-offset-4 text-tropical-600 font-semibold" : ""
+                      isActive
+                        ? "underline underline-offset-4 text-tropical-600 font-semibold"
+                        : ""
                     }`
                   }
                 >
@@ -136,12 +131,6 @@ const Navbar = () => {
                     <User className="h-4 w-4 mr-1" />
                     Dashboard
                   </button>
-                  <button
-                    onClick={handleLogout}
-                    className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Logout
-                  </button>
                 </>
               ) : (
                 <button onClick={handleAuth} className="btn">
@@ -152,8 +141,15 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="lg:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          <button
+            className="lg:hidden p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
 
@@ -206,7 +202,9 @@ const Navbar = () => {
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <Mail className="h-4 w-4 text-tropical-600" />
-                  <span className="text-gray-700">info@puravidatransfers.cr</span>
+                  <span className="text-gray-700">
+                    info@puravidatransfers.cr
+                  </span>
                 </div>
                 <button
                   onClick={handleBookNowClick}

@@ -52,10 +52,10 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      if (currentUser?.email) {
+      if (currentUser.email) {
         try {
-          const res = await axios.get(
-            `http://localhost:5000/api/userByEmail?email=${currentUser.email}`
+          const res = await axiosSecurePublic.get(
+            `api/userByEmail?email=${currentUser.email}`
           );
           if (res.data) {
             setUserRole(res.data);
@@ -72,9 +72,8 @@ const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, [user]);
-  console.log(user);
-  console.log(userRole);
+  }, []);
+
   const userInfo = {
     user,
     loading,

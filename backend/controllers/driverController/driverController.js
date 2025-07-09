@@ -130,3 +130,37 @@ exports.updateDriverStatus = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
+// controllers/driverController.js
+
+exports.getActiveDrivers = async (req, res) => {
+  try {
+    const db = getDB();
+    const driversCollection = db.collection("drivers");
+    const query = { status: { $in: ["active", "Active"] } };    // status = 'active' wala driver gula ber koro
+    const activeDrivers = await driversCollection.find(query).toArray();
+
+    res.status(200).json({ activeDrivers });
+  } catch (error) {
+    console.error("Error fetching active drivers:", error);
+    res.status(500).json({ error: "Failed to fetch active drivers" });
+  }
+};
+
+
+exports.getTotalActiveDrivers = async (req, res) => {
+  try {
+    const db = getDB();
+    const driversCollection = db.collection("drivers");
+    const query = { status: { $in: ["active", "Active"] } };   
+
+    const activeDriversCount = await driversCollection.countDocuments(query);
+
+    res.status(200).json({ activeDriversCount });
+  } catch (error) {
+    console.error("Error fetching active drivers:", error);
+    res.status(500).json({ error: "Failed to fetch active drivers" });
+  }
+};

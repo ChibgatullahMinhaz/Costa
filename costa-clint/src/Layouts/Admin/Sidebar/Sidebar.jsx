@@ -73,7 +73,10 @@ const menuItems = [
 const Sidebar = () => {
   return (
     <div className="sticky top-0 min-h-screen p-4">
-      <h1 className="text-xl font-bold mb-6">Costa Rica Admin</h1>
+      <h1 className="text-xl font-bold mb-6 flex gap-x-1.5">
+        <Car className="h-6 w-6" />
+        Costa Rica
+      </h1>
       <nav className="flex flex-col space-y-4">
         {menuItems.map(({ name, Icon, path, useNavLink }) => {
           const baseClasses =
