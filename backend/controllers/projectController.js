@@ -5,5 +5,5 @@ require("dotenv").config();
 
 // Server test
 exports.getServer = (req, res) => {
-  res.status(200).send("Portfolio API is running");
+  res.status(200).send("costa server is running");
 };

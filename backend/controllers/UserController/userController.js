@@ -14,11 +14,10 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-// GET /user?email=someone@example.com
 exports.getUserByEmail = async (req, res) => {
   try {
-    const { email } = req.query;
-
+    const email = req.query?.email?.toLowerCase();
+    console.log(email)
     if (!email) {
       return res.status(400).json({ message: "Email query parameter is required" });
     }
@@ -59,7 +58,8 @@ exports.createUser = async (req, res) => {
   try {
     const db = getDB();
     const user = req.body;
-    const { name, email, role } = user;
+    const { name, role } = user;
+    const email = user?.email?.toLowerCase();
 
     if (!name || !email) {
       return res.status(400).json({ message: "Name and email are required" });

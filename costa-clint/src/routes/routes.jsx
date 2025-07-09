@@ -38,6 +38,11 @@ import UserRoutes from "./UserRoutes";
 import About from "../Pages/About/About";
 import Destinations from "../Pages/Destinations/Destinations";
 import Services from "../Pages/Services/Services";
+import DashboardHome from "../Layouts/CustomerLayout/components/Home";
+import MyBookings from "../Layouts/CustomerLayout/components/MyBookings";
+import Invoice from "../Layouts/CustomerLayout/components/Invoice";
+import FlightSearch from "../Layouts/CustomerLayout/components/FlightSearch";
+import DriverDashboardHome from "../Dashboard/Driver/Components/DriverDashboardHome";
 
 const routers = createBrowserRouter([
   {
@@ -186,14 +191,32 @@ const routers = createBrowserRouter([
         </UserRoutes>
       </PrivateRoute>
     ),
+    children: [
+      {
+        index: true,
+        Component: DashboardHome,
+      },
+      {
+        path: "myBookings",
+        Component: MyBookings,
+      },
+      {
+        path: "invoice",
+        Component: Invoice,
+      },
+      {
+        path: "flights",
+        Component: FlightSearch,
+      },
+    ],
   },
   {
     path: "/driver-dashboard",
-    element: (
-      <DriverRoute>
-        <DriverLayouts></DriverLayouts>
-      </DriverRoute>
-    ),
+    element: <DriverLayouts></DriverLayouts>,
+    children: [{
+      index:true,
+      Component: DriverDashboardHome
+    }],
   },
   {
     path: "auth",

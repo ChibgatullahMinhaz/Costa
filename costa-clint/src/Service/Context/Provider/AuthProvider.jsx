@@ -9,6 +9,7 @@ import {
 import { auth } from "../../Firebase/firebase.init";
 import { AuthContext } from "../CreateContext/Auth/AuthContext";
 import axiosSecurePublic from "../../APIs/AxiosPublic";
+import axios from "axios";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -53,12 +54,12 @@ const AuthProvider = ({ children }) => {
       setUser(currentUser);
       if (currentUser?.email) {
         try {
-          const res = await axiosSecurePublic.get(
-            `/api/userByEmail?email=${currentUser.email}`
+          const res = await axios.get(
+            `http://localhost:5000/api/userByEmail?email=${currentUser.email}`
           );
           if (res.data) {
             setUserRole(res.data);
-            localStorage.setItem("userRole", JSON.stringify(res.data)); // Save
+            localStorage.setItem("userRole", JSON.stringify(res.data));
           }
         } catch (err) {
           console.error("Error fetching user role:", err);
@@ -71,7 +72,8 @@ const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
+  console.log(user);
   console.log(userRole);
   const userInfo = {
     user,
