@@ -1,73 +1,58 @@
 import React, { useState } from "react";
-import { Search, MoreHorizontal } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Search, MoreHorizontal, Eye, Edit, Ban, Trash } from "lucide-react";
 import instance from "../../../../Service/APIs/AxiosSecure";
+import { format } from "date-fns";
+import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 
 export default function DriversList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [openMenuUserId, setOpenMenuUserId] = useState(null);
 
-  const drivers = [
-    {
-      id: 1,
-      name: "Ahmed Hassan",
-      email: "ahmed@example.com",
-      phone: "+8801711234567",
-      avatar: "AH",
-      vehicle: "Toyota Corolla",
-      licenseNo: "DH-12345",
-      rating: 4.8,
-      totalTrips: 234,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Mahmud Rahman",
-      email: "mahmud@example.com",
-      phone: "+8801811234568",
-      avatar: "MR",
-      vehicle: "Honda Civic",
-      licenseNo: "DH-12346",
-      rating: 4.6,
-      totalTrips: 189,
-      status: "Inactive",
-    },
-    {
-      id: 3,
-      name: "Karim Uddin",
-      email: "karim@example.com",
-      phone: "+8801911234569",
-      avatar: "KU",
-      vehicle: "Nissan Sunny",
-      licenseNo: "DH-12347",
-      rating: 4.9,
-      totalTrips: 298,
-      status: "Active",
-    },
-  ];
-
-  const { data: users = [], refetch } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => instance.get("api/user").then((res) => res.data),
+  const { data: drivers = [], isLoading, isFetching } = useQuery({
+    queryKey: ["drivers"],
+    queryFn: () => axiosSecurePublic.get("api/driver").then((res) => res.data),
   });
 
-  const filteredDrivers = drivers.filter(
-    (driver) =>
-      driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      driver.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = drivers.filter((user) =>
+    [user.name, user.email].some((val) =>
+      val?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
+  const toggleDropdown = (userId) => {
+    setOpenMenuUserId(openMenuUserId === userId ? null : userId);
+  };
+
+  const handleView = (user) => {
+    console.log("View", user);
+  };
+
+  const handleEdit = (user) => {
+    console.log("Edit", user);
+  };
+
+  const handleBan = (user) => {
+    console.log("Ban/Unban", user);
+  };
+
+  const handleDelete = (user) => {
+    console.log("Delete", user);
+  };
+
   const getStatusBadge = (status) => {
-    const baseClasses =
+    const base =
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
-    if (status === "Active") {
-      return (
-        <span className={`${baseClasses} bg-green-100 text-green-800`}>
-          Active
-        </span>
-      );
-    }
     return (
-      <span className={`${baseClasses} bg-red-100 text-red-800`}>Inactive</span>
+      <span
+        className={`${base} ${
+          status === "Active"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {status}
+      </span>
     );
   };
 
@@ -85,14 +70,15 @@ export default function DriversList() {
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             />
           </div>
         </div>
       </div>
+
       <div className="p-6 pt-0">
         <div className="relative w-full overflow-auto">
-          <table className="w-full caption-bottom text-sm">
+          <table className="w-full text-sm">
             <thead className="[&_tr]:border-b">
               <tr className="border-b transition-colors hover:bg-gray-50/50">
                 <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
@@ -118,57 +104,90 @@ export default function DriversList() {
                 </th>
               </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {filteredDrivers.map((driver) => (
-                <tr
-                  key={driver.id}
-                  className="border-b transition-colors hover:bg-gray-50"
-                >
-                  <td className="p-4 align-middle">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <div className="flex h-full w-full items-center justify-center rounded-full bg-green-100 text-green-700">
-                          {driver.avatar}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {driver.name}
-                        </p>
-                        <p className="text-sm text-gray-500">{driver.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <p className="text-gray-900">{driver.phone}</p>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <div>
-                      <p className="font-medium">{driver.vehicle}</p>
-                      <p className="text-sm text-gray-500">
-                        {driver.licenseNo}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="font-medium">{driver.rating}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <span className="font-medium">{driver.totalTrips}</span>
-                  </td>
-                  <td className="p-4 align-middle">
-                    {getStatusBadge(driver.status)}
-                  </td>
-                  <td className="p-4 align-middle">
-                    <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 w-9">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
+            <tbody>
+              {isLoading || isFetching ? (
+                <tr>
+                  <td colSpan="4" className="text-center py-4 text-gray-500">
+                    Loading users...
                   </td>
                 </tr>
-              ))}
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="text-center py-4 text-gray-500">
+                    No users found.
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr key={user._id} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
+                          {user.avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt={user.name}
+                              className="h-10 w-10 object-cover rounded-full"
+                            />
+                          ) : (
+                            <span className="text-blue-700 font-semibold">
+                              {user.name?.charAt(0)?.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {user.createdAt
+                        ? format(new Date(user.createdAt), "dd MMM yyyy")
+                        : "N/A"}
+                    </td>
+                    <td className="px-4 py-3">{getStatusBadge(user.status)}</td>
+                    <td className="px-4 py-3 relative">
+                      <button
+                        onClick={() => toggleDropdown(user._id)}
+                        className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+
+                      {openMenuUserId === user._id && (
+                        <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border border-gray-200 bg-white shadow-lg">
+                          <button
+                            onClick={() => handleView(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                          >
+                            <Eye className="h-4 w-4" /> View Details
+                          </button>
+                          <button
+                            onClick={() => handleEdit(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                          >
+                            <Edit className="h-4 w-4" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleBan(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-600 hover:bg-gray-100"
+                          >
+                            <Ban className="h-4 w-4" />
+                            {user.status === "banned" ? "Unban" : "Ban"}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
+                          >
+                            <Trash className="h-4 w-4" /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

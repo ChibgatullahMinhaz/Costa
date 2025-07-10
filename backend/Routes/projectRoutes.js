@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail } = require('../controllers/UserController/userController');
+const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail, userBanned } = require('../controllers/UserController/userController');
 const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, updateDriverStatus, getActiveDrivers, getTotalActiveDrivers } = require('../controllers/driverController/driverController');
 const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
@@ -37,7 +37,7 @@ router.put("/api/user/update/:id", updateUser);
 router.delete("/api/user/delete/:id", deleteUser);
 router.patch("/api/user/update:id/status", updateStatus);
 router.get("/api/userById/:id", getUserById);
-
+router.put('/api/ban/:id',userBanned )
 
 // Drivers
 router.get("/api/driver", getDrivers);

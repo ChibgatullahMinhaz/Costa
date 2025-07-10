@@ -1,63 +1,88 @@
-import React from 'react';
-import { User, Car, DollarSign, Clock } from 'lucide-react';
+import React from "react";
+import {
+  User,
+  Car,
+  DollarSign,
+  Clock,
+  AlertCircle,
+  ShieldCheck,
+} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import axios from "axios";
+import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 
-export function RecentActivity() {
-  const activities = [
-    {
-      id: 1,
-      type: 'user',
-      description: 'New user John Doe registered',
-      time: '2 minutes ago',
-      icon: User
+const iconMap = {
+  user_Registration: User,
+  trip_completed: Car,
+  payment_received: DollarSign,
+  driver_status: Clock,
+  warning: AlertCircle,
+  verified: ShieldCheck,
+};
+
+const RecentActivity = () => {
+  const {
+    data: logs = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["logs"],
+    queryFn: async () => {
+      const res = await axiosSecurePublic.get("api/activity");
+      return res.data?.logs || [];
     },
-    {
-      id: 2,
-      type: 'trip',
-      description: 'Trip completed by Ahmed Hassan',
-      time: '15 minutes ago',
-      icon: Car
-    },
-    {
-      id: 3,
-      type: 'payment',
-      description: 'Payment of ৳500 received',
-      time: '1 hour ago',
-      icon: DollarSign
-    },
-    {
-      id: 4,
-      type: 'driver',
-      description: 'Driver Mahmud Rahman went offline',
-      time: '2 hours ago',
-      icon: Clock
-    }
-  ];
+  });
 
   return (
-    <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight">Recent Activity</h3>
+    <div className="rounded-2xl border bg-white shadow-sm p-6 w-full">
+      <div className="mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Recent Activity
+        </h2>
+        <p className="text-sm text-gray-500">Latest updates from the system</p>
       </div>
-      <div className="p-6 pt-0">
-        <div className="space-y-4">
-          {activities.map((activity) => {
-            const Icon = activity.icon;
-            return (
-              <div key={activity.id} className="flex items-center space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-blue-600" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">{activity.description}</p>
-                  <p className="text-xs text-gray-500">{activity.time}</p>
+
+      {isLoading && <p className="text-sm text-gray-500">Loading...</p>}
+      {isError && (
+        <p className="text-sm text-red-500">Failed to load activity logs.</p>
+      )}
+
+      <div className="space-y-4">
+        {logs.map((log) => {
+          const Icon = iconMap[log.action] || AlertCircle;
+
+          return (
+            <div
+              key={log._id}
+              className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition"
+            >
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
-            );
-          })}
-        </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800">
+                  {log.description}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {formatDistanceToNow(new Date(log.timestamp), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+        {logs.length === 0 && !isLoading && (
+          <p className="text-sm text-gray-400 text-center">
+            No recent activity
+          </p>
+        )}
       </div>
     </div>
   );
-}
+};
+export default RecentActivity;

@@ -4,13 +4,20 @@ import { useQuery } from "@tanstack/react-query";
 import instance from "../../../../Service/APIs/AxiosSecure";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { format } from "date-fns";
+import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 
 export default function UsersList() {
   const [openMenuUserId, setOpenMenuUserId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const { data: users = [], refetch } = useQuery({
+  const {
+    data: users = [],
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["users"],
     queryFn: () => instance.get("api/user").then((res) => res.data),
   });
@@ -29,9 +36,36 @@ export default function UsersList() {
     navigate(`/admin-dashboard/userManagement/userUpdate/${user?._id}`);
   };
 
-  const handleBan = (user) => {
-    const action = user.isBanned ? "unban" : "ban";
-    console.log(`Trying to ${action} user:`, user);
+  const handleBan = async (user) => {
+    const action = user.status === "banned" ? "Unban" : "Ban";
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action.toLowerCase()} ${user.name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: `Yes, ${action.toLowerCase()}!`,
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axiosSecurePublic.put(`api/ban/${user._id}`, {
+          status: user.status === "banned" ? "active" : "banned",
+        });
+
+        Swal.fire({
+          title: `${action}ned!`,
+          text: `${user.name} has been ${action.toLowerCase()}ned.`,
+          icon: "success",
+          timer: 2000,
+        });
+        setOpenMenuUserId(null);
+        refetch();
+      } catch (error) {
+        console.error("Ban error:", error);
+        Swal.fire("Error!", "Failed to update user status.", "error");
+      }
+    }
   };
 
   const handleDelete = async (user) => {
@@ -49,6 +83,7 @@ export default function UsersList() {
       try {
         await instance.delete(`api/user/delete/${user._id}`);
         Swal.fire("Deleted!", "User has been deleted.", "success");
+        setOpenMenuUserId(null);
         refetch();
       } catch (error) {
         Swal.fire("Error!", "Something went wrong.", "error");
@@ -59,7 +94,7 @@ export default function UsersList() {
   const toggleDropdown = (userId) => {
     setOpenMenuUserId((prevId) => (prevId === userId ? null : userId));
   };
- 
+
   return (
     <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
       <div className="flex flex-col space-y-1.5 p-6">
@@ -79,7 +114,6 @@ export default function UsersList() {
       </div>
 
       <div className="p-6 pt-0">
-       
         <div className="relative w-full overflow-auto">
           <table className="w-full text-sm">
             <thead>
@@ -87,9 +121,7 @@ export default function UsersList() {
                 <th className="h-12 px-4 text-left font-medium text-gray-500">
                   User
                 </th>
-                <th className="h-12 px-4 text-left font-medium text-gray-500">
-                  Contact
-                </th>
+
                 <th className="h-12 px-4 text-left font-medium text-gray-500">
                   Join Date
                 </th>
@@ -102,79 +134,88 @@ export default function UsersList() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user._id} className="border-b hover:bg-gray-50">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden">
-                        {typeof user.avatar === "string" ? (
-                          <img
-                            src={user.avatar}
-                            alt={user.name}
-                            className="h-10 w-10 object-cover rounded-full"
-                          />
-                        ) : (
-                          <span className="flex items-center justify-center h-full w-full text-blue-700 font-semibold">
-                            {user.name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">{user.phone}</td>
-                  <td className="p-4">{user.join_date}</td>
-                  <td className="p-4">{user.status}</td>
-                  <td className="p-2 relative">
-                    <button
-                      onClick={() => toggleDropdown(user._id)}
-                      className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
-
-                    {openMenuUserId === user._id && (
-                      <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border border-gray-200 bg-white shadow-lg">
-                        <button
-                          onClick={() => handleView(user)}
-                          className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
-                        >
-                          <Eye className="h-4 w-4" /> View Details
-                        </button>
-                        <button
-                          onClick={() => handleEdit(user)}
-                          className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
-                        >
-                          <Edit className="h-4 w-4" /> Edit
-                        </button>
-                        <button
-                          onClick={() => handleBan(user)}
-                          className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-600 hover:bg-gray-100"
-                        >
-                          <Ban className="h-4 w-4" />
-                          {user.isBanned ? "Unban" : "Ban"}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(user)}
-                          className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
-                        >
-                          <Trash className="h-4 w-4" /> Delete
-                        </button>
-                      </div>
-                    )}
+              {isLoading || isFetching ? (
+                <tr>
+                  <td colSpan="5" className="text-center p-4 text-gray-500">
+                    Loading users...
                   </td>
                 </tr>
-              ))}
-
-              {filteredUsers.length === 0 && (
+              ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center p-4 text-gray-500">
                     No users found.
                   </td>
                 </tr>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr key={user._id} className="border-b hover:bg-gray-50">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden">
+                          {typeof user.avatar === "string" ? (
+                            <img
+                              src={user.avatar}
+                              alt={user.name}
+                              className="h-10 w-10 object-cover rounded-full"
+                            />
+                          ) : (
+                            <span className="flex items-center justify-center h-full w-full text-blue-700 font-semibold">
+                              {user.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      {user.createdAt
+                        ? format(new Date(user.createdAt), "dd MMM yyyy")
+                        : "N/A"}
+                    </td>
+                    <td className="p-4">{user.status}</td>
+                    <td className="p-2 relative">
+                      <button
+                        onClick={() => toggleDropdown(user._id)}
+                        className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+
+                      {openMenuUserId === user._id && (
+                        <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border border-gray-200 bg-white shadow-lg">
+                          <button
+                            onClick={() => handleView(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                          >
+                            <Eye className="h-4 w-4" /> View Details
+                          </button>
+                          <button
+                            onClick={() => handleEdit(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                          >
+                            <Edit className="h-4 w-4" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleBan(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-600 hover:bg-gray-100"
+                          >
+                            <Ban className="h-4 w-4" />
+                            {user.status === "banned" ? "Unban" : "Ban"}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
+                          >
+                            <Trash className="h-4 w-4" /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

@@ -32,7 +32,7 @@ const DriverManagement = () => {
             }`
           }
         >
-          Performance
+          Pending Driver
         </NavLink>
       </div>
 

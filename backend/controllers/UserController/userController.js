@@ -64,13 +64,12 @@ exports.createUser = async (req, res) => {
       status: "active",
       deleted: false,
     }
-    console.log(userDoc)
     if (!name || !email) {
       return res.status(400).json({ message: "Name and email are required" });
     }
-    if (role !== 'user') {
-      return res.status(403).json({ message: "Access denied" });
-    }
+   if (role !== 'user' && role !== 'admin') {
+  return res.status(403).json({ message: "Access denied" });
+}
 
     // Check if user already exists
     const existingUser = await db.collection("users").findOne({ email });
@@ -78,9 +77,22 @@ exports.createUser = async (req, res) => {
     if (existingUser) {
       return res.status(200).json({ message: "User already exists", user: existingUser });
     }
+    const activityLogs = {
+      ...user,
+      action: "user_Registration",
+      metadata: {
+        email: user.email,
+        login_time: new Date(),
+
+      },
+
+      timestamp: new Date(),
+      description: `User ${user.email} Registered in`
+    }
 
     // If not, save the user
     const result = await db.collection("users").insertOne(userDoc);
+    const logs = await db.collection('activityLogs').insertOne(activityLogs)
     res.status(201).json(result);
 
   } catch (error) {
@@ -142,5 +154,33 @@ exports.updateStatus = async (req, res) => {
   } catch (error) {
     console.error("Error updating status:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.userBanned = async (req, res) => {
+  const db = getDB();
+  const userId = req.params.id;
+  const { status } = req.body;
+
+  try {
+    const result = await db.collection('users').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          status: status,
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'User not found or already banned' });
+    }
+
+    res.status(200).json({ message: 'User has been banned successfully' });
+  } catch (error) {
+    console.error('Ban error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -26,7 +26,6 @@ import Reports from "../Dashboard/Admin/Pages/Reports";
 import Settings from "../Dashboard/Admin/Pages/Settings";
 import UserUpdated from "../Dashboard/Admin/Components/userManagement/UserUpdated";
 import UserDetails from "../Dashboard/Admin/Components/userManagement/UserDetails";
-import UserAddForm from "../Dashboard/Admin/Components/userManagement/UserAddForm";
 import AuthLayout from "../Layouts/Auth/AuthLayout";
 import Login from "../components/Auth/Login";
 import Register from "../components/Auth/Register";
@@ -112,10 +111,7 @@ const routers = createBrowserRouter([
             path: "details/:id",
             element: <UserDetails></UserDetails>,
           },
-          {
-            path: "addUser",
-            element: <UserAddForm></UserAddForm>,
-          },
+          
           {
             path: "analytics",
             element: <UserAnalytics></UserAnalytics>,

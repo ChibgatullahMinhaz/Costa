@@ -13,10 +13,9 @@ exports.getServer = (req, res) => {
 exports.getRecentActivity = async (req, res) => {
   try {
     const db = getDB();
-    const logs = await db.collection("ActivityLogs")
-      .find({ userId: req.userId }) // বা role বা অন্য condition
-      .sort({ timestamp: -1 })
-      .limit(10)
+    const logs = await db.collection("activityLogs")
+      .find().sort({ timestamp: -1 })
+      .limit(6)
       .toArray();
 
     res.status(200).json({ logs });
