@@ -1,6 +1,6 @@
 const express = require('express');
-const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail, userBanned } = require('../controllers/UserController/userController');
-const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, updateDriverStatus, getActiveDrivers, getTotalActiveDrivers } = require('../controllers/driverController/driverController');
+const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail, userBanned, driverBanned } = require('../controllers/UserController/userController');
+const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, getActiveDrivers, getTotalActiveDrivers, getDriversByStatus, updateDriverStatus } = require('../controllers/driverController/driverController');
 const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
 const { getServer, getRecentActivity } = require('../controllers/projectController');
@@ -48,7 +48,8 @@ router.delete("/api/driver/delete/:id", deleteDriver);
 router.patch("/api/driver/update/:id/status", updateDriverStatus);
 router.get("/api/drivers/active", getActiveDrivers);
 router.get("/api/drivers/total/active", getTotalActiveDrivers);
-
+router.get("/api/drivers/total/status", getDriversByStatus);
+router.put('/api/driver/ban/:id',driverBanned )
 
 // Vehicles
 router.get("/api/vehicle", getAllVehicles);

@@ -106,7 +106,6 @@ exports.updateUser = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
-    console.log(id)
     const filter = { _id: new ObjectId(id) }
     const updateData = { ...req.body };
     if (updateData._id) delete updateData._id;
@@ -169,6 +168,32 @@ exports.userBanned = async (req, res) => {
       {
         $set: {
           status: status,
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'User not found or already banned' });
+    }
+
+    res.status(200).json({ message: 'User has been banned successfully' });
+  } catch (error) {
+    console.error('Ban error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+exports.driverBanned = async (req, res) => {
+  const db = getDB();
+  const userId = req.params.id;
+  const { status } = req.body;
+
+  try {
+    const result = await db.collection('drivers').updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          application_status: status,
           updatedAt: new Date(),
         },
       }

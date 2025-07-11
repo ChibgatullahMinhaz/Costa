@@ -85,9 +85,8 @@ const BookingForm = ({ onBooking }) => {
 
   const handleClick = () => {
     onBooking("booking");
-    setValue("totalPrice", subtotal)
+    setValue("totalPrice", subtotal);
     setStep(2);
-
   };
 
   const isDisabled =
@@ -117,7 +116,7 @@ const BookingForm = ({ onBooking }) => {
           type="button"
           onClick={() => {
             setFlowType("oneWay");
-            setValue("transferType", "one way")
+            setValue("transferType", "one way");
           }}
           className={`px-4 py-2 rounded ${
             flowType === "oneWay" ? "bg-blue-600 text-white" : "bg-gray-200"
@@ -128,8 +127,8 @@ const BookingForm = ({ onBooking }) => {
         <button
           type="button"
           onClick={() => {
-            setFlowType("hourly")
-            setValue("transferType", "hourly")
+            setFlowType("hourly");
+            setValue("transferType", "hourly");
           }}
           className={`px-4 py-2 rounded ${
             flowType === "hourly" ? "bg-blue-600 text-white" : "bg-gray-200"
@@ -284,6 +283,27 @@ const BookingForm = ({ onBooking }) => {
                     Please select pet option
                   </p>
                 )}
+              </div>
+              {/* Extras Textbox */}
+              <div className="mt-4">
+                <label className="text-sm font-medium">Extras</label>
+                <input
+                  type="text"
+                  {...register("extras")}
+                  placeholder="Any extras?"
+                  className="w-full border p-2 rounded mt-1"
+                />
+              </div>
+
+              {/* Notes Textbox */}
+              <div className="mt-4">
+                <label className="text-sm font-medium">Notes</label>
+                <textarea
+                  {...register("notes")}
+                  placeholder="Additional notes..."
+                  rows={3}
+                  className="w-full border p-2 rounded mt-1"
+                />
               </div>
 
               <div className="text-right font-semibold mt-2">

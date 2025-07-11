@@ -1,6 +1,15 @@
 // DriverDashboardHome.jsx
 import React, { useEffect, useState } from "react";
-import { MapPin, CheckCircle, Clock, AlertCircle, DollarSign, Navigation, Phone } from "lucide-react";
+import {
+  MapPin,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  DollarSign,
+  Navigation,
+  Phone,
+} from "lucide-react";
+import NavigateButton from "./NavigateButton";
 
 const mockData = {
   driverName: "Carlos",
@@ -40,32 +49,6 @@ const DriverDashboardHome = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
-      {/* Greeting */}
-      <h1 className="text-3xl font-bold">Welcome back, {data.driverName}!</h1>
-      <p className="text-green-600 font-medium">🟢 Status: Available for new rides</p>
-
-      {/* Next Ride */}
-      <section className="bg-base-200 p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Next Assigned Ride</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <p><strong>Pickup:</strong> {data.nextRide.pickup}</p>
-            <p><strong>Dropoff:</strong> {data.nextRide.dropoff}</p>
-            <p><strong>Flight:</strong> {data.nextRide.flight}</p>
-          </div>
-          <div>
-            <p><strong>Time:</strong> {data.nextRide.time}</p>
-            <p><strong>Passenger:</strong> {data.nextRide.passenger}</p>
-            <p><strong>Contact:</strong> {data.nextRide.contact}</p>
-          </div>
-        </div>
-        <div className="mt-4 flex gap-3 flex-wrap">
-          <button className="btn btn-primary"><Navigation size={16} /> Navigate</button>
-          <button className="btn btn-outline"><CheckCircle size={16} /> Mark Completed</button>
-          <button className="btn btn-outline"><Phone size={16} /> Contact</button>
-        </div>
-      </section>
-
       {/* Stats */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="stat bg-base-100 shadow rounded-xl p-4">
@@ -83,23 +66,53 @@ const DriverDashboardHome = () => {
           <div className="stat-title">Earnings</div>
           <div className="stat-value">${data.stats.weeklyEarnings}</div>
         </div>
-        <div className="stat bg-base-100 shadow rounded-xl p-4">
-          <Clock className="text-blue-500 mb-2" />
-          <div className="stat-title">Hours Online</div>
-          <div className="stat-value">{data.stats.hoursOnline}h</div>
-        </div>
       </section>
 
-      {/* Notifications */}
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-        <ul className="menu bg-base-100 rounded-lg shadow p-4 space-y-2">
-          {data.notifications.map((note, idx) => (
-            <li key={idx} className="flex items-center gap-2">
-              <AlertCircle className="text-info" size={16} /> {note}
-            </li>
-          ))}
-        </ul>
+      {/* Greeting */}
+      <h1 className="text-3xl font-bold">Welcome back, {data.driverName}!</h1>
+      <p className="text-green-600 font-medium">
+        🟢 Status: Available for new rides
+      </p>
+
+      {/* Next Ride */}
+      <section className="bg-base-200 p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-4">Next Assigned Ride</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <p>
+              <strong>Pickup:</strong> {data.nextRide.pickup}
+            </p>
+            <p>
+              <strong>Dropoff:</strong> {data.nextRide.dropoff}
+            </p>
+            <p>
+              <strong>Flight:</strong> {data.nextRide.flight}
+            </p>
+          </div>
+          <div>
+            <p>
+              <strong>Time:</strong> {data.nextRide.time}
+            </p>
+            <p>
+              <strong>Passenger:</strong> {data.nextRide.passenger}
+            </p>
+            <p>
+              <strong>Contact:</strong> {data.nextRide.contact}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex gap-3 flex-wrap">
+          <button className="btn btn-primary">
+          
+            <NavigateButton destinationLat={data.nextRide.pickup} destinationLng={data.nextRide.dropoff}/>
+          </button>
+          <button className="btn btn-outline">
+            <CheckCircle size={16} /> Mark Completed
+          </button>
+          <button className="btn btn-outline">
+            <Phone size={16} /> Contact
+          </button>
+        </div>
       </section>
     </div>
   );

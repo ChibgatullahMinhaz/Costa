@@ -42,6 +42,8 @@ import MyBookings from "../Layouts/CustomerLayout/components/MyBookings";
 import Invoice from "../Layouts/CustomerLayout/components/Invoice";
 import FlightSearch from "../Layouts/CustomerLayout/components/FlightSearch";
 import DriverDashboardHome from "../Dashboard/Driver/Components/DriverDashboardHome";
+import DriverDetails from "../Dashboard/Admin/Pages/DriverDetails";
+import UpdateDriver from "../Dashboard/Admin/Components/DriverManagement/UpdateDriver";
 
 const routers = createBrowserRouter([
   {
@@ -147,6 +149,14 @@ const routers = createBrowserRouter([
           {
             path: "driverPerformance",
             element: <DriverPerformance></DriverPerformance>,
+          },
+          {
+            path: "driverDetails/:id",
+            element: <DriverDetails></DriverDetails>,
+          },
+          {
+            path: "updateDriver/:id",
+            element: <UpdateDriver></UpdateDriver>,
           },
         ],
       },

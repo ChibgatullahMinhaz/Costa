@@ -4,12 +4,19 @@ import { Search, MoreHorizontal, Eye, Edit, Ban, Trash } from "lucide-react";
 import instance from "../../../../Service/APIs/AxiosSecure";
 import { format } from "date-fns";
 import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 export default function DriversList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuUserId, setOpenMenuUserId] = useState(null);
-
-  const { data: drivers = [], isLoading, isFetching } = useQuery({
+  const navigate = useNavigate();
+  const {
+    data: drivers = [],
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["drivers"],
     queryFn: () => axiosSecurePublic.get("api/driver").then((res) => res.data),
   });
@@ -19,25 +26,72 @@ export default function DriversList() {
       val?.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-
   const toggleDropdown = (userId) => {
     setOpenMenuUserId(openMenuUserId === userId ? null : userId);
   };
 
   const handleView = (user) => {
-    console.log("View", user);
+    navigate(`/admin-dashboard/driverManagement/driverDetails/${user._id}`);
   };
 
   const handleEdit = (user) => {
-    console.log("Edit", user);
+    navigate(`/admin-dashboard/driverManagement/updateDriver/${user._id}`);
   };
 
-  const handleBan = (user) => {
-    console.log("Ban/Unban", user);
+  const handleBan = async (user) => {
+    console.log(user);
+    const action = user.application_status === "banned" ? "Unban" : "Ban";
+    const result = await Swal.fire({
+      title: `Are you sure you want to ${action.toLowerCase()} ${user.name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: `Yes, ${action.toLowerCase()}!`,
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axiosSecurePublic.put(`api/driver/ban/${user._id}`, {
+          status: user.application_status === "banned" ? "active" : "banned",
+        });
+
+        Swal.fire({
+          title: `${action}ned!`,
+          text: `${user.name} has been ${action.toLowerCase()}ned.`,
+          icon: "success",
+          timer: 2000,
+        });
+        setOpenMenuUserId(null);
+        refetch();
+      } catch (error) {
+        console.error("Ban error:", error);
+        Swal.fire("Error!", "Failed to update user status.", "error");
+      }
+    }
   };
 
-  const handleDelete = (user) => {
-    console.log("Delete", user);
+  const handleDelete = async (user) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to delete ${user.name}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await instance.delete(`api/driver/delete/${user._id}`);
+        Swal.fire("Deleted!", "User has been deleted.", "success");
+        setOpenMenuUserId(null);
+        refetch();
+      } catch (error) {
+        Swal.fire("Error!", "Something went wrong.", "error");
+      }
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -90,12 +144,7 @@ export default function DriversList() {
                 <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
                   Vehicle
                 </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
-                  Rating
-                </th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
-                  Total Trips
-                </th>
+
                 <th className="h-12 px-4 text-left align-middle font-medium text-gray-500">
                   Status
                 </th>
@@ -131,22 +180,22 @@ export default function DriversList() {
                             />
                           ) : (
                             <span className="text-blue-700 font-semibold">
-                              {user.name?.charAt(0)?.toUpperCase()}
+                              {user.fullName?.charAt(0)?.toUpperCase()}
                             </span>
                           )}
                         </div>
                         <div>
-                          <p className="font-medium">{user.name}</p>
+                          <p className="font-medium">{user.fullName}</p>
                           <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                       </div>
                     </td>
+                    <td className="px-4 py-3">{user.phone}</td>
+
+                    <td className="px-4 py-3">{user.vehicleType}</td>
                     <td className="px-4 py-3">
-                      {user.createdAt
-                        ? format(new Date(user.createdAt), "dd MMM yyyy")
-                        : "N/A"}
+                      {getStatusBadge(user.application_status)}
                     </td>
-                    <td className="px-4 py-3">{getStatusBadge(user.status)}</td>
                     <td className="px-4 py-3 relative">
                       <button
                         onClick={() => toggleDropdown(user._id)}

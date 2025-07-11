@@ -35,33 +35,13 @@ exports.getDriverById = async (req, res) => {
 exports.createDriver = async (req, res) => {
   try {
     const db = getDB();
-    const {
-      name,
-      phone,
-      email,
-      licenseNumber,
-      vehicleType,
-      vehicleNumber,
-      location,
-    } = req.body;
-
-    if (!name || !phone || !licenseNumber) {
-      return res.status(400).json({ message: "Name, phone, and license number are required" });
+    const newDriver = req.body;
+    const finalData = {
+      ...newDriver,
+      application_status: "pending"
     }
-
-    const newDriver = {
-      name,
-      phone,
-      email,
-      licenseNumber,
-      vehicleType,
-      vehicleNumber,
-      location,
-      createdAt: new Date(),
-    };
-
-    const result = await db.collection("drivers").insertOne(newDriver);
-    res.status(201).json({ _id: result.insertedId, ...newDriver });
+    const result = await db.collection("drivers").insertOne(finalData);
+    res.status(201).json(result);
   } catch (error) {
     console.error("Error creating driver:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -73,17 +53,19 @@ exports.updateDriver = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
+    console.log(id)
 
-    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+    // Remove _id if it's in the request body
+    const updateData = { ...req.body };
+    delete updateData._id;
+
 
     const result = await db.collection("drivers").findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: req.body },
-      { returnDocument: "after" }
-    );
+      { $set: updateData });
 
-    if (!result.value) return res.status(404).json({ message: "Driver not found" });
-    res.json(result.value);
+    if (!result) return res.status(404).json({ message: "Driver not found" });
+    res.send(result);
   } catch (error) {
     console.error("Error updating driver:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -154,7 +136,7 @@ exports.getTotalActiveDrivers = async (req, res) => {
   try {
     const db = getDB();
     const driversCollection = db.collection("drivers");
-    const query = { status: { $in: ["active", "Active"] } };   
+    const query = { status: { $in: ["active", "Active"] } };
 
     const activeDriversCount = await driversCollection.countDocuments(query);
 
@@ -162,5 +144,81 @@ exports.getTotalActiveDrivers = async (req, res) => {
   } catch (error) {
     console.error("Error fetching active drivers:", error);
     res.status(500).json({ error: "Failed to fetch active drivers" });
+  }
+};
+
+// Get all drivers with a specific status (e.g., "pending")
+exports.getDriversByStatus = async (req, res) => {
+  const status = req.query.status;
+
+  try {
+    const db = getDB();
+    const drivers = await db
+      .collection('drivers')
+      .find({ application_status: status })
+      .toArray();
+
+    res.status(200).json(drivers);
+  } catch (error) {
+    console.error('Error fetching drivers:', error);
+    res.status(500).json({ error: 'Failed to fetch drivers' });
+  }
+};
+
+// Update a driver's application status
+exports.updateDriverStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!['accepted', 'rejected'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
+
+  try {
+    const db = getDB();
+    const result = await db
+      .collection('drivers')
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { application_status: status } }
+      );
+
+    if (result.modifiedCount === 1) {
+      res.status(200).json({ message: `Driver status updated to ${status}` });
+    } else {
+      res.status(404).json({ error: 'Driver not found or already updated' });
+    }
+  } catch (error) {
+    console.error('Error updating driver status:', error);
+    res.status(500).json({ error: 'Failed to update driver status' });
+  }
+};
+
+
+exports.updateApplicationStatus = async (req, res) => {
+  const db = req.app.locals.db;
+  const driverId = req.params.id;
+  const { status } = req.body;
+
+  // Validate status - allow only certain statuses, adjust as needed
+  const allowedStatuses = ['pending', 'accepted', 'rejected', 'banned', 'active'];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value.' });
+  }
+
+  try {
+    const result = await db.collection('drivers').updateOne(
+      { _id: new ObjectId(driverId) },
+      { $set: { application_status: status } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'Driver not found.' });
+    }
+
+    res.json({ message: `Application status updated to "${status}".` });
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 };
