@@ -23,13 +23,19 @@ const VehiclesList = () => {
     queryFn: fetchVehicles,
   });
 
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.driver.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ // Safe filtering with optional chaining & fallback empty strings
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const model = vehicle?.model?.toLowerCase() || "";
+    const license = vehicle?.licensePlate?.toLowerCase() || "";
+    const driver = vehicle?.driver?.toLowerCase() || "";
+    const term = searchTerm.toLowerCase();
 
+    return (
+      model.includes(term) ||
+      license.includes(term) ||
+      driver.includes(term)
+    );
+  });
   const getStatusBadge = (status) => {
     const baseClasses =
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";

@@ -41,6 +41,22 @@ exports.createDriver = async (req, res) => {
       application_status: "pending"
     }
     const result = await db.collection("drivers").insertOne(finalData);
+    const vehicleData = {
+      fullName: newDriver?.fullName,
+      vehicleType: newDriver?.vehicleType,
+      vehicleModel: newDriver?.vehicleModel,
+      vehicleYear: newDriver?.vehicleYear,
+      licensePlate: newDriver?.licenseNumber,
+      vehicleColor: newDriver?.vehicleColor,
+      seatCapacity: newDriver?.seatCapacity,
+      luggageCapacity: newDriver?.luggageCapacity,
+      status: 'active',
+      title: newDriver?.title,
+      subtitle: newDriver?.subtitle,
+      imageUrl: newDriver?.imageUrl,
+      price: newDriver?.price
+    };
+    const vehicleResult = await db.collection("cars").insertOne(vehicleData);
     res.status(201).json(result);
   } catch (error) {
     console.error("Error creating driver:", error);

@@ -5,7 +5,7 @@ const { getDB } = require("../../Config/db");
 exports.getAllVehicles = async (req, res) => {
   try {
     const db = getDB();
-    const vehicles = await db.collection("vehicles").find().toArray();
+    const vehicles = await db.collection("cars").find().toArray();
     res.json(vehicles);
   } catch (error) {
     console.error("Error fetching vehicles:", error);

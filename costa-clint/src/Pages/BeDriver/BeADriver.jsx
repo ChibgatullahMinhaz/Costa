@@ -14,7 +14,10 @@ const BeADriver = () => {
 
   const mutation = useMutation({
     mutationFn: async (formData) => {
-      const response = await axiosSecurePublic.post("api/driver/create", formData);
+      const response = await axiosSecurePublic.post(
+        "api/driver/create",
+        formData
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -94,7 +97,7 @@ const BeADriver = () => {
         </div>
 
         <div>
-          <label>Email</label>
+          <label className="block">Email</label>
           <input
             {...register("email", { required: true })}
             type="email"
@@ -144,6 +147,42 @@ const BeADriver = () => {
           <input
             {...register("vehicleType", { required: true })}
             placeholder="e.g. SUV"
+            className="input"
+          />
+        </div>
+        <div>
+          <label className="block">Title</label>
+          <input
+            {...register("title", { required: true })}
+            placeholder="Title"
+            className="input"
+          />
+        </div>
+
+        <div>
+          <label>Subtitle</label>
+          <input
+            {...register("subtitle", { required: true })}
+            placeholder="Subtitle"
+            className="input"
+          />
+        </div>
+
+        <div>
+          <label>Image URL</label>
+          <input
+            {...register("imageUrl", { required: true })}
+            placeholder="Image URL"
+            className="input"
+          />
+        </div>
+
+        <div>
+          <label>base Price</label>
+          <input
+            {...register("price", { required: true })}
+            type="number"
+            placeholder="Price"
             className="input"
           />
         </div>
