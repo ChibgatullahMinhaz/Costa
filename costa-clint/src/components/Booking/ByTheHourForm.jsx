@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
 
-const ByTheHourForm = ({ onBooking,setStep }) => {
+const ByTheHourForm = ({ onBooking, setStep }) => {
   const {
     register,
     setValue,
@@ -43,6 +43,8 @@ const ByTheHourForm = ({ onBooking,setStep }) => {
     !formData.pet;
   const handleNext = () => {
     onBooking("booking");
+    setValue("totalPrice", subtotal);
+
     setStep(2);
   };
   return (
@@ -171,6 +173,27 @@ const ByTheHourForm = ({ onBooking,setStep }) => {
         )}
       </div>
 
+      {/* Extras Textbox */}
+      <div className="mt-4">
+        <label className="text-sm font-medium">Extras</label>
+        <input
+          type="text"
+          {...register("extras")}
+          placeholder="Any extras?"
+          className="w-full border p-2 rounded mt-1"
+        />
+      </div>
+
+      {/* Notes Textbox */}
+      <div className="mt-4">
+        <label className="text-sm font-medium">Notes</label>
+        <textarea
+          {...register("notes")}
+          placeholder="Additional notes..."
+          rows={3}
+          className="w-full border p-2 rounded mt-1"
+        />
+      </div>
 
       {/* Subtotal */}
       <div className="text-right font-semibold">
@@ -195,7 +218,6 @@ const ByTheHourForm = ({ onBooking,setStep }) => {
       >
         Choose Vehicles
       </button>
-
     </div>
   );
 };

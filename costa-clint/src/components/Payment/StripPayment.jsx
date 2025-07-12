@@ -2,8 +2,11 @@ import React, { useContext, useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import instance from "../../Service/APIs/AxiosSecure";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
+import axiosSecureInstance from "../../Service/APIs/AxiosInstance";
+import useAuth from "../../Hooks/useAuth";
 
 function PaymentForm({ onSuccess }) {
+  const { user } = useAuth();
   const stripe = useStripe();
   const elements = useElements();
   const { methods } = useContext(BookingFormContext);
@@ -23,11 +26,13 @@ function PaymentForm({ onSuccess }) {
     try {
       // Get payment intent from backend
       const amount = parseFloat(allValues.totalPrice) * 100;
-      const res = await instance.post("api/create-checkout-session", {
-        amount,
-        currency: "usd",
-        // bookingData: allValues,
-      });
+      const res = await axiosSecureInstance.post(
+        "api/create-checkout-session",
+        {
+          amount,
+          currency: "usd",
+        }
+      );
 
       const clientSecret = res.data.clientSecret;
       // Confirm the payment with card
@@ -35,8 +40,8 @@ function PaymentForm({ onSuccess }) {
         payment_method: {
           card: card,
           billing_details: {
-            name: "Guest",
-            email: "unknown@example.com",
+            name: user?.displayName,
+            email: user?.email,
           },
         },
       });
@@ -46,11 +51,14 @@ function PaymentForm({ onSuccess }) {
         alert("❌ " + result.error.message);
       } else if (result.paymentIntent.status === "succeeded") {
         alert("✅ Payment successful!");
+        const email = user?.email;
+
         const bookingHistory = {
           allValues,
+          email: email,
           result,
         };
-        const response = await instance.post(
+        const response = await axiosSecureInstance.post(
           "api/createBooking",
           bookingHistory
         );

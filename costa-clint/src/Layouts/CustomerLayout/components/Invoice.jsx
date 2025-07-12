@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import html2pdf from "html2pdf.js/dist/html2pdf.bundle.min.js";
 
 const Invoice = () => {
   // Example static data (replace with real props or API data)
@@ -51,139 +52,246 @@ const Invoice = () => {
   const taxAmount = ((subtotal + nightSurcharge) * taxPercent) / 100;
   const total = subtotal + nightSurcharge + taxAmount;
 
+  const invoiceRef = useRef();
+
+ const handleDownloadPDF = async () => {
+  try {
+    const element = invoiceRef.current;
+
+    const opt = {
+      margin: 0.5,
+      filename: `${invoiceData.invoiceNumber}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        backgroundColor: "#ffffff",
+      },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    await html2pdf().set(opt).from(element).save();
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    alert("Failed to generate PDF. Please try again.");
+  }
+};
+
+
+  const paymentStatus = invoiceData.pricing.paymentStatus;
+
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-base-200 rounded-lg shadow-md">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-primary">RideApp</h1>
-          <p>Airport & Hotel Transfer Services</p>
-        </div>
-        <div className="text-right">
-          <p>
-            <strong>Invoice #:</strong> {invoiceData.invoiceNumber}
+    <>
+      <div
+        ref={invoiceRef}
+        style={{
+          maxWidth: "800px",
+          margin: "auto",
+          padding: "24px",
+          backgroundColor: "#ffffff",
+          color: "#000000",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+          fontSize: "16px",
+          lineHeight: "1.5",
+        }}
+      >
+        {/* Header */}
+        <header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "24px",
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontSize: "2rem",
+                fontWeight: "700",
+                color: "#1d4ed8", // Tailwind blue-700 hex
+                margin: 0,
+              }}
+            >
+              RideApp
+            </h1>
+            <p style={{ margin: "4px 0 0 0" }}>
+              Airport & Hotel Transfer Services
+            </p>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ margin: "4px 0" }}>
+              <strong>Invoice #:</strong> {invoiceData.invoiceNumber}
+            </p>
+            <p style={{ margin: "4px 0" }}>
+              <strong>Date:</strong> {invoiceData.invoiceDate}
+            </p>
+            <p style={{ margin: "4px 0" }}>
+              <strong>Due Date:</strong> {invoiceData.dueDate}
+            </p>
+          </div>
+        </header>
+
+        {/* Customer Info */}
+        <section style={{ marginBottom: "24px", color: "#000000" }}>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+            Bill To:
+          </h2>
+          <p style={{ margin: "2px 0" }}>{invoiceData.customer.name}</p>
+          <p style={{ margin: "2px 0" }}>{invoiceData.customer.email}</p>
+          <p style={{ margin: "2px 0" }}>{invoiceData.customer.phone}</p>
+        </section>
+
+        {/* Booking Info */}
+        <section style={{ marginBottom: "24px", color: "#000000" }}>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+            Booking Details:
+          </h2>
+          <p style={{ margin: "2px 0" }}>
+            <strong>Pickup:</strong> {invoiceData.booking.pickup}
           </p>
-          <p>
-            <strong>Date:</strong> {invoiceData.invoiceDate}
+          <p style={{ margin: "2px 0" }}>
+            <strong>Dropoff:</strong> {invoiceData.booking.dropoff}
           </p>
-          <p>
-            <strong>Due Date:</strong> {invoiceData.dueDate}
+          <p style={{ margin: "2px 0" }}>
+            <strong>Date & Time:</strong> {invoiceData.booking.date} @{" "}
+            {invoiceData.booking.time}
           </p>
-        </div>
-      </header>
+          <p style={{ margin: "2px 0" }}>
+            <strong>Flight Number:</strong> {invoiceData.booking.flight}
+          </p>
+        </section>
 
-      {/* Customer Info */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Bill To:</h2>
-        <p>{invoiceData.customer.name}</p>
-        <p>{invoiceData.customer.email}</p>
-        <p>{invoiceData.customer.phone}</p>
-      </section>
-
-      {/* Booking Info */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Booking Details:</h2>
-        <p>
-          <strong>Pickup:</strong> {invoiceData.booking.pickup}
-        </p>
-        <p>
-          <strong>Dropoff:</strong> {invoiceData.booking.dropoff}
-        </p>
-        <p>
-          <strong>Date & Time:</strong> {invoiceData.booking.date} @{" "}
-          {invoiceData.booking.time}
-        </p>
-        <p>
-          <strong>Flight Number:</strong> {invoiceData.booking.flight}
-        </p>
-      </section>
-
-      {/* Pricing Table */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Pricing Breakdown:</h2>
-        <table className="w-full text-left border-collapse">
-          <tbody>
-            <tr className="border-b border-gray-300">
-              <td>Base Fare</td>
-              <td>${baseFare.toFixed(2)}</td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <td>
-                Distance Charge ({Math.max(0, distanceKm - 10)} km @ $
-                {distanceRate}/km)
-              </td>
-              <td>
-                $
-                {(
-                  Math.max(0, distanceKm - 10) * distanceRate
-                ).toFixed(2)}
-              </td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <td>
-                Extra Passenger Fee (
-                {Math.max(0, extraPassengers - 3)} passengers @ $
-                {extraPassengerFee})
-              </td>
-              <td>
-                $
-                {(
-                  Math.max(0, extraPassengers - 3) * extraPassengerFee
-                ).toFixed(2)}
-              </td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <td>Night Surcharge ({nightSurchargePercent}%)</td>
-              <td>${nightSurcharge.toFixed(2)}</td>
-            </tr>
-            <tr className="border-b border-gray-300">
-              <td>Tax ({taxPercent}%)</td>
-              <td>${taxAmount.toFixed(2)}</td>
-            </tr>
-            <tr className="font-bold text-lg border-t border-gray-500">
-              <td>Total</td>
-              <td>${total.toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      {/* Payment Info */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Payment Information:</h2>
-        <p>
-          <strong>Method:</strong> {invoiceData.pricing.paymentMethod}
-        </p>
-        <p>
-          <strong>Status:</strong>{" "}
-          <span
-            className={`badge ${
-              invoiceData.pricing.paymentStatus === "Paid"
-                ? "badge-success"
-                : "badge-warning"
-            }`}
+        {/* Pricing Table */}
+        <section style={{ marginBottom: "24px", color: "#000000" }}>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+            Pricing Breakdown:
+          </h2>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              textAlign: "left",
+            }}
           >
-            {invoiceData.pricing.paymentStatus}
-          </span>
-        </p>
-      </section>
+            <tbody>
+              <tr style={{ borderBottom: "1px solid #d1d5db" }}>
+                <td style={{ padding: "8px 0" }}>Base Fare</td>
+                <td style={{ padding: "8px 0" }}>${baseFare.toFixed(2)}</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid #d1d5db" }}>
+                <td style={{ padding: "8px 0" }}>
+                  Distance Charge ({Math.max(0, distanceKm - 10)} km @ $
+                  {distanceRate}/km)
+                </td>
+                <td style={{ padding: "8px 0" }}>
+                  ${(Math.max(0, distanceKm - 10) * distanceRate).toFixed(2)}
+                </td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid #d1d5db" }}>
+                <td style={{ padding: "8px 0" }}>
+                  Extra Passenger Fee ({Math.max(0, extraPassengers - 3)} passengers @ $
+                  {extraPassengerFee})
+                </td>
+                <td style={{ padding: "8px 0" }}>
+                  ${(Math.max(0, extraPassengers - 3) * extraPassengerFee).toFixed(2)}
+                </td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid #d1d5db" }}>
+                <td style={{ padding: "8px 0" }}>
+                  Night Surcharge ({nightSurchargePercent}%)
+                </td>
+                <td style={{ padding: "8px 0" }}>${nightSurcharge.toFixed(2)}</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid #d1d5db" }}>
+                <td style={{ padding: "8px 0" }}>Tax ({taxPercent}%)</td>
+                <td style={{ padding: "8px 0" }}>${taxAmount.toFixed(2)}</td>
+              </tr>
+              <tr
+                style={{
+                  fontWeight: "700",
+                  fontSize: "1.125rem",
+                  borderTop: "2px solid #6b7280",
+                }}
+              >
+                <td style={{ padding: "8px 0" }}>Total</td>
+                <td style={{ padding: "8px 0" }}>${total.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
 
-      {/* Footer / Terms */}
-      <footer className="text-sm text-gray-600 mt-10">
-        <p>
-          Thank you for choosing RideApp. Please contact support@example.com for
-          any questions regarding this invoice.
-        </p>
-      </footer>
+        {/* Payment Info */}
+        <section style={{ marginBottom: "24px", color: "#000000" }}>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+            Payment Information:
+          </h2>
+          <p style={{ margin: "4px 0" }}>
+            <strong>Method:</strong> {invoiceData.pricing.paymentMethod}
+          </p>
+          <p style={{ margin: "4px 0" }}>
+            <strong>Status:</strong>{" "}
+            <span
+              style={{
+                padding: "0.25em 0.5em",
+                borderRadius: "0.25rem",
+                color: paymentStatus === "Paid" ? "#15803d" : "#b45309",
+                backgroundColor: paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7",
+                fontWeight: "600",
+              }}
+            >
+              {paymentStatus}
+            </span>
+          </p>
+        </section>
 
-      {/* Download / Print Button */}
-      <div className="mt-6 flex justify-end gap-4">
-        <button className="btn btn-outline btn-primary" onClick={() => window.print()}>
-          Print Invoice
-        </button>
-        {/* You can add a PDF download button here if you integrate a PDF library */}
+        {/* Footer / Terms */}
+        <footer
+          style={{
+            fontSize: "0.875rem",
+            color: "#4b5563",
+            marginTop: "40px",
+            lineHeight: "1.4",
+          }}
+        >
+          <p>
+            Thank you for choosing RideApp. Please contact support@example.com for any
+            questions regarding this invoice.
+          </p>
+        </footer>
       </div>
-    </div>
+
+      {/* Download PDF Button */}
+      <div
+        style={{
+          marginTop: "24px",
+          display: "flex",
+          justifyContent: "flex-end",
+          maxWidth: "800px",
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
+        <button
+          onClick={handleDownloadPDF}
+          style={{
+            backgroundColor: "#2563eb",
+            color: "#ffffff",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.375rem",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "1rem",
+          }}
+          type="button"
+        >
+          Download PDF
+        </button>
+      </div>
+    </>
   );
 };
 

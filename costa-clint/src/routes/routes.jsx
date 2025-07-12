@@ -44,6 +44,7 @@ import FlightSearch from "../Layouts/CustomerLayout/components/FlightSearch";
 import DriverDashboardHome from "../Dashboard/Driver/Components/DriverDashboardHome";
 import DriverDetails from "../Dashboard/Admin/Pages/DriverDetails";
 import UpdateDriver from "../Dashboard/Admin/Components/DriverManagement/UpdateDriver";
+import BookingUpdateForm from "../Layouts/CustomerLayout/components/BookingUpdateForm";
 
 const routers = createBrowserRouter([
   {
@@ -192,9 +193,9 @@ const routers = createBrowserRouter([
     path: "/dashboard",
     element: (
       <PrivateRoute>
-        <UserRoutes>
+        {/* <UserRoutes> */}
           <CustomerLayouts></CustomerLayouts>
-        </UserRoutes>
+        {/* </UserRoutes> */}
       </PrivateRoute>
     ),
     children: [
@@ -213,6 +214,10 @@ const routers = createBrowserRouter([
       {
         path: "flights",
         Component: FlightSearch,
+      },
+      {
+        path: "updateBooking/:id",
+        Component: BookingUpdateForm,
       },
     ],
   },

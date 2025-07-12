@@ -183,6 +183,7 @@ exports.userBanned = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 exports.driverBanned = async (req, res) => {
   const db = getDB();
   const userId = req.params.id;

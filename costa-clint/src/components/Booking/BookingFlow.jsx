@@ -11,7 +11,7 @@ const BookingFlow = ({setStepPhase}) => {
   const allValues = methods.getValues();
   const {step, setStep } = useStep();
 
-  const steps = ["Trip Info", "Choose Vehicle", "Confirm", "Done"];
+  const steps = ["Trip Info", "Choose Vehicle", "Confirm"];
 
   return (
     <div className="max-w-4xl mx-auto py-10 mt-20">

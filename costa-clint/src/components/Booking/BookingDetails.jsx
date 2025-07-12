@@ -8,14 +8,11 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import ContactForm from "./ContactForm";
-import Modal from "../UI/Modal/Modal";
-import PaymentForm from "../Payment/StripPayment";
 
 const BookingDetails = ({ setStepPhase }) => {
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
-
+  console.log(allValues);
   const origin = allValues?.from;
   const destination = allValues?.to;
   const [directions, setDirections] = useState(null);
@@ -45,10 +42,7 @@ const BookingDetails = ({ setStepPhase }) => {
     );
   }, [isLoaded, destination, origin]);
 
-  // Open modal on button click
-  const handleContinueToPayment = () => {
-    setShowPaymentModal(true);
-  };
+
   return (
     <div className="bg-white font-sans text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -150,12 +144,7 @@ const BookingDetails = ({ setStepPhase }) => {
             </div>
 
             {/* Contact Form */}
-
-            <ContactForm />
-          </section>
-
-          {/* Right Side */}
-          <aside className="w-full max-w-sm space-y-6">
+ <aside className="w-full max-w-sm space-y-6">
             <section className="border border-gray-300 rounded p-3">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-semibold text-gray-900 text-xs">
@@ -185,45 +174,12 @@ const BookingDetails = ({ setStepPhase }) => {
                 </div>
               </div>
             </section>
-
+            
+            {/* payments */}
             <section className="border border-gray-300 rounded p-3 space-y-3 text-xs">
-              {/* <div>
-                <p className="text-gray-500">Vehicle service</p>
-                <p className="text-right text-orange-400 font-semibold">
-                  -- USD 216.00
-                </p>
-              </div> */}
               <div className="flex justify-between items-center font-semibold text-orange-500">
                 <span>Total</span>
                 <span>USD {allValues?.totalPrice}</span>
-              </div>
-              <div className="text-gray-500">
-                <p className="mb-1">
-                  Do you have a coupon?
-                  <a className="text-orange-400 underline" href="#">
-                    Enter it here!
-                  </a>
-                </p>
-                <input
-                  className="w-full border border-orange-400 rounded px-2 py-1 text-[10px] text-orange-400 placeholder-orange-400 mb-1"
-                  placeholder="Enter your coupon"
-                  type="text"
-                />
-                <button
-                  className="bg-orange-400 text-white text-[10px] font-semibold rounded px-3 py-1 mb-1"
-                  type="button"
-                >
-                  Apply
-                </button>
-                <p className="text-[8px] text-gray-400 italic">
-                  The coupon code cannot be empty
-                </p>
-              </div>
-              <div className="flex items-center space-x-2 text-[10px] text-gray-500">
-                <input className="w-3 h-3" id="nonrefundable" type="checkbox" />
-                <label htmlFor="nonrefundable">
-                  Make ride non-refundable (save an extra 5% on the whole ride)
-                </label>
               </div>
               <div>
                 <p className="text-gray-500 mb-1">Payment method</p>
@@ -239,31 +195,18 @@ const BookingDetails = ({ setStepPhase }) => {
                   </span>
                 </label>
               </div>
-              <button
-                className="w-full bg-orange-400 text-white text-xs font-semibold rounded py-2 mt-2"
-                type="submit"
-                onClick={handleContinueToPayment}
-              >
-                Continue to payment
-              </button>
-              {/* Payment modal */}
-              <Modal
-                isOpen={showPaymentModal}
-                onClose={() => setShowPaymentModal(false)}
-              >
-                <PaymentForm
-                  onSuccess={() => {
-                    setShowPaymentModal(false);
-                    // Optionally move to next step or show success message
-                  }}
-                />
-              </Modal>
+           
               <p className="text-[8px] text-gray-400 mt-2">
                 By continuing, you indicate that you have read and agreed to
                 Terms and Conditions and Privacy Policy.
               </p>
             </section>
           </aside>
+        
+          </section>
+
+          {/* Right Side */}
+             <ContactForm />
         </main>
       </div>
       <div className="border-t border-orange-400 mt-6"></div>

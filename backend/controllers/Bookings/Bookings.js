@@ -4,36 +4,31 @@ const { getDB } = require("../../Config/db");
 
 exports.createBooking = async (req, res) => {
   try {
-    const {
-      userId,
-      serviceId,
-      date,
-      time,
-      paymentIntentId,
-      amount,
-      status = "paid",
-    } = req.body;
-
-    const db = req.app.locals.db;
-    const bookingsCollection = db.collection("bookings");
+    const { allValues, result, email } = req.body;
+    const db = getDB();
+    const bookingsCollection = db.collection("Bookings");
+    const paymentHistory = db.collection("paymentHistory");
 
     const booking = {
-      userId: new ObjectId(userId),
-      serviceId: new ObjectId(serviceId),
-      date,
-      time,
-      amount,
-      paymentIntentId: paymentIntentId || null,
-      paymentStatus: status,
+      ...allValues,
+      ...result,
+      useEmail: email,
+      paymentStatus: "paid",
       createdAt: new Date(),
+      bookingStatus: 'pending'
     };
 
-    const result = await bookingsCollection.insertOne(booking);
+    const bookingResult = await bookingsCollection.insertOne(booking);
+    const history = {
+      ...result
+    }
+    await paymentHistory.insertOne(history);
 
     res.status(201).json({
       message: "Booking saved successfully.",
-      bookingId: result.insertedId,
+      bookingId: bookingResult.insertedId,
     });
+    console.log(bookingResult)
   } catch (error) {
     console.error("Error saving booking:", error);
     res.status(500).json({ message: "Failed to save booking." });
@@ -67,5 +62,52 @@ exports.getTotalCustomers = async (req, res) => {
   } catch (error) {
     console.error("Error fetching total customers:", error);
     res.status(500).json({ error: "Failed to fetch total customers" });
+  }
+};
+
+exports.getMyBookingsByEmail = async (req, res) => {
+  try {
+    const email = req.query.email;
+    console.log(email)
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+    const db = getDB();
+    const bookingsCollection = db.collection("Bookings");
+
+    const bookings = await bookingsCollection.find({ useEmail: email }).toArray();
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+exports.getAllBookings = async (req, res) => {
+  try {
+    const db = getDB();
+    const bookingsCollection = db.collection("Bookings");
+    const allBookings = await bookingsCollection.find().toArray();
+
+    res.status(200).json(allBookings);
+  } catch (error) {
+    console.error("Error fetching all bookings:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
+exports.deleteBooking = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    const result = await db.collection("Bookings").deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) return res.status(404).json({ message: "booking not found" });
+
+    res.json({ message: "User deleted" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

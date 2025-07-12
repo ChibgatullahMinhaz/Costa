@@ -5,7 +5,7 @@ const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehi
 const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
 const { getServer, getRecentActivity } = require('../controllers/projectController');
 const { processPayment } = require('../controllers/payment/payment');
-const { createBooking, getTotalBookings, getTotalCustomers } = require('../controllers/Bookings/Bookings');
+const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking } = require('../controllers/Bookings/Bookings');
 const router = express.Router();
 
 
@@ -60,6 +60,10 @@ router.delete("/api/vehicle/delete/:id", deleteVehicle);
 
 // Total bookings
 router.get("/api/totalBookings", getTotalBookings);
+router.get("/api/myBookings", getMyBookingsByEmail);
+router.get("/all-bookings", getAllBookings);
+router.delete("/api/booking/delete/:id", deleteBooking);
+
 // get total customer
 router.get("/api/booking/total-customers", getTotalCustomers);
 

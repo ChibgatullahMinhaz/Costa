@@ -1,37 +1,226 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import useStep from "../../Hooks/useStep";
+import Modal from "../UI/Modal/Modal";
+import PaymentForm from "../Payment/StripPayment";
 
-const ContactInformation = () => {
+const ContactInformation = ({ onContinue }) => {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const {
     register,
     control,
     watch,
     formState: { errors },
+    handleSubmit,
   } = useFormContext();
+  const { step, setStep } = useStep();
 
   const isBookingForSomeoneElse = watch("bookingForSomeoneElse");
 
+  // On successful validation, call onContinue
+  const onValid = (data) => {
+    if (onContinue) {
+      onContinue(data);
+    }
+  };
+  // Open modal on button click
+  const handleContinueToPayment = () => {
+    setShowPaymentModal(true);
+    handleSubmit(onValid)
+  };
   return (
-    <div className="space-y-4">
-      {/* ✅ Booking for someone else */}
+    <div className="space-y-6">
+      <h1 className="font-bold">Contact Information</h1>
+      {/* Booking for someone else checkbox */}
       <label className="flex items-center space-x-2 text-sm font-semibold">
         <input type="checkbox" {...register("bookingForSomeoneElse")} />
         <span>I’m booking for someone else</span>
       </label>
 
-      {/* ✅ Agent fields if checked */}
+      {/* Form fields when booking for someone else is checked */}
       {isBookingForSomeoneElse && (
         <>
-          <input
-            {...register("agentName", { required: true })}
-            placeholder="Name of the agent"
-            className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
-          />
+          <h1>Booking Agent Details</h1>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                className="block text-xs font-semibold mb-1"
+                htmlFor="agentName"
+              >
+                Name of the agent *
+              </label>
+              <input
+                id="agentName"
+                {...register("agentName", {
+                  required: "Agent name is required",
+                })}
+                placeholder="Name of the agent"
+                className={`border rounded px-2 py-1 text-xs w-full ${
+                  errors.agentName ? "border-red-600" : "border-gray-300"
+                }`}
+              />
+              {errors.agentName && (
+                <p className="text-xs text-red-600">
+                  {errors.agentName.message}
+                </p>
+              )}
+            </div>
 
+            <div>
+              <label
+                className="block text-xs font-semibold mb-1"
+                htmlFor="salutation"
+              >
+                Salutation
+              </label>
+              <select
+                id="salutation"
+                {...register("salutation")}
+                className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
+              >
+                <option value="">Select</option>
+                <option>Mr.</option>
+                <option>Mrs.</option>
+                <option>Ms.</option>
+                <option>Dr.</option>
+              </select>
+            </div>
+
+            <div className="col-span-2">
+              <label
+                className="block text-xs font-semibold mb-1"
+                htmlFor="agentEmail"
+              >
+                Email *
+              </label>
+              <input
+                id="agentEmail"
+                type="email"
+                {...register("agentEmail", {
+                  required: "Agent email is required",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Invalid email address",
+                  },
+                })}
+                placeholder="Email address to receive ride info"
+                className={`border rounded px-2 py-1 text-xs w-full ${
+                  errors.agentEmail ? "border-red-600" : "border-gray-300"
+                }`}
+              />
+              {errors.agentEmail && (
+                <p className="text-xs text-red-600">
+                  {errors.agentEmail.message}
+                </p>
+              )}
+            </div>
+
+            <div className="col-span-2">
+              <label
+                className="block text-xs font-semibold mb-1"
+                htmlFor="agentPhone"
+              >
+                Phone Number *
+              </label>
+              <Controller
+                name="agentPhone"
+                control={control}
+                rules={{ required: "Agent phone number is required" }}
+                render={({ field }) => (
+                  <PhoneInput
+                    {...field}
+                    country={"bd"}
+                    enableSearch
+                    inputStyle={{
+                      width: "100%",
+                      fontSize: "12px",
+                      padding: "10px",
+                    }}
+                    containerStyle={{ width: "100%" }}
+                    onChange={(value) => field.onChange(value)}
+                    placeholder="Phone Number"
+                  />
+                )}
+              />
+              {errors.agentPhone && (
+                <p className="text-xs text-red-600">
+                  {errors.agentPhone.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Main contact info inputs */}
+      <h1>Passenger Details</h1>
+      <div className="grid grid-cols-2 gap-4">
+        {/* Name */}
+        <div>
+          <label
+            className="block text-xs font-semibold mb-1"
+            htmlFor="contactName"
+          >
+            Name *
+          </label>
+          <input
+            id="contactName"
+            {...register("contactInfo.name", { required: "Name is required" })}
+            placeholder="Name *"
+            className={`border rounded px-2 py-1 text-xs w-full ${
+              errors.contactInfo?.name ? "border-red-600" : "border-gray-300"
+            }`}
+          />
+          {errors.contactInfo?.name && (
+            <p className="text-xs text-red-600">
+              {errors.contactInfo.name.message}
+            </p>
+          )}
+        </div>
+
+        {/* Email */}
+        <div>
+          <label
+            className="block text-xs font-semibold mb-1"
+            htmlFor="contactEmail"
+          >
+            Email *
+          </label>
+          <input
+            id="contactEmail"
+            {...register("contactInfo.email", {
+              required: "Email is required",
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: "Invalid email address",
+              },
+            })}
+            placeholder="Email *"
+            className={`border rounded px-2 py-1 text-xs w-full ${
+              errors.contactInfo?.email ? "border-red-600" : "border-gray-300"
+            }`}
+          />
+          {errors.contactInfo?.email && (
+            <p className="text-xs text-red-600">
+              {errors.contactInfo.email.message}
+            </p>
+          )}
+        </div>
+
+        {/* Salutation */}
+        <div>
+          <label
+            className="block text-xs font-semibold mb-1"
+            htmlFor="contactSalutation"
+          >
+            Salutation
+          </label>
           <select
-            {...register("salutation")}
+            id="contactSalutation"
+            {...register("salutation", { required: "salutation is required" })}
             className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
           >
             <option value="">Select</option>
@@ -40,76 +229,118 @@ const ContactInformation = () => {
             <option>Ms.</option>
             <option>Dr.</option>
           </select>
-        </>
-      )}
+          {errors?.salutation && (
+            <p className="text-xs text-red-600">{errors.salutation.message}</p>
+          )}
+        </div>
 
-      {/* ✅ Name */}
-      <input
-        {...register("contactInfo.name", { required: "Name is required" })}
-        placeholder="Name *"
-        className={`border rounded px-2 py-1 text-xs w-full ${
-          errors.contactInfo?.name ? "border-red-600" : "border-gray-300"
-        }`}
-      />
-      {errors.contactInfo?.name && (
-        <p className="text-xs text-red-600">{errors.contactInfo.name.message}</p>
-      )}
+        {/* Empty div to keep 2 col alignment */}
+        <div></div>
 
-      {/* ✅ Email */}
-      <input
-        {...register("contactInfo.email", {
-          required: "Email is required",
-          pattern: {
-            value: /\S+@\S+\.\S+/,
-            message: "Invalid email address",
-          },
-        })}
-        placeholder="Email *"
-        className={`border rounded px-2 py-1 text-xs w-full ${
-          errors.contactInfo?.email ? "border-red-600" : "border-gray-300"
-        }`}
-      />
-      {errors.contactInfo?.email && (
-        <p className="text-xs text-red-600">{errors.contactInfo.email.message}</p>
-      )}
+        {/* Phone numbers: 3 fields */}
+        {[0, 1, 2].map((idx) => (
+          <div key={idx} className="col-span-2 md:col-span-1">
+            <label
+              className="block text-xs font-semibold mb-1"
+              htmlFor={`phone${idx}`}
+            >
+              {idx === 0 ? "Phone Number *" : `Additional Phone Number ${idx}`}
+            </label>
+            <Controller
+              name={`contactInfo.phoneNumbers.${idx}`}
+              control={control}
+              rules={idx === 0 ? { required: "Phone number is required" } : {}}
+              render={({ field }) => (
+                <PhoneInput
+                  {...field}
+                  country={"bd"}
+                  enableSearch
+                  inputStyle={{
+                    width: "100%",
+                    fontSize: "12px",
+                    padding: "10px",
+                  }}
+                  containerStyle={{ width: "100%" }}
+                  onChange={(value) => field.onChange(value)}
+                  placeholder={
+                    idx === 0
+                      ? "Phone Number"
+                      : `Additional Phone Number ${idx}`
+                  }
+                />
+              )}
+            />
+            {errors.contactInfo?.phoneNumbers?.[idx] && (
+              <p className="text-xs text-red-600">
+                {errors.contactInfo.phoneNumbers[idx]?.message}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* ✅ Phone number (with all countries and code) */}
-      <Controller
-        name="contactInfo.phone"
-        control={control}
-        rules={{ required: "Phone number is required" }}
-        render={({ field }) => (
-          <PhoneInput
-            {...field}
-            country={"bd"}
-            enableSearch
-            inputStyle={{
-              width: "100%",
-              fontSize: "12px",
-              padding: "10px",
-            }}
-            containerStyle={{ width: "100%" }}
-            onChange={(value) => field.onChange(value)}
-            placeholder="Phone Number"
-          />
+      {/* Newsletter subscribe checkbox */}
+      <label className="flex items-start space-x-2 text-sm">
+        <input
+          type="checkbox"
+          {...register("agreeNewsletter", {
+            required: "please check our Subscription",
+          })}
+        />
+        <span>
+          I agree to subscribe to Elife’s newsletter for the latest discounts,
+          promotions, and updates.
+        </span>
+        {errors?.agreeNewsletter && (
+          <p className="text-xs text-red-600">
+            {errors.agreeNewsletter.message}
+          </p>
         )}
-      />
-      {errors.contactInfo?.phone && (
-        <p className="text-xs text-red-600">{errors.contactInfo.phone.message}</p>
-      )}
+      </label>
+      {/* Special Instructions (Optional) */}
+      <div>
+        <label
+          className="block text-xs font-semibold mb-1 mt-2"
+          htmlFor="specialInstructions"
+        >
+          Special Instructions (Optional)
+        </label>
+        <textarea
+          id="specialInstructions"
+          {...register("specialInstructions")}
+          placeholder="Add any notes or special instructions..."
+          className="border border-gray-300 rounded px-2 py-1 text-xs w-full h-24 resize-none"
+        />
+      </div>
 
-      {/* ✅ Social Media dropdown */}
-      <select
-        {...register("socialMedia")}
-        className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
+      {/* Continue Button */}
+
+      {/* <button
+        type="button"
+        onClick={}
+        className="mt-4 w-full bg-orange-400 text-white text-xs font-semibold rounded py-2"
       >
-        <option value="">Select Social Media</option>
-        <option value="facebook">Facebook</option>
-        <option value="whatsapp">WhatsApp</option>
-        <option value="viber">Viber</option>
-        <option value="telegram">Telegram</option>
-        <option value="wechat">WeChat</option>
-      </select>
+        Continue
+      </button> */}
+      <button
+        className="w-full bg-orange-400 text-white text-xs font-semibold rounded py-2 mt-2"
+        type="submit"
+        onClick={handleContinueToPayment}
+      >
+        Continue to payment
+      </button>
+      {/* Payment modal */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+      >
+        <PaymentForm
+          onSuccess={() => {
+            setShowPaymentModal(false);
+            // Optionally move to next step or show success message
+          }}
+        />
+      </Modal>
     </div>
   );
 };

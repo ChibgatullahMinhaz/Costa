@@ -1,48 +1,91 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
+import useAuth from "../../../Hooks/useAuth";
+import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
+import { useNavigate } from "react-router";
+
+const deleteBooking = async (id) => {
+  return await axiosSecureInstance.delete(`api/booking/delete/${id}`);
+};
 
 const MyBookings = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const Navigation = useNavigate();
+  const {
+    data: bookings = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["myBookings", user?.email],
+    queryFn: async () => {
+      const { data } = await axiosSecureInstance.get(
+        `api/myBookings?email=${user?.email}`
+      );
+      return data;
+    },
+    enabled: !!user?.email,
+  });
 
-  // Simulate data fetching (replace this with your API call)
-  useEffect(() => {
-    const fetchBookings = async () => {
-      // Simulated delay
-      await new Promise((r) => setTimeout(r, 1000));
+  const deleteMutation = useMutation({
+    mutationFn: deleteBooking,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["myBookings"]);
+      Swal.fire("Deleted!", "Booking has been deleted.", "success");
+    },
+    onError: () => {
+      Swal.fire("Error!", "Could not delete the booking.", "error");
+    },
+  });
 
-      // Replace with your real API data fetch here
-      const fetchedBookings = [
-        {
-          id: "12345",
-          pickup: "Juan Santamaría International Airport (SJO)",
-          dropoff: "Hotel San Bada, Manuel Antonio",
-          date: "2025-08-15",
-          time: "10:00 AM",
-          flight: "AA1234",
-          status: "Scheduled",
-        },
-        {
-          id: "12346",
-          pickup: "Daniel Oduber Quirós International Airport (LIR)",
-          dropoff: "Hotel Tamarindo",
-          date: "2025-08-20",
-          time: "02:30 PM",
-          flight: "DL5678",
-          status: "Completed",
-        },
-      ];
+  const handleView = (booking) => {
+    Swal.fire({
+      title: `Booking ID: ${booking._id}`,
+      html: `
+        <p><strong>Pickup:</strong> ${booking.from}</p>
+        <p><strong>Dropoff:</strong> ${booking.to}</p>
+        <p><strong>Date & Time:</strong> ${booking.date} @ ${booking.time}</p>
+        <p><strong>Flight:</strong> ${booking?.flight}</p>
+        <p><strong>Status:</strong> ${booking?.bookingStatus}</p>
+      `,
+      icon: "info",
+    });
+  };
 
-      setBookings(fetchedBookings);
-      setLoading(false);
-    };
-
-    fetchBookings();
-  }, []);
-
-  if (loading) {
+  const handleDelete = (booking) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `This will permanently delete booking ID: ${booking._id}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(booking._id);
+        refetch();
+      }
+    });
+  };
+  const handleUpdate = (booking) => {
+    Navigation(`/dashboard/updateBooking/${booking._id}`);
+  };
+  if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto p-6 text-center text-gray-600">
         Loading your bookings...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-5xl mx-auto p-6 text-center text-red-500">
+        Failed to load bookings: {error.message}
       </div>
     );
   }
@@ -69,15 +112,15 @@ const MyBookings = () => {
               <div className="space-y-1 md:space-y-0 md:space-x-6 md:flex md:items-center">
                 <div>
                   <p className="text-sm text-gray-500">Booking ID</p>
-                  <p className="font-semibold text-lg">{booking.id}</p>
+                  <p className="font-semibold text-lg">{booking._id}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Pickup Location</p>
-                  <p>{booking.pickup}</p>
+                  <p>{booking.from}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Dropoff Location</p>
-                  <p>{booking.dropoff}</p>
+                  <p>{booking.to}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Date & Time</p>
@@ -87,16 +130,27 @@ const MyBookings = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Flight Number</p>
-                  <p>{booking.flight}</p>
+                  {booking.flight && <p>{booking.flight}</p>}
                 </div>
               </div>
 
               <div className="mt-4 md:mt-0 flex space-x-3">
-                <button className="btn btn-sm btn-primary">View</button>
-                <button className="btn btn-sm btn-outline btn-secondary">
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={() => handleView(booking)}
+                >
+                  View
+                </button>
+                <button
+                  onClick={() => handleUpdate(booking)}
+                  className="btn btn-sm btn-outline btn-secondary"
+                >
                   Edit
                 </button>
-                <button className="btn btn-sm btn-outline btn-error">
+                <button
+                  className="btn btn-sm btn-outline btn-error"
+                  onClick={() => handleDelete(booking)}
+                >
                   Cancel
                 </button>
               </div>
@@ -105,14 +159,14 @@ const MyBookings = () => {
             <div className="mt-4">
               <span
                 className={`badge ${
-                  booking.status === "Completed"
+                  booking.bookingStatus === "Completed"
                     ? "badge-success"
-                    : booking.status === "Cancelled"
+                    : booking.bookingStatus === "Cancelled"
                     ? "badge-error"
                     : "badge-info"
                 }`}
               >
-                {booking.status}
+                {booking.bookingStatus}
               </span>
             </div>
           </div>

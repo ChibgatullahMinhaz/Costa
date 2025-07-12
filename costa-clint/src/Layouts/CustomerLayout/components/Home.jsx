@@ -2,26 +2,7 @@ import React from "react";
 
 const DashboardHome = () => {
   // Example array of upcoming bookings (replace with real API data)
-  const upcomingBookings = [
-    {
-      id: 1,
-      pickup: "Juan Santamaría International Airport (SJO)",
-      dropoff: "Hotel San Bada, Manuel Antonio",
-      date: "2025-08-15",
-      time: "10:00 AM",
-      flight: "AA1234",
-      status: "Scheduled",
-    },
-    {
-      id: 2,
-      pickup: "Daniel Oduber Quirós International Airport (LIR)",
-      dropoff: "Hotel Tamarindo",
-      date: "2025-08-20",
-      time: "02:30 PM",
-      flight: "DL5678",
-      status: "Scheduled",
-    },
-  ];
+  const upcomingBookings = [];
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-10">
@@ -106,27 +87,6 @@ const DashboardHome = () => {
             Contact Support
           </button>
         </div>
-      </section>
-
-      {/* Recent Activity Section */}
-      <section>
-        <h2 className="text-2xl font-semibold border-b-2 border-primary pb-2 mb-4">
-          Recent Activity
-        </h2>
-        <ul className="menu bg-base-100 rounded-lg p-6 shadow-md space-y-3 text-sm md:text-base">
-          <li className="hover:bg-base-200 rounded px-3 py-2 cursor-pointer transition">
-            Booking #12345 confirmed for 2025-07-20
-          </li>
-          <li className="hover:bg-base-200 rounded px-3 py-2 cursor-pointer transition">
-            Invoice #INV98765 generated
-          </li>
-          <li className="hover:bg-base-200 rounded px-3 py-2 cursor-pointer transition">
-            Flight AA1234 delayed by 30 minutes
-          </li>
-          <li className="hover:bg-base-200 rounded px-3 py-2 cursor-pointer transition">
-            Support chat answered
-          </li>
-        </ul>
       </section>
     </div>
   );
