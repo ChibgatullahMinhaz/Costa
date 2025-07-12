@@ -1,59 +1,104 @@
-// src/components/BookingManagementAdvanced.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
+import Swal from "sweetalert2";
 
-// Dummy bookings data
-const dummyBookings = [
-  { id: 101, customerName: "Maria Gonzalez", flightNumber: "SJO123", pickupLocation: "SJO", dropoffLocation: "Manuel Antonio", date: "2025-07-01", time: "14:30", vehicleType: "Sedan", status: "Confirmed", price: 65.5 },
-  { id: 102, customerName: "John Smith",    flightNumber: "LIR456", pickupLocation: "LIR", dropoffLocation: "Tamarindo",       date: "2025-07-02", time: "09:15", vehicleType: "SUV",   status: "Pending",   price: 120   },
-  { id: 103, customerName: "Ana Rodriguez", flightNumber: "SJO789", pickupLocation: "SJO", dropoffLocation: "La Fortuna",      date: "2025-07-03", time: "18:00", vehicleType: "Minivan",status: "Cancelled", price: 150   },
-  // ...more
-];
+const fetchBookings = async () => {
+  const { data } = await axiosSecureInstance.get("/all-bookings");
+  return data;
+};
+
+const updateBookingStatus = async ({ id, status }) => {
+  const { data } = await axiosSecureInstance.patch(`api/booking/update/status/${id}`, { status });
+  return data;
+};
 
 const statusOptions = ["All", "Confirmed", "Pending", "Completed", "Cancelled"];
 const vehicleOptions = ["All", "Sedan", "SUV", "Minivan"];
 
 export default function BookingManagementAdvanced() {
-  const [bookings, setBookings]         = useState([]);
-  const [search, setSearch]             = useState("");
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [vehicleFilter, setVehicleFilter] = useState("All");
-  const [currentPage, setCurrentPage]   = useState(1);
-  const [perPage, setPerPage]           = useState(10);
-  const [selectedIds, setSelectedIds]   = useState([]);
-  const [showDetails, setShowDetails]   = useState(null);
+  const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [showDetails, setShowDetails] = useState(null);
 
-  useEffect(() => {
-    setBookings(dummyBookings); // replace with API fetch
-  }, []);
+  const {
+    data: bookings = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["bookings"],
+    queryFn: fetchBookings,
+  });
 
-  // Filtering
-  const filtered = bookings.filter(b => {
-    if (search && ! (b.customerName.toLowerCase().includes(search.toLowerCase()) || b.flightNumber.toLowerCase().includes(search.toLowerCase()))) return false;
+  const updateStatusMutation = useMutation({
+    mutationFn: updateBookingStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["bookings"]);
+    },
+  });
+
+  if (!Array.isArray(bookings)) {
+    return <div className="p-6 text-red-500">Invalid bookings data from API</div>;
+  }
+
+  const filtered = bookings.filter((b) => {
+    if (
+      search &&
+      !(
+        b.customerName.toLowerCase().includes(search.toLowerCase()) ||
+        b.flightNumber.toLowerCase().includes(search.toLowerCase())
+      )
+    )
+      return false;
     if (statusFilter !== "All" && b.status !== statusFilter) return false;
     if (vehicleFilter !== "All" && b.vehicleType !== vehicleFilter) return false;
     return true;
   });
 
-  // Metrics
   const total = filtered.length;
-  const revenue = filtered.reduce((sum,b)=>sum + b.price, 0).toFixed(2);
-
-  // Pagination
   const totalPages = Math.ceil(total / perPage);
   const pageStart = (currentPage - 1) * perPage;
-  const pageData  = filtered.slice(pageStart, pageStart + perPage);
+  const pageData = filtered.slice(pageStart, pageStart + perPage);
 
-  // Bulk actions
-  const toggleSelect = id => {
-    setSelectedIds(ids =>
-      ids.includes(id) ? ids.filter(x=>x!==id) : [...ids, id]
+  const revenue = filtered.reduce((sum, b) => sum + (b.price || 0), 0).toFixed(2);
+
+  const toggleSelect = (id) => {
+    setSelectedIds((ids) =>
+      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
     );
   };
+
   const selectAllOnPage = () => {
-    const ids = pageData.map(b=>b.id);
+    const ids = pageData.map((b) => b.id);
     setSelectedIds(ids);
   };
+
   const clearSelection = () => setSelectedIds([]);
+
+  const handleBulkStatusChange = () => {
+    Swal.fire({
+      title: `Cancel ${selectedIds.length} bookings?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel all",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        selectedIds.forEach((id) => {
+          updateStatusMutation.mutate({ id, status: "Cancelled" });
+        });
+        clearSelection();
+        Swal.fire("Cancelled!", "Selected bookings are cancelled.", "success");
+      }
+    });
+  };
+
+  if (isLoading) return <div className="p-6">Loading bookings...</div>;
+  if (isError) return <div className="p-6 text-red-500">Failed to load bookings.</div>;
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow">
@@ -64,42 +109,33 @@ export default function BookingManagementAdvanced() {
         <div className="p-4 bg-gray-100 rounded">Selected: <strong>{selectedIds.length}</strong></div>
       </div>
 
-      {/* Filters & Search */}
+      {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-4 mb-4">
         <input
-          type="text" placeholder="Search customer or flight..."
-          value={search} onChange={e=>setSearch(e.target.value)}
+          type="text"
+          placeholder="Search customer or flight..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="p-2 border rounded w-full lg:w-1/3"
         />
-        <select
-          value={statusFilter}
-          onChange={e=>setStatusFilter(e.target.value)}
-          className="p-2 border rounded"
-        >
-          {statusOptions.map(s => <option key={s}>{s}</option>)}
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="p-2 border rounded">
+          {statusOptions.map((s) => <option key={s}>{s}</option>)}
         </select>
-        <select
-          value={vehicleFilter}
-          onChange={e=>setVehicleFilter(e.target.value)}
-          className="p-2 border rounded"
-        >
-          {vehicleOptions.map(v => <option key={v}>{v}</option>)}
+        <select value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value)} className="p-2 border rounded">
+          {vehicleOptions.map((v) => <option key={v}>{v}</option>)}
         </select>
-        <select
-          value={perPage}
-          onChange={e=>setPerPage(+e.target.value)}
-          className="p-2 border rounded"
-        >
-          {[10,25,50,100].map(n=><option key={n} value={n}>{n}/page</option>)}
+        <select value={perPage} onChange={(e) => setPerPage(+e.target.value)} className="p-2 border rounded">
+          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}/page</option>)}
         </select>
       </div>
 
-      {/* Bulk Toolbar */}
+      {/* Bulk Actions */}
       {selectedIds.length > 0 && (
         <div className="mb-4 p-3 bg-blue-50 rounded flex items-center space-x-3">
-          <button onClick={()=>alert("Status changed")} className="px-3 py-1 bg-blue-500 text-white rounded">Change Status</button>
-          <button onClick={()=>alert("Reminder sent")} className="px-3 py-1 bg-green-500 text-white rounded">Send Reminder</button>
-          <button onClick={()=>clearSelection()} className="px-3 py-1 bg-gray-300 rounded">Clear Selection</button>
+          <button onClick={handleBulkStatusChange} className="px-3 py-1 bg-blue-500 text-white rounded">
+            Cancel Selected
+          </button>
+          <button onClick={clearSelection} className="px-3 py-1 bg-gray-300 rounded">Clear Selection</button>
         </div>
       )}
 
@@ -121,14 +157,10 @@ export default function BookingManagementAdvanced() {
             </tr>
           </thead>
           <tbody>
-            {pageData.map(b => (
+            {pageData.map((b) => (
               <tr key={b.id} className="hover:bg-gray-50">
                 <td className="p-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(b.id)}
-                    onChange={()=>toggleSelect(b.id)}
-                  />
+                  <input type="checkbox" checked={selectedIds.includes(b.id)} onChange={() => toggleSelect(b.id)} />
                 </td>
                 <td className="p-2">{b.customerName}</td>
                 <td className="p-2">{b.flightNumber}</td>
@@ -136,28 +168,46 @@ export default function BookingManagementAdvanced() {
                 <td className="p-2">{b.dropoffLocation}</td>
                 <td className="p-2">{b.date} @ {b.time}</td>
                 <td className="p-2">{b.vehicleType}</td>
-                <td className="p-2">${b.price.toFixed(2)}</td>
-                <td className="p-2">{b.status}</td>
-                <td className="p-2 space-x-2">
-                  <button
-                    onClick={()=>setShowDetails(b)}
-                    className="text-indigo-600 hover:underline text-sm"
+                <td className="p-2">${(b.price || 0).toFixed(2)}</td>
+                <td className="p-2">
+                  <select
+                    value={b.status}
+                    onChange={async (e) => {
+                      const newStatus = e.target.value;
+                      if (newStatus === b.status) return;
+
+                      const res = await Swal.fire({
+                        title: `Change status to ${newStatus}?`,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, change it!",
+                      });
+
+                      if (res.isConfirmed) {
+                        updateStatusMutation.mutate({ id: b.id, status: newStatus });
+                        Swal.fire("Updated!", `Status changed to ${newStatus}.`, "success");
+                      }
+                    }}
+                    className="p-1 border rounded text-sm"
                   >
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </td>
+                <td className="p-2">
+                  <button onClick={() => setShowDetails(b)} className="text-indigo-600 hover:underline text-sm">
                     View
-                  </button>
-                  <button
-                    onClick={()=>setBookings(bs => bs.map(x=>x.id===b.id?{...x,status:"Cancelled"}:x))}
-                    disabled={b.status==="Cancelled"}
-                    className={`text-sm ${b.status==="Cancelled"?"text-gray-400":"text-red-600 hover:underline"}`}
-                  >
-                    Cancel
                   </button>
                 </td>
               </tr>
             ))}
-            {pageData.length===0 && (
+            {pageData.length === 0 && (
               <tr>
-                <td colSpan="10" className="p-6 text-center text-gray-500">No bookings found.</td>
+                <td colSpan="10" className="p-6 text-center text-gray-500">
+                  No bookings found.
+                </td>
               </tr>
             )}
           </tbody>
@@ -166,27 +216,51 @@ export default function BookingManagementAdvanced() {
 
       {/* Pagination */}
       <div className="mt-4 flex justify-center space-x-2">
-        <button onClick={()=>setCurrentPage(p=>Math.max(1,p-1))} disabled={currentPage===1} className="px-3 py-1 bg-gray-200 rounded">Prev</button>
-        {[...Array(totalPages)].map((_,i)=>{
-          const p = i+1;
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-gray-200 rounded"
+        >
+          Prev
+        </button>
+        {[...Array(totalPages)].map((_, i) => {
+          const p = i + 1;
           return (
-            <button key={p} onClick={()=>setCurrentPage(p)}
-             className={`px-3 py-1 rounded ${currentPage===p?"bg-indigo-600 text-white":"bg-gray-200 hover:bg-gray-300"}`}>
+            <button
+              key={p}
+              onClick={() => setCurrentPage(p)}
+              className={`px-3 py-1 rounded ${currentPage === p
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+                }`}
+            >
               {p}
             </button>
-          )
+          );
         })}
-        <button onClick={()=>setCurrentPage(p=>Math.min(totalPages,p+1))} disabled={currentPage===totalPages} className="px-3 py-1 bg-gray-200 rounded">Next</button>
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-gray-200 rounded"
+        >
+          Next
+        </button>
       </div>
 
       {/* Details Modal */}
       {showDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-2xl">
             <h3 className="text-xl font-semibold mb-4">Booking #{showDetails.id}</h3>
-            <pre className="text-sm">{JSON.stringify(showDetails, null, 2)}</pre>
+            <div className="max-h-[60vh] overflow-y-auto text-sm whitespace-pre-wrap">
+              {Object.entries(showDetails).map(([key, val]) => (
+                <div key={key} className="mb-1">
+                  <strong className="capitalize">{key}:</strong> {String(val)}
+                </div>
+              ))}
+            </div>
             <button
-              onClick={()=>setShowDetails(null)}
+              onClick={() => setShowDetails(null)}
               className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded"
             >
               Close

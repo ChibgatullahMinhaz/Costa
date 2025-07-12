@@ -111,3 +111,27 @@ exports.deleteBooking = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.updateBookingByAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+console.log(status)
+  try {
+    const bookingCollection = req.app.locals.db.collection("bookings");
+
+    const result = await bookingCollection.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { status } },
+      { returnDocument: "after" } // returns the updated document
+    );
+
+    if (!result.value) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.json(result.value);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+

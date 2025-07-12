@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Search, MoreHorizontal, Eye, Edit, Ban, Trash } from "lucide-react";
 import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 import Swal from "sweetalert2";
+import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
 
 const fetchVehicles = async () => {
-  const { data } = await axiosSecurePublic.get("api/vehicle"); 
+  const { data } = await axiosSecureInstance.get("api/vehicle"); 
   return data;
 };
 
@@ -22,7 +23,7 @@ const VehiclesList = () => {
     queryKey: ["vehicles"],
     queryFn: fetchVehicles,
   });
-
+console.log(vehicles)
  // Safe filtering with optional chaining & fallback empty strings
   const filteredVehicles = vehicles.filter((vehicle) => {
     const model = vehicle?.model?.toLowerCase() || "";
