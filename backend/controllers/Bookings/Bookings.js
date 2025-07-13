@@ -115,9 +115,8 @@ exports.deleteBooking = async (req, res) => {
 exports.updateBookingByAdmin = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-console.log(status)
   try {
-    const bookingCollection = req.app.locals.db.collection("bookings");
+    const bookingCollection = req.app.locals.db.collection("Bookings");
 
     const result = await bookingCollection.findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -135,3 +134,84 @@ console.log(status)
   }
 };
 
+
+exports.updateBooking = async (req, res) => {
+  const db = getDB();
+  const bookingId = req.params.id;
+
+  const updateData = req.body;
+
+  try {
+    const result = await db.collection('Bookings').findOneAndUpdate(
+      { _id: new ObjectId(bookingId) },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    res.status(200).json(result.value);
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.getBookingById = async (req, res) => {
+  const db = getDB();
+  const bookingId = req.params.id;
+
+  let objectId;
+  try {
+    objectId = new ObjectId(bookingId); // validate ObjectId
+  } catch (err) {
+    return res.status(400).json({ message: 'Invalid booking ID format' });
+  }
+
+  try {
+    const booking = await db.collection('Bookings').findOne({ _id: objectId });
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    res.status(200).json(booking);
+  } catch (error) {
+    console.error('Error fetching booking:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+
+exports.cancelBooking = async (req, res) => {
+  const bookingId = req.params.id;
+
+  if (!ObjectId.isValid(bookingId)) {
+    return res.status(400).json({ message: "Invalid booking ID" });
+  }
+
+  try {
+    const db = getDB()
+    const bookingCollection = db.collection('Bookings')
+    const result = await bookingCollection.updateOne(
+      { _id: new ObjectId(bookingId) },
+      { $set: { bookingStatus: "Cancelled" } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    if (result.modifiedCount === 1) {
+      return res.json({ message: "Booking cancelled successfully" });
+    } else {
+      return res.status(500).json({ message: "Could not cancel booking" });
+    }
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

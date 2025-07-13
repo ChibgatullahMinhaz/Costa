@@ -5,8 +5,10 @@ import useAuth from "../../../Hooks/useAuth";
 import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
 import { useNavigate } from "react-router";
 
-const deleteBooking = async (id) => {
-  return await axiosSecureInstance.delete(`api/booking/delete/${id}`);
+const cancelBooking = async (id) => {
+  return await axiosSecureInstance.put(`api/booking/cancel/${id}`, {
+    bookingStatus: "Cancelled",
+  });
 };
 
 const MyBookings = () => {
@@ -30,14 +32,18 @@ const MyBookings = () => {
     enabled: !!user?.email,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteBooking,
+  const cancelMutation = useMutation({
+    mutationFn: cancelBooking,
     onSuccess: () => {
       queryClient.invalidateQueries(["myBookings"]);
-      Swal.fire("Deleted!", "Booking has been deleted.", "success");
+      Swal.fire(
+        "Cancelled!",
+        "Booking status updated to Cancelled.",
+        "success"
+      );
     },
     onError: () => {
-      Swal.fire("Error!", "Could not delete the booking.", "error");
+      Swal.fire("Error!", "Could not cancel the booking.", "error");
     },
   });
 
@@ -55,22 +61,22 @@ const MyBookings = () => {
     });
   };
 
-  const handleDelete = (booking) => {
+  const handleCancel = (booking) => {
     Swal.fire({
       title: "Are you sure?",
-      text: `This will permanently delete booking ID: ${booking._id}`,
+      text: `This will cancel booking ID: ${booking._id}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, cancel it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteMutation.mutate(booking._id);
-        refetch();
+        cancelMutation.mutate(booking._id);
       }
     });
   };
+
   const handleUpdate = (booking) => {
     Navigation(`/dashboard/updateBooking/${booking._id}`);
   };
@@ -147,12 +153,16 @@ const MyBookings = () => {
                 >
                   Edit
                 </button>
-                <button
-                  className="btn btn-sm btn-outline btn-error"
-                  onClick={() => handleDelete(booking)}
-                >
-                  Cancel
-                </button>
+                {booking.bookingStatus === "Cancelled" ? (
+                  ""
+                ) : (
+                  <button
+                    className="btn btn-sm btn-outline btn-error"
+                    onClick={() => handleCancel(booking)}
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
 

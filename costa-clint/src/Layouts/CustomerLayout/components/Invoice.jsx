@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import html2pdf from "html2pdf.js/dist/html2pdf.bundle.min.js";
 
 const Invoice = () => {
   // Example static data (replace with real props or API data)
