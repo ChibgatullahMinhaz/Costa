@@ -18,8 +18,10 @@ const BeADriver = () => {
         "api/driver/create",
         formData
       );
+      console.log(response)
       return response.data;
     },
+
     onSuccess: () => {
       Swal.fire({
         icon: "success",

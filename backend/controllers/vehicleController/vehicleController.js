@@ -21,7 +21,7 @@ exports.getVehicleById = async (req, res) => {
 
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
 
-    const vehicle = await db.collection("vehicles").findOne({ _id: new ObjectId(id) });
+    const vehicle = await db.collection("cars").findOne({ _id: new ObjectId(id) });
     if (!vehicle) return res.status(404).json({ message: "Vehicle not found" });
 
     res.json(vehicle);
@@ -50,7 +50,7 @@ exports.createVehicle = async (req, res) => {
       createdAt: new Date()
     };
 
-    const result = await db.collection("vehicles").insertOne(newVehicle);
+    const result = await db.collection("cars").insertOne(newVehicle);
     res.status(201).json({ _id: result.insertedId, ...newVehicle });
   } catch (error) {
     console.error("Error creating vehicle:", error);
@@ -64,34 +64,43 @@ exports.updateVehicle = async (req, res) => {
     const db = getDB();
     const { id } = req.params;
 
-    if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
 
-    const result = await db.collection("vehicles").findOneAndUpdate(
+    // Remove _id from update data to avoid immutable field error
+    const updateData = { ...req.body };
+    delete updateData._id;
+    const result = await db.collection("cars").findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: req.body },
+      { $set: updateData },
       { returnDocument: "after" }
     );
+    console.log(result)
+    if (!result) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
 
-    if (!result.value) return res.status(404).json({ message: "Vehicle not found" });
-    res.json(result.value);
+    res.json({ message: "Vehicle updated", result });
   } catch (error) {
     console.error("Error updating vehicle:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
 // DELETE /vehicles/:id
 exports.deleteVehicle = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
-
+    console.log(id)
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
 
-    const result = await db.collection("vehicles").deleteOne({ _id: new ObjectId(id) });
+    const result = await db.collection("cars").deleteOne({ _id: new ObjectId(id) });
     if (result.deletedCount === 0) return res.status(404).json({ message: "Vehicle not found" });
 
-    res.json({ message: "Vehicle deleted" });
+    res.send(result)
   } catch (error) {
     console.error("Error deleting vehicle:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -123,7 +132,7 @@ exports.getVehicleTypesWithPrices = async (req, res) => {
     const db = getDB();
     const result = await db.collection("carType").find().toArray();
 
-    res.json(result); 
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: "Failed to get vehicle types with prices", error });
   }

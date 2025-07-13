@@ -56,7 +56,9 @@ exports.createDriver = async (req, res) => {
       imageUrl: newDriver?.imageUrl,
       price: newDriver?.price
     };
+    console.log(vehicleData)
     const vehicleResult = await db.collection("cars").insertOne(vehicleData);
+    console.log(vehicleResult)
     res.status(201).json(result);
   } catch (error) {
     console.error("Error creating driver:", error);
