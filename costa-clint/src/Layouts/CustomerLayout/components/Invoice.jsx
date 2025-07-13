@@ -1,14 +1,17 @@
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import React, { useRef } from "react";
+import useAuth from "../../../Hooks/useAuth";
 
 const Invoice = () => {
-  // Example static data (replace with real props or API data)
+  const {user } = useAuth()
   const invoiceData = {
     invoiceNumber: "INV-20250709-001",
     invoiceDate: "2025-07-09",
     dueDate: "2025-07-16",
     customer: {
-      name: "John Doe",
-      email: "john.doe@example.com",
+      name:user.displayName ,
+      email: user.email,
       phone: "+1 234 567 890",
     },
     booking: {
@@ -52,29 +55,53 @@ const Invoice = () => {
   const total = subtotal + nightSurcharge + taxAmount;
 
   const invoiceRef = useRef();
+  const handleDownloadPDF = async () => {
+    try {
+      const element = invoiceRef.current;
+      if (!element) return;
 
- const handleDownloadPDF = async () => {
-  try {
-    const element = invoiceRef.current;
+      const styleEls = document.querySelectorAll("style");
+      const tailwindEls = [];
 
-    const opt = {
-      margin: 0.5,
-      filename: `${invoiceData.invoiceNumber}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
+      styleEls.forEach((styleEl) => {
+        const text = styleEl.textContent || "";
+        if (text.includes("oklch") || text.includes("--tw")) {
+          tailwindEls.push({ el: styleEl, media: styleEl.media });
+          styleEl.media = "print"; 
+        }
+      });
+
+      // 📸 Capture the element
+      const canvas = await html2canvas(element, {
         scale: 2,
-        backgroundColor: "#ffffff",
-      },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
+        useCORS: true,
+      });
 
-    await html2pdf().set(opt).from(element).save();
-  } catch (error) {
-    console.error("PDF generation error:", error);
-    alert("Failed to generate PDF. Please try again.");
-  }
-};
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "pt", "a4");
 
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+      const imgScaledWidth = imgWidth * ratio;
+      const imgScaledHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, "PNG", 0, 0, imgScaledWidth, imgScaledHeight);
+      pdf.save(`${invoiceData.invoiceNumber}.pdf`);
+
+      // ✅ Restore Tailwind styles
+      tailwindEls.forEach(({ el, media }) => {
+        el.media = media;
+      });
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      alert("Failed to generate PDF. Please try again.");
+    }
+  };
 
   const paymentStatus = invoiceData.pricing.paymentStatus;
 
@@ -110,7 +137,7 @@ const Invoice = () => {
               style={{
                 fontSize: "2rem",
                 fontWeight: "700",
-                color: "#1d4ed8", // Tailwind blue-700 hex
+                color: "#1d4ed8",
                 margin: 0,
               }}
             >
@@ -135,7 +162,13 @@ const Invoice = () => {
 
         {/* Customer Info */}
         <section style={{ marginBottom: "24px", color: "#000000" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+          <h2
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: "600",
+              marginBottom: "8px",
+            }}
+          >
             Bill To:
           </h2>
           <p style={{ margin: "2px 0" }}>{invoiceData.customer.name}</p>
@@ -145,7 +178,13 @@ const Invoice = () => {
 
         {/* Booking Info */}
         <section style={{ marginBottom: "24px", color: "#000000" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+          <h2
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: "600",
+              marginBottom: "8px",
+            }}
+          >
             Booking Details:
           </h2>
           <p style={{ margin: "2px 0" }}>
@@ -165,7 +204,13 @@ const Invoice = () => {
 
         {/* Pricing Table */}
         <section style={{ marginBottom: "24px", color: "#000000" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+          <h2
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: "600",
+              marginBottom: "8px",
+            }}
+          >
             Pricing Breakdown:
           </h2>
           <table
@@ -191,18 +236,23 @@ const Invoice = () => {
               </tr>
               <tr style={{ borderBottom: "1px solid #d1d5db" }}>
                 <td style={{ padding: "8px 0" }}>
-                  Extra Passenger Fee ({Math.max(0, extraPassengers - 3)} passengers @ $
-                  {extraPassengerFee})
+                  Extra Passenger Fee ({Math.max(0, extraPassengers - 3)}{" "}
+                  passengers @ ${extraPassengerFee})
                 </td>
                 <td style={{ padding: "8px 0" }}>
-                  ${(Math.max(0, extraPassengers - 3) * extraPassengerFee).toFixed(2)}
+                  $
+                  {(
+                    Math.max(0, extraPassengers - 3) * extraPassengerFee
+                  ).toFixed(2)}
                 </td>
               </tr>
               <tr style={{ borderBottom: "1px solid #d1d5db" }}>
                 <td style={{ padding: "8px 0" }}>
                   Night Surcharge ({nightSurchargePercent}%)
                 </td>
-                <td style={{ padding: "8px 0" }}>${nightSurcharge.toFixed(2)}</td>
+                <td style={{ padding: "8px 0" }}>
+                  ${nightSurcharge.toFixed(2)}
+                </td>
               </tr>
               <tr style={{ borderBottom: "1px solid #d1d5db" }}>
                 <td style={{ padding: "8px 0" }}>Tax ({taxPercent}%)</td>
@@ -224,7 +274,13 @@ const Invoice = () => {
 
         {/* Payment Info */}
         <section style={{ marginBottom: "24px", color: "#000000" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "8px" }}>
+          <h2
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: "600",
+              marginBottom: "8px",
+            }}
+          >
             Payment Information:
           </h2>
           <p style={{ margin: "4px 0" }}>
@@ -237,7 +293,8 @@ const Invoice = () => {
                 padding: "0.25em 0.5em",
                 borderRadius: "0.25rem",
                 color: paymentStatus === "Paid" ? "#15803d" : "#b45309",
-                backgroundColor: paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7",
+                backgroundColor:
+                  paymentStatus === "Paid" ? "#dcfce7" : "#fef3c7",
                 fontWeight: "600",
               }}
             >
@@ -246,7 +303,7 @@ const Invoice = () => {
           </p>
         </section>
 
-        {/* Footer / Terms */}
+        {/* Footer */}
         <footer
           style={{
             fontSize: "0.875rem",
@@ -256,8 +313,8 @@ const Invoice = () => {
           }}
         >
           <p>
-            Thank you for choosing RideApp. Please contact support@example.com for any
-            questions regarding this invoice.
+            Thank you for choosing RideApp. Please contact support@example.com
+            for any questions regarding this invoice.
           </p>
         </footer>
       </div>
@@ -287,7 +344,7 @@ const Invoice = () => {
           }}
           type="button"
         >
-          Download PDF
+          Download Invoice
         </button>
       </div>
     </>
