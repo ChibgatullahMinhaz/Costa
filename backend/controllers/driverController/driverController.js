@@ -35,6 +35,7 @@ exports.getDriverById = async (req, res) => {
 exports.createDriver = async (req, res) => {
   try {
     const db = getDB();
+    const typeCollection = db.collection('carType')
     const newDriver = req.body;
     const finalData = {
       ...newDriver,
@@ -56,7 +57,8 @@ exports.createDriver = async (req, res) => {
       imageUrl: newDriver?.imageUrl,
       price: newDriver?.price
     };
-    console.log(vehicleData)
+
+
     const vehicleResult = await db.collection("cars").insertOne(vehicleData);
     console.log(vehicleResult)
     res.status(201).json(result);

@@ -16,7 +16,6 @@ const CustomizeRide = ({ setStepPhase }) => {
   const allValues = methods.getValues();
   const [selectedType, setSelectedType] = useState("Sedan");
   const { step, setStep } = useStep();
-
   const origin = allValues?.from;
   const destination = allValues?.to;
   const [directions, setDirections] = useState(null);
@@ -238,7 +237,7 @@ const CustomizeRide = ({ setStepPhase }) => {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-sm">
-                      USD {car.price.toFixed(2)}
+                      USD {(parseFloat(car.price)+ parseFloat(allValues?.totalPrice)).toFixed(2)}
                     </p>
                     <p className="text-xs text-gray-400 mb-2">All inclusive</p>
                     {step < 4 && (

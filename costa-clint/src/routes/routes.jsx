@@ -46,6 +46,7 @@ import DriverDetails from "../Dashboard/Admin/Pages/DriverDetails";
 import UpdateDriver from "../Dashboard/Admin/Components/DriverManagement/UpdateDriver";
 import BookingUpdateForm from "../Layouts/CustomerLayout/components/BookingUpdateForm";
 import VehicleUpdateForm from "../Dashboard/Admin/Components/vehiclsemanagment/VehicleUpdateForm";
+import Pricing from "../Dashboard/Admin/Pages/Pricing";
 
 const routers = createBrowserRouter([
   {
@@ -177,6 +178,10 @@ const routers = createBrowserRouter([
           {
             path: "updateVehicle/:id",
             element: <VehicleUpdateForm />,
+          },
+          {
+            path: "Pricing",
+            element: <Pricing />,
           },
           {
             path: "manualAssign",

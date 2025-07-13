@@ -38,7 +38,7 @@ export default function Settings() {
     { id: 'general', name: 'General', icon: SettingsIcon },
     { id: 'notifications', name: 'Notifications', icon: Bell },
     { id: 'security', name: 'Security', icon: Shield },
-    { id: 'pricing', name: 'Pricing', icon: Globe },
+    // { id: 'pricing', name: 'Pricing', icon: Globe },
     { id: 'system', name: 'System', icon: Database }
   ];
 
@@ -260,89 +260,7 @@ export default function Settings() {
             </div>
           )}
 
-          {activeTab === 'pricing' && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-800">Pricing Settings</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Base Fare (৳)</label>
-                  <input
-                    type="number"
-                    value={settings.baseFare}
-                    onChange={(e) => handleSettingChange('baseFare', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Per KM Rate (৳)</label>
-                  <input
-                    type="number"
-                    value={settings.perKmRate}
-                    onChange={(e) => handleSettingChange('perKmRate', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Per Minute Rate (৳)</label>
-                  <input
-                    type="number"
-                    value={settings.perMinuteRate}
-                    onChange={(e) => handleSettingChange('perMinuteRate', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Commission Rate (%)</label>
-                  <input
-                    type="number"
-                    value={settings.commissionRate}
-                    onChange={(e) => handleSettingChange('commissionRate', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Driver Signup Bonus (৳)</label>
-                  <input
-                    type="number"
-                    value={settings.driverSignupBonus}
-                    onChange={(e) => handleSettingChange('driverSignupBonus', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Referral Bonus (৳)</label>
-                  <input
-                    type="number"
-                    value={settings.referralBonus}
-                    onChange={(e) => handleSettingChange('referralBonus', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Enable Surge Pricing</p>
-                  <p className="text-sm text-gray-500">Automatically increase prices during high demand</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.surgePricing}
-                    onChange={(e) => handleSettingChange('surgePricing', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-            </div>
-          )}
+         
 
           {activeTab === 'system' && (
             <div className="space-y-6">

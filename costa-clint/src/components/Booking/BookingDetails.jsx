@@ -12,7 +12,7 @@ import ContactForm from "./ContactForm";
 const BookingDetails = ({ setStepPhase }) => {
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
-  console.log(allValues);
+  const payable = parseFloat(allValues.selectedCar.price) + parseFloat(allValues.totalPrice)
   const origin = allValues?.from;
   const destination = allValues?.to;
   const [directions, setDirections] = useState(null);
@@ -179,7 +179,7 @@ const BookingDetails = ({ setStepPhase }) => {
             <section className="border border-gray-300 rounded p-3 space-y-3 text-xs">
               <div className="flex justify-between items-center font-semibold text-orange-500">
                 <span>Total</span>
-                <span>USD {allValues?.totalPrice}</span>
+                <span>USD {payable}</span>
               </div>
               <div>
                 <p className="text-gray-500 mb-1">Payment method</p>

@@ -6,6 +6,7 @@ const { sendNotification, getAllNotifications } = require('../controllers/Notifi
 const { getServer, getRecentActivity } = require('../controllers/projectController');
 const { processPayment } = require('../controllers/payment/payment');
 const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
+const { getPricingSettings, updatePricingSettings } = require('../controllers/Pricing/Pricing');
 const router = express.Router();
 
 
@@ -70,5 +71,7 @@ router.put("/api/booking/cancel/:id", cancelBooking)
 // get total customer
 router.get("/api/booking/total-customers", getTotalCustomers);
 
-
+// pricing setting
+router.get('/api/settings/pricing', getPricingSettings)
+router.put('/api/settings/pricing/update', updatePricingSettings)
 module.exports = router;
