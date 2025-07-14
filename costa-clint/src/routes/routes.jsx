@@ -39,7 +39,6 @@ import Destinations from "../Pages/Destinations/Destinations";
 import Services from "../Pages/Services/Services";
 import DashboardHome from "../Layouts/CustomerLayout/components/Home";
 import MyBookings from "../Layouts/CustomerLayout/components/MyBookings";
-import Invoice from "../Layouts/CustomerLayout/components/Invoice";
 import FlightSearch from "../Layouts/CustomerLayout/components/FlightSearch";
 import DriverDashboardHome from "../Dashboard/Driver/Components/DriverDashboardHome";
 import DriverDetails from "../Dashboard/Admin/Pages/DriverDetails";
@@ -47,6 +46,36 @@ import UpdateDriver from "../Dashboard/Admin/Components/DriverManagement/UpdateD
 import BookingUpdateForm from "../Layouts/CustomerLayout/components/BookingUpdateForm";
 import VehicleUpdateForm from "../Dashboard/Admin/Components/vehiclsemanagment/VehicleUpdateForm";
 import Pricing from "../Dashboard/Admin/Pages/Pricing";
+import InvoiceList from "../components/Invoice/InvoiceList";
+
+// Dummy data
+const dummyInvoices = [
+  {
+    invoiceNumber: "INV-001",
+    invoiceDate: "2025-07-13",
+    customer: {
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "123-456",
+    },
+    booking: {
+      pickup: "Airport",
+      dropoff: "Hotel XYZ",
+      date: "2025-07-12",
+      time: "10:00 AM",
+      flight: "QR 123",
+    },
+    pricing: {
+      baseFare: 30,
+      distanceKm: 15,
+      distanceRate: 2,
+      extraPassengers: 4,
+      extraPassengerFee: 5,
+      nightSurchargePercent: 10,
+      taxPercent: 8,
+    },
+  },
+];
 
 const routers = createBrowserRouter([
   {
@@ -116,7 +145,7 @@ const routers = createBrowserRouter([
             path: "details/:id",
             element: <UserDetails></UserDetails>,
           },
-          
+
           {
             path: "analytics",
             element: <UserAnalytics></UserAnalytics>,
@@ -203,9 +232,9 @@ const routers = createBrowserRouter([
     path: "/dashboard",
     element: (
       <PrivateRoute>
-        {/* <UserRoutes> */}
+        <UserRoutes>
           <CustomerLayouts></CustomerLayouts>
-        {/* </UserRoutes> */}
+        </UserRoutes>
       </PrivateRoute>
     ),
     children: [
@@ -219,7 +248,7 @@ const routers = createBrowserRouter([
       },
       {
         path: "invoice",
-        Component: Invoice,
+        element: <InvoiceList invoices={dummyInvoices} />,
       },
       {
         path: "flights",
@@ -233,11 +262,17 @@ const routers = createBrowserRouter([
   },
   {
     path: "/driver-dashboard",
-    element: <DriverLayouts></DriverLayouts>,
-    children: [{
-      index:true,
-      Component: DriverDashboardHome
-    }],
+    element: (
+      <DriverRoute>
+        <DriverLayouts></DriverLayouts>
+      </DriverRoute>
+    ),
+    children: [
+      {
+        index: true,
+        Component: DriverDashboardHome,
+      },
+    ],
   },
   {
     path: "auth",
