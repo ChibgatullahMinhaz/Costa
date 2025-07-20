@@ -67,9 +67,9 @@ exports.createUser = async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({ message: "Name and email are required" });
     }
-   if (role !== 'user' && role !== 'admin') {
-  return res.status(403).json({ message: "Access denied" });
-}
+    if (role !== 'user' && role !== 'admin') {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
     // Check if user already exists
     const existingUser = await db.collection("users").findOne({ email });
@@ -210,3 +210,5 @@ exports.driverBanned = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+

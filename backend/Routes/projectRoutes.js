@@ -2,7 +2,7 @@ const express = require('express');
 const { getUsers, getUserById, createUser, updateUser, deleteUser, updateStatus, getUserByEmail, userBanned, driverBanned } = require('../controllers/UserController/userController');
 const { getDrivers, getDriverById, createDriver, updateDriver, deleteDriver, getActiveDrivers, getTotalActiveDrivers, getDriversByStatus, updateDriverStatus } = require('../controllers/driverController/driverController');
 const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehicle, getVehiclesByType, getVehicleTypesWithPrices } = require('../controllers/vehicleController/vehicleController');
-const { sendNotification, getAllNotifications } = require('../controllers/Notification/notification');
+const { sendNotification, getAllNotifications, getUserToken } = require('../controllers/Notification/notification');
 const { getServer, getRecentActivity } = require('../controllers/projectController');
 const { processPayment } = require('../controllers/payment/payment');
 const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
@@ -28,9 +28,10 @@ router.get("/api/userByEmail", getUserByEmail);
 router.post("/api/user/create", createUser);
 
 // Notifications
-router.post("/api/notification/send", sendNotification);
+router.post("/api/notifications/send", sendNotification);
 router.get("/api/notification", getAllNotifications);
 
+router.get('/api/users/fcm-tokens', getUserToken)
 
 // admin api's
 router.get("/api/user", getUsers);
