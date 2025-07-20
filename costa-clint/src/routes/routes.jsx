@@ -47,6 +47,7 @@ import BookingUpdateForm from "../Layouts/CustomerLayout/components/BookingUpdat
 import VehicleUpdateForm from "../Dashboard/Admin/Components/vehiclsemanagment/VehicleUpdateForm";
 import Pricing from "../Dashboard/Admin/Pages/Pricing";
 import InvoiceList from "../components/Invoice/InvoiceList";
+import NotificationDetails from "../Pages/pushNotification/NotificationDetails";
 
 // Dummy data
 const dummyInvoices = [
@@ -102,15 +103,19 @@ const routers = createBrowserRouter([
         path: "/ourServices",
         Component: Services,
       },
+      {
+        path: "/notification",
+        Component: NotificationDetails,
+      },
     ],
   },
   {
     path: "/admin-dashboard",
     element: (
-      <AdminRoutes>
-        {" "}
+      // <AdminRoutes>
+       
         <AdminLayout></AdminLayout>
-      </AdminRoutes>
+      // </AdminRoutes>
     ),
     children: [
       {

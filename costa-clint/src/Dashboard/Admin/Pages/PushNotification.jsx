@@ -1,102 +1,76 @@
-// components/admin/PushNotifications.jsx
-
 import React, { useState } from "react";
-import { Bell, Trash2 } from "lucide-react"; // For icons (install lucide-react or use your own)
-
-const dummySystemNotifications = [
-  {
-    id: 1,
-    title: "New Booking",
-    message: "Booking #1234 has been created by John Doe.",
-    type: "system",
-    targetGroup: "admin",
-    date: "2025-06-29 10:32 AM",
-    read: false,
-  },
-  {
-    id: 2,
-    title: "Payment Received",
-    message: "Payment of $80.00 received from client Ana.",
-    type: "system",
-    targetGroup: "admin",
-    date: "2025-06-28 04:15 PM",
-    read: false,
-  },
-  {
-    id: 3,
-    title: "Driver Cancelled",
-    message: "Driver Alex cancelled booking #1229.",
-    type: "system",
-    targetGroup: "admin",
-    date: "2025-06-27 01:50 PM",
-    read: true,
-  },
-];
+import { Bell } from "lucide-react";
+import Swal from "sweetalert2";
+import instance from "../../../Service/APIs/AxiosSecure";
 
 export default function PushNotifications() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [targetGroup, setTargetGroup] = useState("clients");
-  const [notifications, setNotifications] = useState(dummySystemNotifications);
-  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!title || !message) {
-      alert("Please fill in all fields.");
-      return;
+      return Swal.fire({
+        icon: "warning",
+        title: "Incomplete!",
+        text: "Please fill in all fields.",
+      });
     }
 
-    const newNotification = {
-      id: Date.now(),
-      title,
-      message,
-      type: "manual",
-      targetGroup,
-      date: new Date().toLocaleString(),
-      read: false,
-    };
+    setLoading(true);
+    try {
+      // Step 1: Get tokens
+      const { data: tokenData } = await instance.get(
+        `api/users/fcm-tokens?group=${targetGroup}`
+      );
 
-    setNotifications([newNotification, ...notifications]);
-    alert("Notification sent successfully!");
+      if (!tokenData.tokens || tokenData.tokens.length === 0) {
+        setLoading(false);
+        return Swal.fire({
+          icon: "info",
+          title: "No Users Found",
+          text: "No users found for the selected group.",
+        });
+      }
 
-    setTitle("");
-    setMessage("");
-    setTargetGroup("clients");
-  };
+      // Step 2: Send notification
+      const { data: sendData } = await instance.post("api/notifications/send", {
+        tokens: tokenData.tokens,
+        title,
+        message,
+      });
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
+      Swal.fire({
+        icon: "success",
+        title: "Notification Sent",
+        html: `✅ Success: ${sendData.successCount} <br> ❌ Failed: ${sendData.failureCount}`,
+      });
 
-  const clearNotifications = () => {
-    if (window.confirm("Are you sure you want to clear all notifications?")) {
-      setNotifications([]);
+      setTitle("");
+      setMessage("");
+      setTargetGroup("clients");
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Send",
+        text: "Something went wrong. Please try again.",
+      });
     }
-  };
 
-  const filteredNotifications =
-    filter === "all"
-      ? notifications
-      : notifications.filter((n) => n.targetGroup === filter);
+    setLoading(false);
+  };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white rounded shadow">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold flex items-center gap-2">
+    <div className="max-w-5xl p-6 mx-auto bg-white rounded shadow">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold">
           <Bell className="text-indigo-600" /> Admin Notifications
         </h2>
-        <button
-          onClick={clearNotifications}
-          className="flex items-center gap-1 text-sm text-red-500 hover:underline"
-        >
-          <Trash2 size={16} /> Clear All
-        </button>
       </div>
 
-      {/* Notification Form */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+      <div className="grid gap-4 mb-6 md:grid-cols-3">
         <input
           className="p-2 border border-gray-300 rounded"
           placeholder="Notification Title"
@@ -120,64 +94,12 @@ export default function PushNotifications() {
         </select>
         <button
           onClick={handleSend}
-          className="col-span-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          disabled={loading}
+          className="px-4 py-2 text-white bg-indigo-600 rounded col-span-full hover:bg-indigo-700 disabled:opacity-50"
         >
-          Send Notification
+          {loading ? "Sending..." : "Send Notification"}
         </button>
       </div>
-
-      {/* Filter */}
-      <div className="flex items-center gap-3 mb-4">
-        <span className="font-medium">Filter:</span>
-        {["all", "clients", "drivers", "admin"].map((g) => (
-          <button
-            key={g}
-            onClick={() => setFilter(g)}
-            className={`px-3 py-1 rounded-full text-sm ${
-              filter === g
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            {g.charAt(0).toUpperCase() + g.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Notification List */}
-      {filteredNotifications.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No notifications found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {filteredNotifications.map((n) => (
-            <li
-              key={n.id}
-              className={`p-4 border rounded shadow-sm ${
-                n.read ? "bg-gray-100" : "bg-yellow-50"
-              }`}
-            >
-              <div className="flex justify-between items-center mb-1">
-                <h4 className="font-semibold text-gray-800">{n.title}</h4>
-                <span className="text-sm text-gray-500">{n.date}</span>
-              </div>
-              <p className="text-gray-700 mb-2">{n.message}</p>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 capitalize">
-                  Type: {n.type} | To: {n.targetGroup}
-                </span>
-                {!n.read && (
-                  <button
-                    onClick={() => markAsRead(n.id)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Mark as Read
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

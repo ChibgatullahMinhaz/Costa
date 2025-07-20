@@ -17,6 +17,7 @@ const SocialLogin = () => {
     try {
       const result = await signInWithProvider(provider);
       const user = result.user;
+      const notificationToken = localStorage.getItem("notificationToken");
 
       if (user) {
         const saveUser = {
@@ -29,12 +30,12 @@ const SocialLogin = () => {
           createdAt: new Date(Number(user.metadata?.createdAt)),
           updatedAt: new Date(),
           lastLoginAt: new Date(Number(user.metadata?.lastLoginAt)),
+          fcmToken: notificationToken || null,
         };
 
         await axiosSecurePublic.post("/api/user/create", saveUser);
       }
 
-      
       Swal.fire({
         icon: "success",
         title: "Login Successful",

@@ -56,7 +56,7 @@ const Register = () => {
         displayName: data.name,
         photoURL: imageUrl,
       });
-
+      const notificationToken = localStorage.getItem("notificationToken");
       const saveUser = {
         firebaseUID: firebaseUser.uid,
         name: data.name,
@@ -67,6 +67,7 @@ const Register = () => {
         createdAt: new Date(Number(firebaseUser.metadata?.createdAt)),
         updatedAt: new Date(),
         lastLoginAt: new Date(Number(firebaseUser.metadata?.lastLoginAt)),
+        fcmToken: notificationToken || null,
       };
 
       const res = await axiosSecurePublic.post("api/user/create", saveUser);
@@ -96,7 +97,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col-reverse lg:flex-row items-center justify-center min-h-screen w-full p-6 bg-gray-100">
+    <div className="flex flex-col-reverse items-center justify-center w-full min-h-screen p-6 bg-gray-100 lg:flex-row">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-xl">
         <div>
           <h2 className="text-2xl font-bold text-center text-gray-800">
@@ -118,7 +119,7 @@ const Register = () => {
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
             )}
           </div>
 
@@ -132,7 +133,7 @@ const Register = () => {
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {errors.email.message}
               </p>
             )}
@@ -162,13 +163,13 @@ const Register = () => {
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute right-3 top-10 text-gray-600 hover:text-gray-900"
+              className="absolute text-gray-600 right-3 top-10 hover:text-gray-900"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {errors.password.message}
               </p>
             )}
@@ -188,13 +189,13 @@ const Register = () => {
             <button
               type="button"
               onClick={toggleConfirmPasswordVisibility}
-              className="absolute right-3 top-10 text-gray-600 hover:text-gray-900"
+              className="absolute text-gray-600 right-3 top-10 hover:text-gray-900"
               tabIndex={-1}
             >
               {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -213,7 +214,7 @@ const Register = () => {
               </Link>
             </label>
             {errors.terms && (
-              <p className="text-red-500 text-sm ml-2">You must agree</p>
+              <p className="ml-2 text-sm text-red-500">You must agree</p>
             )}
           </div>
 
@@ -235,7 +236,7 @@ const Register = () => {
         </p>
       </div>
 
-      <div className="w-full max-w-md hidden sm:block lg:max-w-lg">
+      <div className="hidden w-full max-w-md sm:block lg:max-w-lg">
         <Lottie animationData={registerAnimation} loop={true} />
       </div>
     </div>

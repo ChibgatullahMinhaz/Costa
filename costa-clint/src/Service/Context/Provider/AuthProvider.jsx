@@ -43,28 +43,27 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      if (currentUser.email) {
+      if (currentUser?.email) {
         try {
           const res = await axiosSecurePublic.get(
             `api/userByEmail?email=${currentUser.email}`
           );
           if (res.data) {
             setUserRole(res.data);
-            localStorage.setItem("userRole", JSON.stringify(res.data));
           }
         } catch (err) {
           console.error("Error fetching user role:", err);
         }
       } else {
         setUserRole(null);
-        localStorage.removeItem("userRole");
+      
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
-console.log(user)
+console.log(userRole)
   const userInfo = {
     user,
     loading,

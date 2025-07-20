@@ -76,13 +76,13 @@ function PaymentForm({ onSuccess }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 w-full max-w-md bg-white p-6 rounded shadow-md"
+      className="w-full max-w-md p-6 space-y-4 bg-white rounded shadow-md"
     >
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">
+      <h2 className="mb-2 text-lg font-semibold text-gray-800">
         Enter your payment details
       </h2>
 
-      <div className="border border-gray-300 rounded p-3 bg-gray-50">
+      <div className="p-3 border border-gray-300 rounded bg-gray-50">
         <CardElement
           options={{
             style: {
@@ -100,12 +100,12 @@ function PaymentForm({ onSuccess }) {
       <button
         type="submit"
         disabled={!stripe || loading}
-        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded transition duration-200 disabled:opacity-50"
+        className="w-full px-4 py-2 font-semibold text-white transition duration-200 bg-orange-500 rounded hover:bg-orange-600 disabled:opacity-50"
       >
         {loading ? "Processing..." : "Pay Now"}
       </button>
 
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-center text-gray-500">
         Transactions are secured and encrypted by Stripe.
       </p>
     </form>

@@ -6,7 +6,7 @@ import useAuth from "../../Hooks/useAuth";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
+  const { user, userRole,logout } = useAuth();
 
   const navLinks = [
     { path: "/", label: "Home", type: "route" },
