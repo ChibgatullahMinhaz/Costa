@@ -267,9 +267,9 @@ const routers = createBrowserRouter([
   {
     path: "/driver-dashboard",
     element: (
-      <DriverRoute>
+      // <DriverRoute>
         <DriverLayouts></DriverLayouts>
-      </DriverRoute>
+      // </DriverRoute>
     ),
     children: [
       {
