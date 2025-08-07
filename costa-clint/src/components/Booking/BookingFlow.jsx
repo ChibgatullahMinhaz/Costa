@@ -14,7 +14,7 @@ const BookingFlow = ({setStepPhase}) => {
   const steps = ["Trip Info", "Choose Vehicle", "Confirm"];
 
   return (
-    <div className="max-w-4xl mx-auto py-10 mt-20">
+    <div className="max-w-4xl py-10 mx-auto mt-20">
       {/* Progress Tracker */}
       <div className="flex justify-between mb-6">
         {steps.map((label, index) => {
@@ -24,7 +24,7 @@ const BookingFlow = ({setStepPhase}) => {
           return (
             <div
               key={label}
-              className="flex flex-col items-center text-center w-full"
+              className="flex flex-col items-center w-full text-center"
             >
               <div
                 className={`h-10 w-10 rounded-full flex items-center justify-center 
@@ -37,7 +37,7 @@ const BookingFlow = ({setStepPhase}) => {
                       : "bg-gray-300"
                   }`}
               >
-                {isCompleted ? <Check className="h-5 w-5" /> : index + 1}
+                {isCompleted ? <Check className="w-5 h-5" /> : index + 1}
               </div>
               <span
                 className={`text-sm mt-1 ${
@@ -55,7 +55,7 @@ const BookingFlow = ({setStepPhase}) => {
 
       {step === 2 && (
         <div>
-           <h1 className="text-2xl font-bold text-gray-800 mb-8">
+           <h1 className="mb-8 text-2xl font-bold text-gray-800">
             Customize Your Ride
           </h1>
           <CustomizeRide setStepPhase={setStepPhase} />

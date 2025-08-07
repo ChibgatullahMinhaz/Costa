@@ -7,6 +7,7 @@ const { getServer, getRecentActivity } = require('../controllers/projectControll
 const { processPayment } = require('../controllers/payment/payment');
 const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
 const { getPricingSettings, updatePricingSettings } = require('../controllers/Pricing/Pricing');
+const { getPricingConfig } = require('../controllers/pricingController');
 const router = express.Router();
 
 
@@ -17,6 +18,7 @@ router.get("/api/activity", getRecentActivity);
 // General apis for all user => Users
 router.get("/api/getAllCarByType", getVehiclesByType);
 router.get("/api/getAllCarTypeWithPrices", getVehicleTypesWithPrices);
+router.get("/pricing/config", getPricingConfig);
 
 // payments
 router.post('/api/create-checkout-session', processPayment)

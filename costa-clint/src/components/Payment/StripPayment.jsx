@@ -5,6 +5,13 @@ import { BookingFormContext } from "../../Service/Context/CreateContext/BookingF
 import axiosSecureInstance from "../../Service/APIs/AxiosInstance";
 import useAuth from "../../Hooks/useAuth";
 
+function generateBookingId() {
+  const timestamp = Date.now().toString(36); // base36 to shorten length
+  const randomStr = Math.random().toString(36).substring(2, 7);
+
+  return `BOOK-${timestamp}-${randomStr}`.toUpperCase();
+}
+
 function PaymentForm({ onSuccess }) {
   const { user } = useAuth();
   const stripe = useStripe();
@@ -25,7 +32,10 @@ function PaymentForm({ onSuccess }) {
 
     try {
       // Get payment intent from backend
-      const amount = parseFloat(allValues.totalPrice) * 100;
+      const finalRice =
+        parseFloat(allValues.totalPrice) +
+        parseFloat(allValues?.selectedCar?.price);
+      const amount = finalRice * 100;
       const res = await axiosSecureInstance.post(
         "api/create-checkout-session",
         {
@@ -57,6 +67,7 @@ function PaymentForm({ onSuccess }) {
           allValues,
           email: email,
           result,
+          bookingID: generateBookingId(),
         };
         const response = await axiosSecureInstance.post(
           "api/createBooking",
@@ -102,7 +113,12 @@ function PaymentForm({ onSuccess }) {
         disabled={!stripe || loading}
         className="w-full px-4 py-2 font-semibold text-white transition duration-200 bg-orange-500 rounded hover:bg-orange-600 disabled:opacity-50"
       >
-        {loading ? "Processing..." : "Pay Now"}
+        {loading
+          ? "Processing..."
+          : `Pay Now ${
+              parseFloat(allValues.totalPrice) +
+              parseFloat(allValues?.selectedCar?.price)
+            }`}
       </button>
 
       <p className="text-xs text-center text-gray-500">

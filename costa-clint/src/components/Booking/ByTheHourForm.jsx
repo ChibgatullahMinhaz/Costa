@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import GoogleAutocompleteInput from "./GoogleAutocompleteInput";
 
-const ByTheHourForm = ({ onBooking, setStep }) => {
+const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
   const {
     register,
     setValue,
@@ -12,7 +12,6 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
 
   const formData = watch();
   const PET_FEE = 10;
-  const BASE_HOURLY_RATE = 50;
 
   const [subtotal, setSubtotal] = useState(0);
 
@@ -22,7 +21,7 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
     const children = parseInt(formData.children || 0);
     const passengers = adults + children;
     const extraPassengers = Math.max(0, passengers - 3);
-
+    const BASE_HOURLY_RATE = pricingConfig?.baseFare || 30;
     let total = duration * BASE_HOURLY_RATE + extraPassengers * 5;
 
     if (formData.pet === "yes") {
@@ -30,7 +29,7 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
     }
 
     setSubtotal(isNaN(total) ? 0 : total);
-  }, [formData.duration, formData.adults, formData.children, formData.pet]);
+  }, [formData.duration, formData.adults, formData.children, formData.pet,pricingConfig]);
 
   const isDisabled =
     !formData.from ||
@@ -44,7 +43,6 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
   const handleNext = () => {
     onBooking("booking");
     setValue("totalPrice", subtotal);
-
     setStep(2);
   };
   return (
@@ -58,23 +56,23 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
           placeholder="Enter pickup location"
         />
         {errors.from && (
-          <p className="text-red-500 text-sm mt-1">
+          <p className="mt-1 text-sm text-red-500">
             Pickup location is required
           </p>
         )}
       </div>
 
       {/* Date and Time */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="text-sm font-medium">Pickup Date *</label>
           <input
             type="date"
             {...register("date", { required: true })}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.date && (
-            <p className="text-red-500 text-sm mt-1">Date is required</p>
+            <p className="mt-1 text-sm text-red-500">Date is required</p>
           )}
         </div>
         <div>
@@ -82,10 +80,10 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
           <input
             type="time"
             {...register("time", { required: true })}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.time && (
-            <p className="text-red-500 text-sm mt-1">Time is required</p>
+            <p className="mt-1 text-sm text-red-500">Time is required</p>
           )}
         </div>
       </div>
@@ -100,25 +98,25 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
             required: true,
             min: 1,
           })}
-          className="w-full border p-2 rounded"
+          className="w-full p-2 border rounded"
         />
         {errors.duration && (
-          <p className="text-red-500 text-sm mt-1">Minimum 1 hour required</p>
+          <p className="mt-1 text-sm text-red-500">Minimum 1 hour required</p>
         )}
       </div>
 
       {/* Adults, Children, Bags */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <div>
           <label className="text-sm font-medium">Adults *</label>
           <input
             type="number"
             min="1"
             {...register("adults", { required: true, min: 1 })}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.adults && (
-            <p className="text-red-500 text-sm mt-1">Min 1 adult required</p>
+            <p className="mt-1 text-sm text-red-500">Min 1 adult required</p>
           )}
         </div>
         <div>
@@ -127,10 +125,10 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
             type="number"
             min="0"
             {...register("children", { required: true, min: 0 })}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.children && (
-            <p className="text-red-500 text-sm mt-1">Required (min 0)</p>
+            <p className="mt-1 text-sm text-red-500">Required (min 0)</p>
           )}
         </div>
         <div>
@@ -139,10 +137,10 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
             type="number"
             min="0"
             {...register("bags", { required: true, min: 0 })}
-            className="w-full border p-2 rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.bags && (
-            <p className="text-red-500 text-sm mt-1">Required (min 0)</p>
+            <p className="mt-1 text-sm text-red-500">Required (min 0)</p>
           )}
         </div>
       </div>
@@ -150,7 +148,7 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
       {/* Pet Option */}
       <div>
         <label className="text-sm font-medium">Will you bring a pet? *</label>
-        <div className="flex space-x-4 mt-1">
+        <div className="flex mt-1 space-x-4">
           <label>
             <input
               type="radio"
@@ -169,7 +167,7 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
           </label>
         </div>
         {errors.pet && (
-          <p className="text-red-500 text-sm mt-1">Please select pet option</p>
+          <p className="mt-1 text-sm text-red-500">Please select pet option</p>
         )}
       </div>
 
@@ -180,7 +178,7 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
           type="text"
           {...register("extras")}
           placeholder="Any extras?"
-          className="w-full border p-2 rounded mt-1"
+          className="w-full p-2 mt-1 border rounded"
         />
       </div>
 
@@ -191,15 +189,15 @@ const ByTheHourForm = ({ onBooking, setStep }) => {
           {...register("notes")}
           placeholder="Additional notes..."
           rows={3}
-          className="w-full border p-2 rounded mt-1"
+          className="w-full p-2 mt-1 border rounded"
         />
       </div>
 
       {/* Subtotal */}
-      <div className="text-right font-semibold">
+      <div className="font-semibold text-right">
         Subtotal: ${subtotal}
         {formData.pet === "yes" && (
-          <span className="text-sm text-green-600 ml-2">
+          <span className="ml-2 text-sm text-green-600">
             (Includes ${PET_FEE} pet fee)
           </span>
         )}

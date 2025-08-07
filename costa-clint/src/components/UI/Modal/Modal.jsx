@@ -6,16 +6,16 @@ const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <div
-      className="fixed inset-0  flex justify-center items-center z-50"
-      onClick={onClose} // Close on outside click
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
+      onClick={onClose} 
     >
       <div
-        className="bg-white p-6 rounded shadow-lg"
-        onClick={(e) => e.stopPropagation()} // Prevent close when clicking inside modal
+        className="p-6 bg-white rounded shadow-lg"
+        onClick={(e) => e.stopPropagation()} 
       >
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-900 float-right mb-2"
+          className="float-right mb-2 text-gray-500 hover:text-gray-900"
         >
           ✖
         </button>

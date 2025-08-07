@@ -50,33 +50,7 @@ import InvoiceList from "../components/Invoice/InvoiceList";
 import NotificationDetails from "../Pages/pushNotification/NotificationDetails";
 
 // Dummy data
-const dummyInvoices = [
-  {
-    invoiceNumber: "INV-001",
-    invoiceDate: "2025-07-13",
-    customer: {
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "123-456",
-    },
-    booking: {
-      pickup: "Airport",
-      dropoff: "Hotel XYZ",
-      date: "2025-07-12",
-      time: "10:00 AM",
-      flight: "QR 123",
-    },
-    pricing: {
-      baseFare: 30,
-      distanceKm: 15,
-      distanceRate: 2,
-      extraPassengers: 4,
-      extraPassengerFee: 5,
-      nightSurchargePercent: 10,
-      taxPercent: 8,
-    },
-  },
-];
+
 
 const routers = createBrowserRouter([
   {
@@ -252,7 +226,7 @@ const routers = createBrowserRouter([
       },
       {
         path: "invoice",
-        element: <InvoiceList invoices={dummyInvoices} />,
+        element: <InvoiceList  />,
       },
       {
         path: "flights",

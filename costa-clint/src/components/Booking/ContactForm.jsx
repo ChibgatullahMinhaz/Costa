@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -7,6 +7,7 @@ import Modal from "../UI/Modal/Modal";
 import PaymentForm from "../Payment/StripPayment";
 
 const ContactInformation = ({ onContinue }) => {
+   
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const {
@@ -25,12 +26,10 @@ const ContactInformation = ({ onContinue }) => {
     if (onContinue) {
       onContinue(data);
     }
+        setShowPaymentModal(true);
+
   };
-  // Open modal on button click
-  const handleContinueToPayment = () => {
-    setShowPaymentModal(true);
-    handleSubmit(onValid)
-  };
+ 
   return (
     <div className="space-y-6">
       <h1 className="font-bold">Contact Information</h1>
@@ -47,7 +46,7 @@ const ContactInformation = ({ onContinue }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
-                className="block text-xs font-semibold mb-1"
+                className="block mb-1 text-xs font-semibold"
                 htmlFor="agentName"
               >
                 Name of the agent *
@@ -71,7 +70,7 @@ const ContactInformation = ({ onContinue }) => {
 
             <div>
               <label
-                className="block text-xs font-semibold mb-1"
+                className="block mb-1 text-xs font-semibold"
                 htmlFor="salutation"
               >
                 Salutation
@@ -79,7 +78,7 @@ const ContactInformation = ({ onContinue }) => {
               <select
                 id="salutation"
                 {...register("salutation")}
-                className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
+                className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
               >
                 <option value="">Select</option>
                 <option>Mr.</option>
@@ -91,7 +90,7 @@ const ContactInformation = ({ onContinue }) => {
 
             <div className="col-span-2">
               <label
-                className="block text-xs font-semibold mb-1"
+                className="block mb-1 text-xs font-semibold"
                 htmlFor="agentEmail"
               >
                 Email *
@@ -120,7 +119,7 @@ const ContactInformation = ({ onContinue }) => {
 
             <div className="col-span-2">
               <label
-                className="block text-xs font-semibold mb-1"
+                className="block mb-1 text-xs font-semibold"
                 htmlFor="agentPhone"
               >
                 Phone Number *
@@ -161,7 +160,7 @@ const ContactInformation = ({ onContinue }) => {
         {/* Name */}
         <div>
           <label
-            className="block text-xs font-semibold mb-1"
+            className="block mb-1 text-xs font-semibold"
             htmlFor="contactName"
           >
             Name *
@@ -184,7 +183,7 @@ const ContactInformation = ({ onContinue }) => {
         {/* Email */}
         <div>
           <label
-            className="block text-xs font-semibold mb-1"
+            className="block mb-1 text-xs font-semibold"
             htmlFor="contactEmail"
           >
             Email *
@@ -213,7 +212,7 @@ const ContactInformation = ({ onContinue }) => {
         {/* Salutation */}
         <div>
           <label
-            className="block text-xs font-semibold mb-1"
+            className="block mb-1 text-xs font-semibold"
             htmlFor="contactSalutation"
           >
             Salutation
@@ -221,7 +220,7 @@ const ContactInformation = ({ onContinue }) => {
           <select
             id="contactSalutation"
             {...register("salutation", { required: "salutation is required" })}
-            className="border border-gray-300 rounded px-2 py-1 text-xs w-full"
+            className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
           >
             <option value="">Select</option>
             <option>Mr.</option>
@@ -241,7 +240,7 @@ const ContactInformation = ({ onContinue }) => {
         {[0, 1, 2].map((idx) => (
           <div key={idx} className="col-span-2 md:col-span-1">
             <label
-              className="block text-xs font-semibold mb-1"
+              className="block mb-1 text-xs font-semibold"
               htmlFor={`phone${idx}`}
             >
               {idx === 0 ? "Phone Number *" : `Additional Phone Number ${idx}`}
@@ -300,7 +299,7 @@ const ContactInformation = ({ onContinue }) => {
       {/* Special Instructions (Optional) */}
       <div>
         <label
-          className="block text-xs font-semibold mb-1 mt-2"
+          className="block mt-2 mb-1 text-xs font-semibold"
           htmlFor="specialInstructions"
         >
           Special Instructions (Optional)
@@ -309,23 +308,15 @@ const ContactInformation = ({ onContinue }) => {
           id="specialInstructions"
           {...register("specialInstructions")}
           placeholder="Add any notes or special instructions..."
-          className="border border-gray-300 rounded px-2 py-1 text-xs w-full h-24 resize-none"
+          className="w-full h-24 px-2 py-1 text-xs border border-gray-300 rounded resize-none"
         />
       </div>
 
       {/* Continue Button */}
-
-      {/* <button
-        type="button"
-        onClick={}
-        className="mt-4 w-full bg-orange-400 text-white text-xs font-semibold rounded py-2"
-      >
-        Continue
-      </button> */}
       <button
-        className="w-full bg-orange-400 text-white text-xs font-semibold rounded py-2 mt-2"
+        className="w-full py-2 mt-2 text-xs font-semibold text-white bg-orange-400 rounded"
         type="submit"
-        onClick={handleContinueToPayment}
+        onClick={  handleSubmit(onValid)}
       >
         Continue to payment
       </button>
@@ -337,7 +328,6 @@ const ContactInformation = ({ onContinue }) => {
         <PaymentForm
           onSuccess={() => {
             setShowPaymentModal(false);
-            // Optionally move to next step or show success message
           }}
         />
       </Modal>

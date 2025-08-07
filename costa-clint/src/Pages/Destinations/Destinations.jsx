@@ -3,38 +3,42 @@ const Destinations = () => {
     {
       name: "Manuel Antonio",
       airport: "SJO",
-      image: "https://source.unsplash.com/featured/?manuel-antonio",
+      image:
+        "https://centralamericaairports.com/wp-content/uploads/2023/08/Costa-Rica-Juan-Santamaria-International-Airport-SJO-MROC.jpeg",
     },
     {
       name: "Tamarindo",
       airport: "LIR",
-      image: "https://source.unsplash.com/featured/?tamarindo,costa-rica",
+      image:
+        "https://res.cloudinary.com/vacationscostarica-com/image/upload/v1650823626/tamarindo_diria_beachfront_overview_guanacaste_7945a0a8c0.jpg",
     },
     {
       name: "La Fortuna",
       airport: "SJO",
-      image: "https://source.unsplash.com/featured/?la-fortuna",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgVa8u8LPTLI9gvT2aa8IvgFNes1RMjT0nDQ&s",
     },
     {
       name: "San José",
       airport: "SYQ",
-      image: "https://source.unsplash.com/featured/?san-jose,costa-rica",
+      image:
+        "https://www.visitcostarica.com/sites/default/files/2024-09/Aurola-15-San-Jose.jpg",
     },
   ];
 
   return (
-    <section className="min-h-screen bg-white px-6 py-16 text-gray-900">
+    <section className="min-h-screen px-6 py-16 my-10 text-gray-900 bg-white">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12">
+        <h2 className="mb-12 text-4xl font-bold text-center">
           Popular Destinations
         </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
           {destinations.map((d, i) => (
-            <div key={i} className="rounded-xl shadow-md overflow-hidden">
+            <div key={i} className="overflow-hidden shadow-md rounded-xl">
               <img
                 src={d.image}
                 alt={d.name}
-                className="h-48 w-full object-cover"
+                className="object-cover w-full h-48"
               />
               <div className="p-4 bg-gray-100">
                 <h3 className="text-xl font-semibold">{d.name}</h3>

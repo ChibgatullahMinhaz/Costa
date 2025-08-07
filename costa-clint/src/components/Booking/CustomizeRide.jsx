@@ -24,7 +24,7 @@ const CustomizeRide = ({ setStepPhase }) => {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
-
+ 
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -54,7 +54,7 @@ const CustomizeRide = ({ setStepPhase }) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: vehicles = [], isPending } = useQuery({
     queryKey: ["vehicles", selectedType],
     queryFn: () =>
       instance
@@ -63,28 +63,26 @@ const CustomizeRide = ({ setStepPhase }) => {
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
-  
-
 
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
-        <div className="flex flex-col items-center bg-gray-100 min-h-screen">
+        <div className="flex flex-col items-center min-h-screen bg-gray-100">
           {/* Ride Info Card */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+          <div className="w-full max-w-md p-6 mb-6 bg-white rounded-lg shadow-md">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-700">Ride Info</h2>
 
               <button
                 onClick={() => setStepPhase("initial")}
-                className="text-orange-600 font-bold flex items-center space-x-1 hover:text-orange-700"
+                className="flex items-center space-x-1 font-bold text-orange-600 hover:text-orange-700"
               >
                 <span className="text-sm">✏️</span>
                 <span>Modify</span>
               </button>
             </div>
 
-            <div className="flex justify-between text-gray-600 text-sm mb-4">
+            <div className="flex justify-between mb-4 text-sm text-gray-600">
               <span className="flex items-center gap-1">
                 <CalendarDays className="w-4 h-4" />
                 {allValues?.date}
@@ -113,7 +111,7 @@ const CustomizeRide = ({ setStepPhase }) => {
               </>
             ) : (
               <>
-                <div className="w-full h-48 bg-gray-200 rounded-md overflow-hidden mb-4 flex items-center justify-center">
+                <div className="flex items-center justify-center w-full h-48 mb-4 overflow-hidden bg-gray-200 rounded-md">
                   {isLoaded ? (
                     <GoogleMap
                       center={{ lat: 40.7128, lng: -74.006 }}
@@ -128,7 +126,7 @@ const CustomizeRide = ({ setStepPhase }) => {
                     <p>Loading map...</p>
                   )}
                 </div>
-                <div className="text-gray-700 text-sm space-y-2">
+                <div className="space-y-2 text-sm text-gray-700">
                   <p className="flex items-center">
                     <span className="mr-2 text-gray-500">⏰</span>{" "}
                     {allValues?.time}
@@ -149,29 +147,29 @@ const CustomizeRide = ({ setStepPhase }) => {
           </div>
 
           {/* Vehicle Features */}
-          <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+            <h2 className="mb-4 text-xl font-semibold text-gray-700">
               All our vehicles include:
             </h2>
-            <ul className="space-y-3 text-gray-700 text-sm">
+            <ul className="space-y-3 text-sm text-gray-700">
               <li className="flex items-center">
-                <span className="mr-3 text-gray-500 text-lg">✈️</span> Flight &
+                <span className="mr-3 text-lg text-gray-500">✈️</span> Flight &
                 Ride Tracking
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-gray-500 text-lg">📞</span> 24/7
+                <span className="mr-3 text-lg text-gray-500">📞</span> 24/7
                 Customer Call Center
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-gray-500 text-lg">🗣️</span>{" "}
+                <span className="mr-3 text-lg text-gray-500">🗣️</span>{" "}
                 Multilingual Driver
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-gray-500 text-lg">💰</span> Full
+                <span className="mr-3 text-lg text-gray-500">💰</span> Full
                 refund if cancelled 24 hours in advance
               </li>
               <li className="flex items-center">
-                <span className="mr-3 text-gray-500 text-lg">⏰</span> Free 60
+                <span className="mr-3 text-lg text-gray-500">⏰</span> Free 60
                 min wait at airport pickups
               </li>
             </ul>
@@ -180,10 +178,10 @@ const CustomizeRide = ({ setStepPhase }) => {
       </div>
 
       {/* Vehicle Selection */}
-      <div className="max-w-7xl mx-auto mt-7">
-        <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+      <div className="mx-auto max-w-7xl mt-7">
+        <div className="flex flex-col space-y-6 md:flex-row md:space-x-6 md:space-y-0">
           <div className="flex-1">
-            <div className="flex text-xs text-gray-600 border border-gray-200 rounded-t-md bg-white select-none overflow-x-auto scrollbar-hide">
+            <div className="flex overflow-x-auto text-xs text-gray-600 bg-white border border-gray-200 select-none rounded-t-md scrollbar-hide">
               {types.map((item, idx) => (
                 <button
                   key={idx}
@@ -204,59 +202,69 @@ const CustomizeRide = ({ setStepPhase }) => {
               ))}
             </div>
 
-            <div className="space-y-4 bg-white border border-t-0 border-gray-200 rounded-b-md p-4">
-              {vehicles.map((car, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-md p-4"
-                >
-                  <div className="flex items-center space-x-4 mb-3 sm:mb-0 sm:flex-1">
-                    <img
-                      src={car.imageUrl}
-                      alt={car.subtitle}
-                      className="w-20 h-auto"
-                    />
-                    <div className="text-xs text-gray-700">
-                      <p className="font-semibold">{car.title}</p>
-                      <p className="text-gray-400">{car.subtitle}</p>
-                      <div className="flex items-center space-x-3 mt-1">
-                        <div className="flex items-center space-x-1">
-                          <i className="fas fa-user text-gray-400"></i>
-                          <span>Max. 3</span>
+            <div className="p-4 space-y-4 bg-white border border-t-0 border-gray-200 rounded-b-md">
+              {isPending ? (
+                <p>Loading......</p>
+              ) : (
+                vehicles.map((car, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col p-4 border border-gray-200 rounded-md sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="flex items-center mb-3 space-x-4 sm:mb-0 sm:flex-1">
+                      <img
+                        src={car.imageUrl}
+                        alt={car.subtitle}
+                        className="w-20 h-auto"
+                      />
+                      <div className="text-xs text-gray-700">
+                        <p className="font-semibold">{car.title}</p>
+                        <p className="text-gray-400">{car.subtitle}</p>
+                        <div className="flex items-center mt-1 space-x-3">
+                          <div className="flex items-center space-x-1">
+                            <i className="text-gray-400 fas fa-user"></i>
+                            <span>Max. 3</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <i className="text-gray-400 fas fa-suitcase"></i>
+                            <span>Max. 3</span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <i className="fas fa-suitcase text-gray-400"></i>
-                          <span>Max. 3</span>
-                        </div>
+                        <label className="inline-flex items-center mt-2 text-xs text-gray-500 cursor-pointer select-none">
+                          <input className="form-checkbox" type="checkbox" />
+                          <span className="ml-1">Need child seats?</span>
+                        </label>
                       </div>
-                      <label className="inline-flex items-center mt-2 cursor-pointer text-gray-500 text-xs select-none">
-                        <input className="form-checkbox" type="checkbox" />
-                        <span className="ml-1">Need child seats?</span>
-                      </label>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold">
+                        USD{" "}
+                        {(
+                          parseFloat(car.price) +
+                          parseFloat(allValues?.totalPrice)
+                        ).toFixed(2)}
+                      </p>
+                      <p className="mb-2 text-xs text-gray-400">
+                        All inclusive
+                      </p>
+                      {step < 4 && (
+                        <button
+                          onClick={() => {
+                            methods.setValue("selectedCar", car);
+                            methods.setValue("vehicleType", selectedType);
+                            setStep(step + 1);
+                          }}
+                          className="bg-[#f97316] text-white text-xs font-semibold px-4 py-1 rounded hover:bg-[#ea7c2d] transition"
+                          type="button"
+                        >
+                          Select <i className="ml-1 fas fa-arrow-right"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-sm">
-                      USD {(parseFloat(car.price)+ parseFloat(allValues?.totalPrice)).toFixed(2)}
-                    </p>
-                    <p className="text-xs text-gray-400 mb-2">All inclusive</p>
-                    {step < 4 && (
-                      <button
-                        onClick={() => {
-                          methods.setValue("selectedCar", car);
-                          methods.setValue("vehicleType", selectedType);
-                          setStep(step + 1);
-                        }}
-                        className="bg-[#f97316] text-white text-xs font-semibold px-4 py-1 rounded hover:bg-[#ea7c2d] transition"
-                        type="button"
-                      >
-                        Select <i className="fas fa-arrow-right ml-1"></i>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {vehicles.length === 0 && <p>Not available</p>}
+                ))
+              )}
+              {vehicles.length === 0 && !isPending && <p>Not available</p>}
             </div>
           </div>
         </div>
