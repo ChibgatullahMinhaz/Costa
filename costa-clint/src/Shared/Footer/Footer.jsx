@@ -10,24 +10,25 @@ import {
 } from "lucide-react";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router";
+import { t } from "i18next";
 
 const Footer = () => {
   return (
-    <footer id="contact" className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-4 gap-8">
+    <footer id="contact" className="text-white bg-gray-900">
+      <div className="container px-4 py-16 mx-auto">
+        <div className="grid gap-8 md:grid-cols-4">
           {/* Company Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="bg-tropical-gradient p-2 rounded-lg">
-                <Plane className="h-6 w-6 text-white" />
+            <div className="flex items-center mb-6 space-x-2">
+              <div className="p-2 rounded-lg bg-tropical-gradient">
+                <Plane className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h3 className="text-xl font-bold">Pura Vida Transfers</h3>
                 <p className="text-sm text-gray-400">Costa Rica</p>
               </div>
             </div>
-            <p className="text-gray-300 mb-4 leading-relaxed">
+            <p className="mb-4 leading-relaxed text-gray-300">
               Your trusted partner for premium airport and hotel transfers
               throughout Costa Rica. Experience the Pura Vida lifestyle from the
               moment you arrive.
@@ -36,77 +37,70 @@ const Footer = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-tropical-600 hover:border-tropical-600"
+                className="text-gray-300 border-gray-600 hover:bg-tropical-600 hover:border-tropical-600"
               >
-                <Facebook className="h-4 w-4" />
+                <Facebook className="w-4 h-4" />
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-tropical-600 hover:border-tropical-600"
+                className="text-gray-300 border-gray-600 hover:bg-tropical-600 hover:border-tropical-600"
               >
-                <Instagram className="h-4 w-4" />
+                <Instagram className="w-4 h-4" />
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-tropical-600 hover:border-tropical-600"
+                className="text-gray-300 border-gray-600 hover:bg-tropical-600 hover:border-tropical-600"
               >
-                <MessageCircle className="h-4 w-4" />
+                <MessageCircle className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
+            <h4 className="mb-6 text-lg font-semibold">Quick Links</h4>
             <ul className="space-y-3">
               <li>
                 <a
                   href="#home"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
+                  className="text-gray-300 transition-colors hover:text-tropical-400"
                 >
-                  Home
+                  {t("nav.home")}
                 </a>
               </li>
               <li>
                 <a
                   href="#services"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
+                  className="text-gray-300 transition-colors hover:text-tropical-400"
                 >
-                  Services
+                  {t("nav.services")}
                 </a>
               </li>
               <li>
                 <a
                   href="#destinations"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
+                  className="text-gray-300 transition-colors hover:text-tropical-400"
                 >
-                  Destinations
+                  {t("nav.destinations")}
                 </a>
               </li>
-              <li>
-                <a
-                  href="#pricing"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
-                >
-                  Pricing
-                </a>
-              </li>
+
               <li>
                 <a
                   href="#about"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
+                  className="text-gray-300 transition-colors hover:text-tropical-400"
                 >
-                  About Us
+                  {t("nav.about")}
                 </a>
               </li>
               <li>
                 <a
                   href="#contact"
-                  className="text-gray-300 hover:text-tropical-400 transition-colors"
+                  className="text-gray-300 transition-colors hover:text-tropical-400"
                 >
-                  Contact
+                  {t("nav.contact")}
                 </a>
               </li>
             </ul>
@@ -114,7 +108,7 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Our Services</h4>
+            <h4 className="mb-6 text-lg font-semibold">Our Services</h4>
             <ul className="space-y-3">
               <li>
                 <span className="text-gray-300">Airport Transfers</span>
@@ -139,31 +133,31 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Contact Us</h4>
+            <h4 className="mb-6 text-lg font-semibold">Contact Us</h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <Phone className="h-5 w-5 text-tropical-400 mt-1 flex-shrink-0" />
+                <Phone className="flex-shrink-0 w-5 h-5 mt-1 text-tropical-400" />
                 <div>
                   <p className="text-gray-300">+506 2222-3333</p>
                   <p className="text-sm text-gray-400">24/7 Support</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <MessageCircle className="h-5 w-5 text-tropical-400 mt-1 flex-shrink-0" />
+                <MessageCircle className="flex-shrink-0 w-5 h-5 mt-1 text-tropical-400" />
                 <div>
                   <p className="text-gray-300">+506 8888-9999</p>
                   <p className="text-sm text-gray-400">WhatsApp</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Mail className="h-5 w-5 text-tropical-400 mt-1 flex-shrink-0" />
+                <Mail className="flex-shrink-0 w-5 h-5 mt-1 text-tropical-400" />
                 <div>
                   <p className="text-gray-300">info@puravidatransfers.cr</p>
                   <p className="text-sm text-gray-400">Email Support</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-tropical-400 mt-1 flex-shrink-0" />
+                <MapPin className="flex-shrink-0 w-5 h-5 mt-1 text-tropical-400" />
                 <div>
                   <p className="text-gray-300">San José, Costa Rica</p>
                   <p className="text-sm text-gray-400">Nationwide Service</p>
@@ -174,27 +168,27 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+        <div className="pt-8 mt-12 border-t border-gray-800">
+          <div className="flex flex-col items-center justify-between md:flex-row">
+            <div className="mb-4 text-sm text-gray-400 md:mb-0">
               © 2025 Pura Vida Transfers CR. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
               <Link
                 to="#"
-                className="text-gray-400 hover:text-tropical-400 transition-colors"
+                className="text-gray-400 transition-colors hover:text-tropical-400"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="#"
-                className="text-gray-400 hover:text-tropical-400 transition-colors"
+                className="text-gray-400 transition-colors hover:text-tropical-400"
               >
                 Terms of Service
               </Link>
               <Link
                 to="#"
-                className="text-gray-400 hover:text-tropical-400 transition-colors"
+                className="text-gray-400 transition-colors hover:text-tropical-400"
               >
                 Cancellation Policy
               </Link>

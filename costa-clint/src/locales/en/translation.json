@@ -1,0 +1,17 @@
+{
+    "welcome": "Welcome to our website!",
+    "book_now": "Book Now",
+    "contact": "Contact Us",
+    "nav": {
+        "home": "Home",
+        "about": "About",
+        "services": "Services",
+        "destinations": "Destinations",
+        "contact": "Contact",
+        "be_driver": "Be Driver",
+        "book_now": "Book Now",
+        "dashboard": "Dashboard"
+    },
+    "One Way": "One Way",
+    "By the Hour": "By the Hour"
+}

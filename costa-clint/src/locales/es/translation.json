@@ -1,0 +1,15 @@
+{
+    "welcome": "¡Bienvenido a nuestro sitio web!",
+    "book_now": "Reservar ahora",
+    "contact": "Contáctenos",
+    "nav": {
+        "home": "Inicio",
+        "about": "Acerca de",
+        "services": "Servicios",
+        "destinations": "Destinos",
+        "contact": "Contacto",
+        "be_driver": "Ser Conductor",
+        "book_now": "Reservar ahora",
+        "dashboard": "Panel"
+    }
+}

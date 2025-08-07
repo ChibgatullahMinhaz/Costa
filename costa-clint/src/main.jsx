@@ -10,7 +10,7 @@ import GoogleMapsLoader from "./Maps/GoogleMapsLoader";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import AuthProvider from "./Service/Context/Provider/AuthProvider";
-
+import './i18n';
 const queryClient = new QueryClient();
 const stripePromise = loadStripe(import.meta.env.VITE_STRIP_PUBLISH_KEY || "");
 
