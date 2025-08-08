@@ -19,11 +19,9 @@ import DriversList from "../Dashboard/Admin/Components/DriverManagement/DriverLi
 import DriverPerformance from "../Dashboard/Admin/Components/DriverManagement/DriverPerformance";
 import VehiclesList from "../Dashboard/Admin/Components/vehiclsemanagment/VehiclesList";
 import ManualAssignment from "../Dashboard/Admin/Components/vehiclsemanagment/ManualAssignment";
-import PriceManagement from "../Dashboard/Admin/Components/vehiclsemanagment/PriceManagement";
 import Earnings from "../Dashboard/Admin/Pages/Earning";
 import EarningOverview from "../Dashboard/Admin/Components/Earnings/EarningOverview";
 import Reports from "../Dashboard/Admin/Pages/Reports";
-import Settings from "../Dashboard/Admin/Pages/Settings";
 import UserUpdated from "../Dashboard/Admin/Components/userManagement/UserUpdated";
 import UserDetails from "../Dashboard/Admin/Components/userManagement/UserDetails";
 import AuthLayout from "../Layouts/Auth/AuthLayout";
@@ -48,6 +46,7 @@ import VehicleUpdateForm from "../Dashboard/Admin/Components/vehiclsemanagment/V
 import Pricing from "../Dashboard/Admin/Pages/Pricing";
 import InvoiceList from "../components/Invoice/InvoiceList";
 import NotificationDetails from "../Pages/pushNotification/NotificationDetails";
+import AddVehicleForm from "../Dashboard/Admin/Components/vehiclsemanagment/AddVehicale";
 
 // Dummy data
 
@@ -104,10 +103,6 @@ const routers = createBrowserRouter([
         element: <Reports />,
       },
       {
-        path: "setting",
-        element: <Settings />,
-      },
-      {
         path: "userManagement",
         element: <UserManagement></UserManagement>,
         children: [
@@ -142,10 +137,7 @@ const routers = createBrowserRouter([
             index: true,
             element: <EarningOverview></EarningOverview>,
           },
-          {
-            path: "pricing",
-            element: <PriceManagement></PriceManagement>,
-          },
+          
         ],
       },
       {
@@ -178,10 +170,7 @@ const routers = createBrowserRouter([
             index: true,
             element: <VehiclesList />,
           },
-          {
-            path: "priceManagement",
-            element: <PriceManagement />,
-          },
+        
           {
             path: "updateVehicle/:id",
             element: <VehicleUpdateForm />,
@@ -191,14 +180,14 @@ const routers = createBrowserRouter([
             element: <Pricing />,
           },
           {
+            path: "add/vehicles",
+            element: <AddVehicleForm />,
+          },
+          {
             path: "manualAssign",
             element: <ManualAssignment></ManualAssignment>,
           },
         ],
-      },
-      {
-        path: "priceManagement",
-        element: <PriceManagement></PriceManagement>,
       },
       {
         path: "pushNotification",

@@ -101,22 +101,21 @@ export default function BookingManagementAdvanced() {
   if (isError) return <div className="p-6 text-red-500">Failed to load bookings.</div>;
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow">
+    <div className="p-6 mx-auto bg-white rounded shadow max-w-7xl">
       {/* Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="p-4 bg-gray-100 rounded">Total Bookings: <strong>{total}</strong></div>
         <div className="p-4 bg-gray-100 rounded">Total Revenue: <strong>${revenue}</strong></div>
-        <div className="p-4 bg-gray-100 rounded">Selected: <strong>{selectedIds.length}</strong></div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 mb-4">
+      <div className="flex flex-col gap-4 mb-4 lg:flex-row">
         <input
           type="text"
           placeholder="Search customer or flight..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="p-2 border rounded w-full lg:w-1/3"
+          className="w-full p-2 border rounded lg:w-1/3"
         />
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="p-2 border rounded">
           {statusOptions.map((s) => <option key={s}>{s}</option>)}
@@ -131,8 +130,8 @@ export default function BookingManagementAdvanced() {
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (
-        <div className="mb-4 p-3 bg-blue-50 rounded flex items-center space-x-3">
-          <button onClick={handleBulkStatusChange} className="px-3 py-1 bg-blue-500 text-white rounded">
+        <div className="flex items-center p-3 mb-4 space-x-3 rounded bg-blue-50">
+          <button onClick={handleBulkStatusChange} className="px-3 py-1 text-white bg-blue-500 rounded">
             Cancel Selected
           </button>
           <button onClick={clearSelection} className="px-3 py-1 bg-gray-300 rounded">Clear Selection</button>
@@ -188,7 +187,7 @@ export default function BookingManagementAdvanced() {
                         Swal.fire("Updated!", `Status changed to ${newStatus}.`, "success");
                       }
                     }}
-                    className="p-1 border rounded text-sm"
+                    className="p-1 text-sm border rounded"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
@@ -197,7 +196,7 @@ export default function BookingManagementAdvanced() {
                   </select>
                 </td>
                 <td className="p-2">
-                  <button onClick={() => setShowDetails(b)} className="text-indigo-600 hover:underline text-sm">
+                  <button onClick={() => setShowDetails(b)} className="text-sm text-indigo-600 hover:underline">
                     View
                   </button>
                 </td>
@@ -215,7 +214,7 @@ export default function BookingManagementAdvanced() {
       </div>
 
       {/* Pagination */}
-      <div className="mt-4 flex justify-center space-x-2">
+      <div className="flex justify-center mt-4 space-x-2">
         <button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           disabled={currentPage === 1}
@@ -249,9 +248,9 @@ export default function BookingManagementAdvanced() {
 
       {/* Details Modal */}
       {showDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-2xl">
-            <h3 className="text-xl font-semibold mb-4">Booking #{showDetails.id}</h3>
+            <h3 className="mb-4 text-xl font-semibold">Booking #{showDetails.id}</h3>
             <div className="max-h-[60vh] overflow-y-auto text-sm whitespace-pre-wrap">
               {Object.entries(showDetails).map(([key, val]) => (
                 <div key={key} className="mb-1">
@@ -261,7 +260,7 @@ export default function BookingManagementAdvanced() {
             </div>
             <button
               onClick={() => setShowDetails(null)}
-              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded"
+              className="px-4 py-2 mt-4 text-white bg-indigo-600 rounded"
             >
               Close
             </button>

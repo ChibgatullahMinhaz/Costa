@@ -35,23 +35,18 @@ exports.getVehicleById = async (req, res) => {
 exports.createVehicle = async (req, res) => {
   try {
     const db = getDB();
-    const { type, baseFare, pricePerKm, capacity, imageUrl } = req.body;
-
-    if (!type || !baseFare || !pricePerKm || !capacity) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    const data = req.body;
 
     const newVehicle = {
-      type,
-      baseFare,
-      pricePerKm,
-      capacity,
-      imageUrl: imageUrl || "",
+      ...data,
       createdAt: new Date()
     };
-
+    await db.collection("carType").insertOne({
+      type: data?.type,
+      price: data?.price
+    });
     const result = await db.collection("cars").insertOne(newVehicle);
-    res.status(201).json({ _id: result.insertedId, ...newVehicle });
+    res.status(201).json(result);
   } catch (error) {
     console.error("Error creating vehicle:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -94,7 +89,7 @@ exports.deleteVehicle = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
-    console.log(id)
+
     if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID format" });
 
     const result = await db.collection("cars").deleteOne({ _id: new ObjectId(id) });

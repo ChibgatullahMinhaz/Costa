@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, MoreHorizontal, Eye, Edit, Trash } from "lucide-react";
-import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 import Swal from "sweetalert2";
 import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const fetchVehicles = async () => {
   const { data } = await axiosSecureInstance.get("api/vehicle");
@@ -14,7 +13,7 @@ const fetchVehicles = async () => {
 const VehiclesList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuVehicleId, setOpenMenuVehicleId] = useState(null);
-  const [viewVehicle, setViewVehicle] = useState(null); // For modal
+  const [viewVehicle, setViewVehicle] = useState(null); 
 const navitage = useNavigate()
   const {
     data: vehicles = [],
@@ -41,7 +40,7 @@ const navitage = useNavigate()
   const getStatusBadge = (status) => {
     const baseClasses =
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
-    if (status === "Active") {
+    if (status == "active" || status == "Active") {
       return (
         <span className={`${baseClasses} bg-green-100 text-green-800`}>
           Active
@@ -68,19 +67,15 @@ const navitage = useNavigate()
     setOpenMenuVehicleId(null);
   };
 
-  const closeModal = () => {
-    setViewVehicle(null);
-  };
 
   const handleEdit = (vehicle) => {
-
     navitage(`/admin-dashboard/vehicles/updateVehicle/${vehicle._id}`)
   };
 
   const handleDelete = async (vehicle) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `You are about to delete ${vehicle.vehicleModel}`, //
+      text: `You are about to delete ${vehicle.vehicleModel}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -101,48 +96,49 @@ const navitage = useNavigate()
   };
 
   if (isLoading) return <div className="p-6">Loading vehicles...</div>;
-  if (isError)
-    return <div className="p-6 text-red-500">Failed to load vehicles.</div>;
+  if (isError) return <div className="p-6 text-red-500">Failed to load vehicles.</div>;
 
+  
   return (
     <>
-      <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
+      <div className="text-gray-900 bg-white border rounded-lg shadow-sm">
         <div className="flex flex-col space-y-1.5 p-6">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">
               Vehicle List
             </h3>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
               <input
                 type="text"
                 placeholder="Search vehicles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="flex h-10 px-3 py-2 pl-10 text-sm bg-white border border-gray-300 rounded-md w-80 ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               />
             </div>
+            <Link to={`/admin-dashboard/vehicles/add/vehicles`} className="btn">Add</Link>
           </div>
         </div>
 
         <div className="p-6 pt-0">
           <div className="relative w-full overflow-auto">
-            <table className="w-full caption-bottom text-sm">
+            <table className="w-full text-sm caption-bottom">
               <thead className="[&_tr]:border-b">
-                <tr className="border-b transition-colors hover:bg-gray-50/50">
-                  <th className="h-12 px-4 text-left font-medium text-gray-500">
+                <tr className="transition-colors border-b hover:bg-gray-50/50">
+                  <th className="h-12 px-4 font-medium text-left text-gray-500">
                     Vehicle
                   </th>
-                  <th className="h-12 px-4 text-left font-medium text-gray-500">
+                  <th className="h-12 px-4 font-medium text-left text-gray-500">
                     License Plate
                   </th>
-                  <th className="h-12 px-4 text-left font-medium text-gray-500">
+                  <th className="h-12 px-4 font-medium text-left text-gray-500">
                     Driver
                   </th>
-                  <th className="h-12 px-4 text-left font-medium text-gray-500">
+                  <th className="h-12 px-4 font-medium text-left text-gray-500">
                     Status
                   </th>
-                  <th className="h-12 px-4 text-left font-medium text-gray-500">
+                  <th className="h-12 px-4 font-medium text-left text-gray-500">
                     Actions
                   </th>
                 </tr>
@@ -151,39 +147,39 @@ const navitage = useNavigate()
                 {filteredVehicles.map((vehicle) => (
                   <tr
                     key={vehicle._id}
-                    className="border-b transition-colors hover:bg-gray-50"
+                    className="transition-colors border-b hover:bg-gray-50"
                   >
                     <td className="p-4">{vehicle.vehicleModel}</td>
                     <td className="p-4 font-mono">{vehicle.licensePlate}</td>
                     <td className="p-4">{vehicle.fullName}</td>
                     <td className="p-4">{getStatusBadge(vehicle.status)}</td>
-                    <td className="p-4 relative">
+                    <td className="relative p-4">
                       <button
                         onClick={() => toggleDropdown(vehicle._id)}
                         className="inline-flex items-center justify-center rounded-md h-9 w-9 hover:bg-gray-100"
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className="w-4 h-4" />
                       </button>
 
                       {openMenuVehicleId === vehicle._id && (
-                        <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border bg-white shadow-lg">
+                        <div className="absolute right-0 z-50 w-40 mt-2 bg-white border rounded-md shadow-lg">
                           <button
                             onClick={() => handleView(vehicle)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm hover:bg-gray-100"
                           >
-                            <Eye className="h-4 w-4" /> View Details
+                            <Eye className="w-4 h-4" /> View Details
                           </button>
                           <button
                             onClick={() => handleEdit(vehicle)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm hover:bg-gray-100"
                           >
-                            <Edit className="h-4 w-4" /> Edit
+                            <Edit className="w-4 h-4" /> Edit
                           </button>
                           <button
                             onClick={() => handleDelete(vehicle)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm text-red-700 hover:bg-red-100"
                           >
-                            <Trash className="h-4 w-4" /> Delete
+                            <Trash className="w-4 h-4" /> Delete
                           </button>
                         </div>
                       )}
@@ -194,7 +190,7 @@ const navitage = useNavigate()
             </table>
 
             {filteredVehicles.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
+              <div className="py-8 text-center text-gray-500">
                 No vehicles found.
               </div>
             )}
@@ -203,46 +199,49 @@ const navitage = useNavigate()
       </div>
 
       {/* Modal */}
-      {viewVehicle && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-          onClick={closeModal}
-        >
-          <div
-            className="bg-white rounded-lg max-w-md w-full p-6 relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-xl font-bold mb-4">Vehicle Details</h2>
-            <div className="space-y-2 text-gray-800">
-              <p>
-                <strong>Model:</strong> {viewVehicle.model}
-              </p>
-              <p>
-                <strong>License Plate:</strong> {viewVehicle.licensePlate}
-              </p>
-              <p>
-                <strong>Driver:</strong> {viewVehicle.driver}
-              </p>
-              <p>
-                <strong>Mileage:</strong> {viewVehicle.mileage}
-              </p>
-              <p>
-                <strong>Last Service:</strong> {viewVehicle.lastService}
-              </p>
-              <p>
-                <strong>Status:</strong> {viewVehicle.status}
-              </p>
-              {/* Add any other fields you want to show */}
-            </div>
-            <button
-              onClick={closeModal}
-              className="mt-6 inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+{viewVehicle && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center py-10 overflow-auto"
+    onClick={() => setViewVehicle(null)}
+  >
+    <div
+      className="relative w-full max-w-lg p-6 bg-white rounded-lg shadow-lg"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h2 className="mb-4 text-xl font-bold">Vehicle Details</h2>
+      <div className="space-y-2 text-gray-800">
+        <p><strong>Type:</strong> {viewVehicle.type}</p>
+        <p><strong>Full Name:</strong> {viewVehicle.fullName}</p>
+        <p><strong>Vehicle Type:</strong> {viewVehicle.vehicleType}</p>
+        <p><strong>Model:</strong> {viewVehicle.vehicleModel}</p>
+        <p><strong>Year:</strong> {viewVehicle.vehicleYear}</p>
+        <p><strong>License Plate:</strong> {viewVehicle.licensePlate}</p>
+        <p><strong>Color:</strong> {viewVehicle.vehicleColor}</p>
+        <p><strong>Seat Capacity:</strong> {viewVehicle.seatCapacity}</p>
+        <p><strong>Luggage Capacity:</strong> {viewVehicle.luggageCapacity}</p>
+        <p><strong>Status:</strong> {viewVehicle.status}</p>
+        <p><strong>Title:</strong> {viewVehicle.title}</p>
+        <p><strong>Subtitle:</strong> {viewVehicle.subtitle}</p>
+        <p><strong>Price:</strong> ${viewVehicle.price}</p>
+        {viewVehicle.imageUrl && (
+          <img
+            src={viewVehicle.imageUrl}
+            alt={viewVehicle.vehicleModel}
+            className="object-cover w-full h-48 mt-2 rounded"
+          />
+        )}
+      </div>
+      <button
+        onClick={() => setViewVehicle(null)}
+        className="inline-block px-4 py-2 mt-6 text-white bg-blue-600 rounded hover:bg-blue-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+
     </>
   );
 };

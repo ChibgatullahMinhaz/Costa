@@ -4,7 +4,6 @@ import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
-import axios from "axios";
 
 const fetchVehicle = async (id) => {
   const { data } = await axiosSecureInstance.get(`api/vehicleById/${id}`);
@@ -15,7 +14,6 @@ const VehicleUpdateForm = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
 
-  // useQuery with latest syntax
   const {
     data: vehicle,
     isLoading,

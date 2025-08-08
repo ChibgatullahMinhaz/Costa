@@ -77,4 +77,7 @@ router.get("/api/booking/total-customers", getTotalCustomers);
 // pricing setting
 router.get('/api/settings/pricing', getPricingSettings)
 router.put('/api/settings/pricing/update', updatePricingSettings)
+
+
+
 module.exports = router;

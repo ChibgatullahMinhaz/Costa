@@ -62,19 +62,13 @@ const menuItems = [
     path: "/admin-dashboard/pushNotification",
     useNavLink: true,
   },
-  {
-    name: "Settings",
-    Icon: Settings,
-    path: "/admin-dashboard/setting",
-    useNavLink: true,
-  },
 ];
 
 const Sidebar = () => {
   return (
     <div className="sticky top-0 min-h-screen p-4">
       <h1 className="text-xl font-bold mb-6 flex gap-x-1.5">
-        <Car className="h-6 w-6" />
+        <Car className="w-6 h-6" />
         Costa Rica
       </h1>
       <nav className="flex flex-col space-y-4">
@@ -94,7 +88,7 @@ const Sidebar = () => {
                 `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`
               }
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="w-5 h-5" />
               <span className="hidden sm:block">{name}</span>
             </NavLink>
           ) : (
@@ -103,7 +97,7 @@ const Sidebar = () => {
               to={path}
               className={`${baseClasses} ${inactiveClasses}`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="w-5 h-5" />
               <span className="hidden sm:block">{name}</span>
             </Link>
           );
