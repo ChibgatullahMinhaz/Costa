@@ -8,8 +8,11 @@ const fetchBookings = async () => {
   return data;
 };
 
-const updateBookingStatus = async ({ id, status }) => {
-  const { data } = await axiosSecureInstance.patch(`api/booking/update/status/${id}`, { status });
+const updateBookingStatus = async ({ id, bookingStatus }) => {
+  const { data } = await axiosSecureInstance.patch(
+    `api/booking/update/status/${id}`,
+    { bookingStatus }
+  );
   return data;
 };
 
@@ -39,23 +42,33 @@ export default function BookingManagementAdvanced() {
     mutationFn: updateBookingStatus,
     onSuccess: () => {
       queryClient.invalidateQueries(["bookings"]);
+      Swal.fire("Updated!", "Booking status updated successfully.", "success");
+    },
+    onError: (error) => {
+      Swal.fire(
+        "Error",
+        error?.response?.data?.message || "Failed to update booking",
+        "error"
+      );
     },
   });
 
   if (!Array.isArray(bookings)) {
-    return <div className="p-6 text-red-500">Invalid bookings data from API</div>;
+    return (
+      <div className="p-6 text-red-500">Invalid bookings data from API</div>
+    );
   }
 
   const filtered = bookings.filter((b) => {
     if (
       search &&
       !(
-        b.customerName.toLowerCase().includes(search.toLowerCase()) ||
-        b.flightNumber.toLowerCase().includes(search.toLowerCase())
+        b.customerName?.toLowerCase().includes(search.toLowerCase()) ||
+        b.flightNumber?.toLowerCase().includes(search.toLowerCase())
       )
     )
       return false;
-    if (statusFilter !== "All" && b.status !== statusFilter) return false;
+    if (statusFilter !== "All" && b.bookingStatus !== statusFilter) return false;
     if (vehicleFilter !== "All" && b.vehicleType !== vehicleFilter) return false;
     return true;
   });
@@ -64,18 +77,14 @@ export default function BookingManagementAdvanced() {
   const totalPages = Math.ceil(total / perPage);
   const pageStart = (currentPage - 1) * perPage;
   const pageData = filtered.slice(pageStart, pageStart + perPage);
+  const revenue = filtered
+    .reduce((sum, b) => sum + (b.price || 0), 0)
+    .toFixed(2);
 
-  const revenue = filtered.reduce((sum, b) => sum + (b.price || 0), 0).toFixed(2);
-
-  const toggleSelect = (id) => {
+  const toggleSelect = (_id) => {
     setSelectedIds((ids) =>
-      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
+      ids.includes(_id) ? ids.filter((x) => x !== _id) : [...ids, _id]
     );
-  };
-
-  const selectAllOnPage = () => {
-    const ids = pageData.map((b) => b.id);
-    setSelectedIds(ids);
   };
 
   const clearSelection = () => setSelectedIds([]);
@@ -88,8 +97,8 @@ export default function BookingManagementAdvanced() {
       confirmButtonText: "Yes, cancel all",
     }).then((res) => {
       if (res.isConfirmed) {
-        selectedIds.forEach((id) => {
-          updateStatusMutation.mutate({ id, status: "Cancelled" });
+        selectedIds.forEach((_id) => {
+          updateStatusMutation.mutate({ id: _id, bookingStatus: "Cancelled" });
         });
         clearSelection();
         Swal.fire("Cancelled!", "Selected bookings are cancelled.", "success");
@@ -104,8 +113,9 @@ export default function BookingManagementAdvanced() {
     <div className="p-6 mx-auto bg-white rounded shadow max-w-7xl">
       {/* Metrics */}
       <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="p-4 bg-gray-100 rounded">Total Bookings: <strong>{total}</strong></div>
-        <div className="p-4 bg-gray-100 rounded">Total Revenue: <strong>${revenue}</strong></div>
+        <div className="p-4 bg-gray-100 rounded">
+          Total Bookings: <strong>{total}</strong>
+        </div>
       </div>
 
       {/* Filters */}
@@ -117,24 +127,52 @@ export default function BookingManagementAdvanced() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full p-2 border rounded lg:w-1/3"
         />
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="p-2 border rounded">
-          {statusOptions.map((s) => <option key={s}>{s}</option>)}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="p-2 border rounded"
+        >
+          {statusOptions.map((s) => (
+            <option key={s}>{s}</option>
+          ))}
         </select>
-        <select value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value)} className="p-2 border rounded">
-          {vehicleOptions.map((v) => <option key={v}>{v}</option>)}
+        <select
+          value={vehicleFilter}
+          onChange={(e) => setVehicleFilter(e.target.value)}
+          className="p-2 border rounded"
+        >
+          {vehicleOptions.map((v) => (
+            <option key={v}>{v}</option>
+          ))}
         </select>
-        <select value={perPage} onChange={(e) => setPerPage(+e.target.value)} className="p-2 border rounded">
-          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}/page</option>)}
+        <select
+          value={perPage}
+          onChange={(e) => setPerPage(+e.target.value)}
+          className="p-2 border rounded"
+        >
+          {[10, 25, 50, 100].map((n) => (
+            <option key={n} value={n}>
+              {n}/page
+            </option>
+          ))}
         </select>
       </div>
 
       {/* Bulk Actions */}
       {selectedIds.length > 0 && (
         <div className="flex items-center p-3 mb-4 space-x-3 rounded bg-blue-50">
-          <button onClick={handleBulkStatusChange} className="px-3 py-1 text-white bg-blue-500 rounded">
+          <button
+            onClick={handleBulkStatusChange}
+            className="px-3 py-1 text-white bg-blue-500 rounded"
+          >
             Cancel Selected
           </button>
-          <button onClick={clearSelection} className="px-3 py-1 bg-gray-300 rounded">Clear Selection</button>
+          <button
+            onClick={clearSelection}
+            className="px-3 py-1 bg-gray-300 rounded"
+          >
+            Clear Selection
+          </button>
         </div>
       )}
 
@@ -143,37 +181,27 @@ export default function BookingManagementAdvanced() {
         <table className="w-full text-left border">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-2"><input type="checkbox" onChange={selectAllOnPage} /></th>
               <th className="p-2">Customer</th>
-              <th className="p-2">Flight</th>
               <th className="p-2">Pickup</th>
               <th className="p-2">Dropoff</th>
               <th className="p-2">Date</th>
-              <th className="p-2">Vehicle</th>
-              <th className="p-2">Price</th>
               <th className="p-2">Status</th>
               <th className="p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {pageData.map((b) => (
-              <tr key={b.id} className="hover:bg-gray-50">
-                <td className="p-2">
-                  <input type="checkbox" checked={selectedIds.includes(b.id)} onChange={() => toggleSelect(b.id)} />
-                </td>
-                <td className="p-2">{b.customerName}</td>
-                <td className="p-2">{b.flightNumber}</td>
-                <td className="p-2">{b.pickupLocation}</td>
-                <td className="p-2">{b.dropoffLocation}</td>
-                <td className="p-2">{b.date} @ {b.time}</td>
-                <td className="p-2">{b.vehicleType}</td>
-                <td className="p-2">${(b.price || 0).toFixed(2)}</td>
+              <tr key={b._id} className="hover:bg-gray-50">
+                <td className="p-2">{b.contactInfo?.name}</td>
+                <td className="p-2">{b.from}</td>
+                <td className="p-2">{b.to}</td>
+                <td className="p-2">{b.date}</td>
                 <td className="p-2">
                   <select
-                    value={b.status}
+                    value={b.bookingStatus}
                     onChange={async (e) => {
                       const newStatus = e.target.value;
-                      if (newStatus === b.status) return;
+                      if (newStatus === b.bookingStatus) return;
 
                       const res = await Swal.fire({
                         title: `Change status to ${newStatus}?`,
@@ -183,8 +211,10 @@ export default function BookingManagementAdvanced() {
                       });
 
                       if (res.isConfirmed) {
-                        updateStatusMutation.mutate({ id: b.id, status: newStatus });
-                        Swal.fire("Updated!", `Status changed to ${newStatus}.`, "success");
+                        updateStatusMutation.mutate({
+                          id: b._id,
+                          bookingStatus: newStatus,
+                        });
                       }
                     }}
                     className="p-1 text-sm border rounded"
@@ -196,7 +226,10 @@ export default function BookingManagementAdvanced() {
                   </select>
                 </td>
                 <td className="p-2">
-                  <button onClick={() => setShowDetails(b)} className="text-sm text-indigo-600 hover:underline">
+                  <button
+                    onClick={() => setShowDetails(b)}
+                    className="text-sm text-indigo-600 hover:underline"
+                  >
                     View
                   </button>
                 </td>
@@ -228,10 +261,11 @@ export default function BookingManagementAdvanced() {
             <button
               key={p}
               onClick={() => setCurrentPage(p)}
-              className={`px-3 py-1 rounded ${currentPage === p
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-                }`}
+              className={`px-3 py-1 rounded ${
+                currentPage === p
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
             >
               {p}
             </button>
@@ -250,11 +284,14 @@ export default function BookingManagementAdvanced() {
       {showDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-2xl">
-            <h3 className="mb-4 text-xl font-semibold">Booking #{showDetails.id}</h3>
+            <h3 className="mb-4 text-xl font-semibold">
+              Booking #{showDetails._id}
+            </h3>
             <div className="max-h-[60vh] overflow-y-auto text-sm whitespace-pre-wrap">
               {Object.entries(showDetails).map(([key, val]) => (
                 <div key={key} className="mb-1">
-                  <strong className="capitalize">{key}:</strong> {String(val)}
+                  <strong className="capitalize">{key}:</strong>{" "}
+                  {String(val)}
                 </div>
               ))}
             </div>

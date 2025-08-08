@@ -114,17 +114,18 @@ exports.deleteBooking = async (req, res) => {
 
 exports.updateBookingByAdmin = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { bookingStatus } = req.body;
+  const db = getDB();
   try {
-    const bookingCollection = req.app.locals.db.collection("Bookings");
+    const bookingCollection =db.collection("Bookings");
 
     const result = await bookingCollection.findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: { status } },
-      { returnDocument: "after" } // returns the updated document
+      { $set: { bookingStatus } },
+      { returnDocument: "after" }
     );
 
-    if (!result.value) {
+    if (!result) {
       return res.status(404).json({ message: "Booking not found" });
     }
 

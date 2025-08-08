@@ -4,6 +4,8 @@ import instance from "../../Service/APIs/AxiosSecure";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 import axiosSecureInstance from "../../Service/APIs/AxiosInstance";
 import useAuth from "../../Hooks/useAuth";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 function generateBookingId() {
   const timestamp = Date.now().toString(36); // base36 to shorten length
@@ -19,6 +21,7 @@ function PaymentForm({ onSuccess }) {
   const { methods } = useContext(BookingFormContext);
   const allValues = methods.getValues();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -60,7 +63,8 @@ function PaymentForm({ onSuccess }) {
         console.error("[Payment Error]", result.error.message);
         alert("❌ " + result.error.message);
       } else if (result.paymentIntent.status === "succeeded") {
-        alert("✅ Payment successful!");
+        Swal.fire("✅ Payment successful!");
+      
         const email = user?.email;
 
         const bookingHistory = {
@@ -73,7 +77,6 @@ function PaymentForm({ onSuccess }) {
           "api/createBooking",
           bookingHistory
         );
-        console.log(response.data);
         onSuccess?.();
       }
     } catch (error) {
