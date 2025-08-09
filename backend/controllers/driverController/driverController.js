@@ -140,11 +140,12 @@ exports.updateDriverStatus = async (req, res) => {
 exports.getActiveDrivers = async (req, res) => {
   try {
     const db = getDB();
+
     const driversCollection = db.collection("drivers");
-    const query = { status: { $in: ["active", "Active"] } };    // status = 'active' wala driver gula ber koro
+    const query = { application_status: { $in: ["active", "Active", "accepted"] } };
     const activeDrivers = await driversCollection.find(query).toArray();
 
-    res.status(200).json({ activeDrivers });
+    res.status(200).json(activeDrivers);
   } catch (error) {
     console.error("Error fetching active drivers:", error);
     res.status(500).json({ error: "Failed to fetch active drivers" });

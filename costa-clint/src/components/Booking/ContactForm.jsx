@@ -6,6 +6,8 @@ import useStep from "../../Hooks/useStep";
 import Modal from "../UI/Modal/Modal";
 import PaymentForm from "../Payment/StripPayment";
 
+
+
 const ContactInformation = ({ onContinue }) => {
    
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -17,9 +19,10 @@ const ContactInformation = ({ onContinue }) => {
     formState: { errors },
     handleSubmit,
   } = useFormContext();
-  const { step, setStep } = useStep();
 
   const isBookingForSomeoneElse = watch("bookingForSomeoneElse");
+
+
 
   // On successful validation, call onContinue
   const onValid = (data) => {

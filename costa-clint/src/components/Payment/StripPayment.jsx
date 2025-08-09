@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
 
 function generateBookingId() {
-  const timestamp = Date.now().toString(36); // base36 to shorten length
+  const timestamp = Date.now().toString(36);
   const randomStr = Math.random().toString(36).substring(2, 7);
 
   return `BOOK-${timestamp}-${randomStr}`.toUpperCase();
@@ -22,6 +22,7 @@ function PaymentForm({ onSuccess }) {
   const allValues = methods.getValues();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [bookingID, setBookingID] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,7 +35,6 @@ function PaymentForm({ onSuccess }) {
     if (!card) return;
 
     try {
-      // Get payment intent from backend
       const finalRice =
         parseFloat(allValues.totalPrice) +
         parseFloat(allValues?.selectedCar?.price);
@@ -63,20 +63,22 @@ function PaymentForm({ onSuccess }) {
         console.error("[Payment Error]", result.error.message);
         alert("❌ " + result.error.message);
       } else if (result.paymentIntent.status === "succeeded") {
-        Swal.fire("✅ Payment successful!");
-      
+        const bookingID = generateBookingId();
+        setBookingID(bookingID);
+        console.log("bookingid", bookingID);
+        Swal.fire("✅ Payment successful!").then(() => {
+          navigate("/dashboard");
+        });
+
         const email = user?.email;
 
         const bookingHistory = {
           allValues,
           email: email,
           result,
-          bookingID: generateBookingId(),
+          bookingID: bookingID,
         };
-        const response = await axiosSecureInstance.post(
-          "api/createBooking",
-          bookingHistory
-        );
+        await axiosSecureInstance.post("api/createBooking", bookingHistory);
         onSuccess?.();
       }
     } catch (error) {

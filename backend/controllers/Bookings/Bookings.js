@@ -4,7 +4,7 @@ const { getDB } = require("../../Config/db");
 
 exports.createBooking = async (req, res) => {
   try {
-    const { allValues, result, email } = req.body;
+    const { allValues, result, email, bookingID } = req.body;
     const db = getDB();
     const bookingsCollection = db.collection("Bookings");
     const paymentHistory = db.collection("paymentHistory");
@@ -15,7 +15,8 @@ exports.createBooking = async (req, res) => {
       useEmail: email,
       paymentStatus: "paid",
       createdAt: new Date(),
-      bookingStatus: 'pending'
+      bookingStatus: 'pending',
+      bookingID
     };
 
     const bookingResult = await bookingsCollection.insertOne(booking);
@@ -117,7 +118,7 @@ exports.updateBookingByAdmin = async (req, res) => {
   const { bookingStatus } = req.body;
   const db = getDB();
   try {
-    const bookingCollection =db.collection("Bookings");
+    const bookingCollection = db.collection("Bookings");
 
     const result = await bookingCollection.findOneAndUpdate(
       { _id: new ObjectId(id) },

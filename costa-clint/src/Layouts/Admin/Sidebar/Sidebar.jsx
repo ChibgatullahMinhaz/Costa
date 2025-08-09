@@ -89,7 +89,7 @@ const Sidebar = () => {
               }
             >
               <Icon className="w-5 h-5" />
-              <span className="hidden sm:block">{name}</span>
+              <span className="">{name}</span>
             </NavLink>
           ) : (
             <Link
@@ -98,7 +98,7 @@ const Sidebar = () => {
               className={`${baseClasses} ${inactiveClasses}`}
             >
               <Icon className="w-5 h-5" />
-              <span className="hidden sm:block">{name}</span>
+              <span className="">{name}</span>
             </Link>
           );
         })}

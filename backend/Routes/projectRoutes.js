@@ -8,6 +8,7 @@ const { processPayment } = require('../controllers/payment/payment');
 const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
 const { getPricingSettings, updatePricingSettings } = require('../controllers/Pricing/Pricing');
 const { getPricingConfig } = require('../controllers/pricingController');
+const { assignTrip, updateDriverBookings } = require('../controllers/assignmentController');
 const router = express.Router();
 
 
@@ -78,6 +79,10 @@ router.get("/api/booking/total-customers", getTotalCustomers);
 router.get('/api/settings/pricing', getPricingSettings)
 router.put('/api/settings/pricing/update', updatePricingSettings)
 
+
+//admin side 
+router.post("/bookings/assign", assignTrip);
+router.patch("/drivers/:driverId/assign-booking", updateDriverBookings);
 
 
 module.exports = router;
