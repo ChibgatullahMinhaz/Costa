@@ -47,9 +47,9 @@ import Pricing from "../Dashboard/Admin/Pages/Pricing";
 import InvoiceList from "../components/Invoice/InvoiceList";
 import NotificationDetails from "../Pages/pushNotification/NotificationDetails";
 import AddVehicleForm from "../Dashboard/Admin/Components/vehiclsemanagment/AddVehicale";
+import LiveChat from "../Layouts/CustomerLayout/components/LiveChat";
 
 // Dummy data
-
 
 const routers = createBrowserRouter([
   {
@@ -86,7 +86,7 @@ const routers = createBrowserRouter([
     path: "/admin-dashboard",
     element: (
       // <AdminRoutes>
-        <AdminLayout></AdminLayout>
+      <AdminLayout></AdminLayout>
       // </AdminRoutes>
     ),
     children: [
@@ -137,7 +137,6 @@ const routers = createBrowserRouter([
             index: true,
             element: <EarningOverview></EarningOverview>,
           },
-          
         ],
       },
       {
@@ -170,7 +169,7 @@ const routers = createBrowserRouter([
             index: true,
             element: <VehiclesList />,
           },
-        
+
           {
             path: "updateVehicle/:id",
             element: <VehicleUpdateForm />,
@@ -215,7 +214,7 @@ const routers = createBrowserRouter([
       },
       {
         path: "invoice",
-        element: <InvoiceList  />,
+        element: <InvoiceList />,
       },
       {
         path: "flights",
@@ -225,13 +224,17 @@ const routers = createBrowserRouter([
         path: "updateBooking/:id",
         Component: BookingUpdateForm,
       },
+      {
+        path: "live/chat",
+        Component: LiveChat,
+      },
     ],
   },
   {
     path: "/driver-dashboard",
     element: (
       // <DriverRoute>
-        <DriverLayouts></DriverLayouts>
+      <DriverLayouts></DriverLayouts>
       // </DriverRoute>
     ),
     children: [

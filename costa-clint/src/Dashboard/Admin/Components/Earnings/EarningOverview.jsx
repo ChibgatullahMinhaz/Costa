@@ -1,113 +1,206 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
-const monthlyData = [
-  { month: 'Jan', revenue: 12000, rides: 450, drivers: 25 },
-  { month: 'Feb', revenue: 15000, rides: 520, drivers: 28 },
-  { month: 'Mar', revenue: 18000, rides: 600, drivers: 32 },
-  { month: 'Apr', revenue: 22000, rides: 750, drivers: 35 },
-  { month: 'May', revenue: 25000, rides: 820, drivers: 38 },
-  { month: 'Jun', revenue: 28000, rides: 900, drivers: 42 }
-];
-
+// Pie chart colors for revenue breakdown (dummy % for example)
 const revenueBreakdown = [
-  { name: 'Ride Fees', value: 65, color: '#3B82F6' },
-  { name: 'Commission', value: 25, color: '#10B981' },
-  { name: 'Surge Pricing', value: 10, color: '#F59E0B' }
+  { name: "Ride Fees", value: 65, color: "#3B82F6" },
+  { name: "Commission", value: 25, color: "#10B981" },
+  { name: "Surge Pricing", value: 10, color: "#F59E0B" },
 ];
 
-const topDrivers = [
-  { name: 'Ahmed Hassan', earnings: 3200, rides: 125 },
-  { name: 'Karim Rahman', earnings: 2800, rides: 110 },
-  { name: 'Rahim Ali', earnings: 2500, rides: 95 },
-  { name: 'Nasir Khan', earnings: 2200, rides: 88 },
-  { name: 'Sakib Hasan', earnings: 2000, rides: 80 }
-];
+// Fetch bookings API call
+const fetchBookings = async () => {
+  const { data } = await axiosSecureInstance.get("all-bookings");
+  return data;
+};
+
+// Process bookings to aggregate monthly data
+const processBookingData = (bookings) => {
+  const monthlySummary = {};
+
+  bookings.forEach(({ amount, date, driverId }) => {
+    // Get short month name like "Jan", "Feb"
+    const month = new Date(date).toLocaleString("default", { month: "short" });
+
+    if (!monthlySummary[month]) {
+      monthlySummary[month] = { revenue: 0, rides: 0, drivers: new Set() };
+    }
+
+    monthlySummary[month].revenue += amount;
+    monthlySummary[month].rides += 1;
+    monthlySummary[month].drivers.add(driverId);
+  });
+
+  return Object.entries(monthlySummary).map(([month, data]) => ({
+    month,
+    revenue: data.revenue,
+    rides: data.rides,
+  }));
+};
+
 const EarningOverview = () => {
-    return (
+  const {
+    data: bookings = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["bookings-overview"],
+    queryFn: fetchBookings,
+  });
+
+  if (isLoading) return <div className="p-6">Loading bookings...</div>;
+  if (isError)
+    return <div className="p-6 text-red-500">Failed to load bookings.</div>;
+
+  // Process data for charts
+  const monthlyData = processBookingData(bookings);
+
+  // Calculate totals
+  const totalRevenue = bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  const commissionRate = 0.25;
+  const commissionEarned = totalRevenue * commissionRate;
+  const totalRides = bookings.length;
+
+  return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border shadow-sm p-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">৳1,20,000</p>
-              <p className="text-sm text-green-600">+12% from last month</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${totalRevenue.toLocaleString()}
+              </p>
             </div>
-            <div className="p-3 rounded-full bg-blue-100">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            <div className="p-3 bg-blue-100 rounded-full">
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border shadow-sm p-6">
+        <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Commission Earned</p>
-              <p className="text-2xl font-bold text-gray-900">৳30,000</p>
-              <p className="text-sm text-green-600">+8% from last month</p>
+              <p className="text-sm font-medium text-gray-600">
+                Commission Earned
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${commissionEarned.toLocaleString()}
+              </p>
             </div>
-            <div className="p-3 rounded-full bg-green-100">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <div className="p-3 bg-green-100 rounded-full">
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border shadow-sm p-6">
+        <div className="p-6 bg-white border rounded-lg shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Rides</p>
-              <p className="text-2xl font-bold text-gray-900">4,085</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {totalRides.toLocaleString()}
+              </p>
               <p className="text-sm text-green-600">+15% from last month</p>
             </div>
-            <div className="p-3 rounded-full bg-yellow-100">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <div className="p-3 bg-yellow-100 rounded-full">
+              <svg
+                className="w-6 h-6 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Active Drivers</p>
-              <p className="text-2xl font-bold text-gray-900">42</p>
-              <p className="text-sm text-green-600">+3 new this month</p>
-            </div>
-            <div className="p-3 rounded-full bg-purple-100">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
+      
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Monthly Revenue Chart */}
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Revenue Trend</h3>
+        <div className="p-6 bg-white border rounded-lg shadow-sm">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800">
+            Monthly Revenue Trend
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyData}>
+            {/* <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={(value) => [`৳${value}`, 'Revenue']} />
-              <Line type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={3} />
-            </LineChart>
+              <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3B82F6"
+                strokeWidth={3}
+              />
+            </LineChart> */}
+
+            <BarChart data={monthlyData}>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="month" />
+  <YAxis yAxisId="left" />
+  <Tooltip />
+  <Bar yAxisId="left" dataKey="rides" fill="#10B981" name="Total Rides" />
+</BarChart>
           </ResponsiveContainer>
+          
         </div>
 
         {/* Revenue Breakdown */}
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue Breakdown</h3>
+        <div className="p-6 bg-white border rounded-lg shadow-sm">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800">
+            Revenue Breakdown
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -123,14 +216,17 @@ const EarningOverview = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
+              <Tooltip formatter={(value) => [`${value}%`, "Percentage"]} />
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-4 space-y-2">
             {revenueBreakdown.map((item, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className={`w-3 h-3 rounded-full mr-2`} style={{ backgroundColor: item.color }}></div>
+                  <div
+                    className={`w-3 h-3 rounded-full mr-2`}
+                    style={{ backgroundColor: item.color }}
+                  ></div>
                   <span className="text-sm text-gray-600">{item.name}</span>
                 </div>
                 <span className="text-sm font-medium">{item.value}%</span>
@@ -141,8 +237,10 @@ const EarningOverview = () => {
       </div>
 
       {/* Rides and Drivers Chart */}
-      <div className="bg-white rounded-lg border shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Rides & Active Drivers Growth</h3>
+      <div className="p-6 bg-white border rounded-lg shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          Rides & Active Drivers Growth
+        </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -150,58 +248,20 @@ const EarningOverview = () => {
             <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip />
-            <Bar yAxisId="left" dataKey="rides" fill="#10B981" name="Total Rides" />
-            <Bar yAxisId="right" dataKey="drivers" fill="#F59E0B" name="Active Drivers" />
+            <Bar
+              yAxisId="left"
+              dataKey="rides"
+              fill="#10B981"
+              name="Total Rides"
+            />
+            <Bar
+              yAxisId="right"
+              dataKey="drivers"
+              fill="#F59E0B"
+              name="Active Drivers"
+            />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Top Performing Drivers */}
-      <div className="bg-white rounded-lg border shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Performing Drivers</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Earnings</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Rides</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg per Ride</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {topDrivers.map((driver, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium ${
-                        index === 0 ? 'bg-yellow-100 text-yellow-800' :
-                        index === 1 ? 'bg-gray-100 text-gray-800' :
-                        index === 2 ? 'bg-orange-100 text-orange-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {index + 1}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{driver.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">৳{driver.earnings.toLocaleString()}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{driver.rides}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">৳{Math.round(driver.earnings / driver.rides)}</div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   );
