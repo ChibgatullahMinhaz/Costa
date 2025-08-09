@@ -50,6 +50,7 @@ import AddVehicleForm from "../Dashboard/Admin/Components/vehiclsemanagment/AddV
 import LiveChat from "../Layouts/CustomerLayout/components/LiveChat";
 import CompletedRides from "../Dashboard/Driver/CompletedRides";
 import AssignedRides from "../Dashboard/Driver/AssingedRids";
+import RideDetailsByDriver from "../Dashboard/Driver/Pages/RideDetailsByDriver";
 
 // Dummy data
 
@@ -239,7 +240,7 @@ const routers = createBrowserRouter([
   {
     path: "/driver-dashboard",
     element: (
-// <DriverRoute>
+      // <DriverRoute>
       <DriverLayouts></DriverLayouts>
       // </DriverRoute>
     ),
@@ -259,6 +260,10 @@ const routers = createBrowserRouter([
       {
         path: "assigned-rides",
         Component: AssignedRides,
+      },
+      {
+        path: "view-ride-details/:id",
+        Component: RideDetailsByDriver,
       },
     ],
   },

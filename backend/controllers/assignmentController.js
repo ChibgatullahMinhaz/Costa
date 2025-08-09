@@ -77,21 +77,6 @@ async function updateDriverBookings(req, res) {
 
 
 
-async function getOwnAssingnedRides(req, res) {
-    try {
-        const db = getDB();
-        const driverId = req.params.driverId;
-        const rides = await db.collection("assign-rids")
-            .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } }).sort({ _id: -1 })
-            .toArray();
-
-        res.json(rides);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Failed to fetch assigned rides" });
-    }
-};
-
 
 
 
@@ -137,9 +122,100 @@ async function updateRideStatusByDriver(req, res) {
     }
 };
 
+async function getOwnAssingnedRides(req, res) {
+    try {
+        const db = getDB();
+        const driverId = req.params.driverId;
+        const rides = await db.collection("assign-rids")
+            .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } }).sort({ _id: -1 })
+            .toArray();
+
+        res.json(rides);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch assigned rides" });
+    }
+};
 
 
-module.exports = { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver };
+
+async function getCompletedAssignedRides(req, res) {
+    try {
+        const db = getDB();
+        const driverId = req.params.driverId;
+
+        const rides = await db.collection("assign-rids")
+            .find({
+                driverId: new ObjectId(driverId),
+                status: "completed"
+            })
+            .sort({ _id: -1 })
+            .toArray();
+
+        res.json(rides);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch completed rides" });
+    }
+};
+
+
+async function getLatestAssignedRides(req, res) {
+    try {
+        const db = getDB();
+        const driverId = req.params.driverId;
+
+        const rides = await db.collection("assign-rids")
+            .find({ driverId: new ObjectId(driverId) ,status: { $ne: "completed" }})
+            .sort({ _id: -1 }) 
+            .limit(2)
+            .toArray();
+
+        res.json(rides);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch latest rides" });
+    }
+}
+
+
+async function getRideDetailsByBookingId(req, res) {
+    try {
+        const db = getDB();
+        const { bookingId } = req.params;
+
+        if (!bookingId) {
+            return res.status(400).json({ message: "Booking ID is required" });
+        }
+
+        // Find booking info from Bookings collection
+        const bookingData = await db.collection("Bookings")
+            .findOne({ bookingID: bookingId });
+
+        // Find assigned ride info from assign-rids collection
+        const assignedRideData = await db.collection("assign-rids")
+            .findOne({ bookingId: bookingId });
+
+        if (!bookingData && !assignedRideData) {
+            return res.status(404).json({ message: "Ride not found" });
+        }
+
+        const rideDetails = {
+            ...assignedRideData,
+            ...bookingData
+        };
+
+        res.json(rideDetails);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch ride details" });
+    }
+}
+
+
+
+module.exports = { assignTrip, updateDriverBookings, getOwnAssingnedRides, getCompletedAssignedRides, updateRideStatusByDriver,getLatestAssignedRides,getRideDetailsByBookingId };
 
 
 

@@ -1,40 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Polyline,
-  Popup,
-} from "react-leaflet";
+
 import "leaflet/dist/leaflet.css";
-import axiosSecureInstance from "../../Service/APIs/AxiosInstance";
-import L from "leaflet";
-import useAuth from "../../Hooks/useAuth";
-import NavigateButton from "./Components/NavigateButton";
+
 import { CheckCircle } from "lucide-react";
 import Swal from "sweetalert2";
+import useAuth from "../../../Hooks/useAuth";
+import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
+import NavigateButton from "./NavigateButton";
 import { useNavigate } from "react-router";
 
-const AssignedRides = () => {
+const ResentAssignRides = () => {
   const { userRole } = useAuth();
-    const navigate = useNavigate();
-  
+  const navigate = useNavigate();
   const driverId = userRole?.driverId;
   const {
     data: rides,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["assignedRides", driverId],
+    queryKey: ["ResentAssignRides", driverId],
     queryFn: async () => {
       const res = await axiosSecureInstance.get(
-        `/api/driver/assigned-rides/${driverId}`
+        `/api/driver/latest-assigned-rides/${driverId}`
       );
       return res.data;
     },
   });
-
 
   // Update ride status handler with confirmation
   const updateStatus = async (bookingId, newStatus) => {
@@ -53,6 +45,7 @@ const AssignedRides = () => {
       });
 
       Swal.fire("Success", `Status updated to '${newStatus}'`, "success");
+
       refetch();
     } catch (error) {
       console.log(error);
@@ -155,9 +148,8 @@ const AssignedRides = () => {
           </section>
         </div>
       ))}
-
     </div>
   );
 };
 
-export default AssignedRides;
+export default ResentAssignRides;

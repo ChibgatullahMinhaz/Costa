@@ -8,7 +8,7 @@ const { processPayment } = require('../controllers/payment/payment');
 const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
 const { getPricingSettings, updatePricingSettings } = require('../controllers/Pricing/Pricing');
 const { getPricingConfig } = require('../controllers/pricingController');
-const { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver } = require('../controllers/assignmentController');
+const { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver, getCompletedAssignedRides, getLatestAssignedRides, getRideDetailsByBookingId } = require('../controllers/assignmentController');
 const router = express.Router();
 
 
@@ -84,6 +84,9 @@ router.put('/api/settings/pricing/update', updatePricingSettings)
 router.post("/bookings/assign", assignTrip);
 router.patch("/drivers/:driverId/assign-booking", updateDriverBookings);
 router.get('/api/driver/assigned-rides/:driverId', getOwnAssingnedRides)
+router.get('/api/driver/completed-rides/:driverId', getCompletedAssignedRides)
 router.put("/api/driver/rides/:rideId/status",updateRideStatusByDriver)
- 
+router.get("/api/driver/latest-assigned-rides/:driverId", getLatestAssignedRides);
+router.get("/api/driver/ride-details/:bookingId", getRideDetailsByBookingId);
+
 module.exports = router;
