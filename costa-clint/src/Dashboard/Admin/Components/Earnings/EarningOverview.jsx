@@ -15,12 +15,17 @@ import {
 } from "recharts";
 import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
 import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 
-// Pie chart colors for revenue breakdown (dummy % for example)
-const revenueBreakdown = [
-  { name: "Ride Fees", value: 65, color: "#3B82F6" },
-  { name: "Commission", value: 25, color: "#10B981" },
-  { name: "Surge Pricing", value: 10, color: "#F59E0B" },
+const COLORS = [
+  "#3B82F6",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EF4444",
+  "#6366F1",
+  "#F97316",
+  "#14B8A6",
 ];
 
 // Fetch bookings API call
@@ -29,36 +34,182 @@ const fetchBookings = async () => {
   return data;
 };
 
-// Process bookings to aggregate monthly data
-const processBookingData = (bookings) => {
-  const monthlySummary = {};
+// Utility to group data by day (last 30 days)
+const getDailySummary = (bookings) => {
+  const summary = {};
 
-  bookings.forEach(({ amount, date, driverId }) => {
-    // Get short month name like "Jan", "Feb"
-    const month = new Date(date).toLocaleString("default", { month: "short" });
+  const today = dayjs();
+  const last30Days = Array.from({ length: 30 }).map((_, i) =>
+    today.subtract(29 - i, "day").format("YYYY-MM-DD")
+  );
 
-    if (!monthlySummary[month]) {
-      monthlySummary[month] = { revenue: 0, rides: 0, drivers: new Set() };
-    }
-
-    monthlySummary[month].revenue += amount;
-    monthlySummary[month].rides += 1;
-    monthlySummary[month].drivers.add(driverId);
+  last30Days.forEach((date) => {
+    summary[date] = { date, revenue: 0, rides: 0 };
   });
 
-  return Object.entries(monthlySummary).map(([month, data]) => ({
-    month,
-    revenue: data.revenue,
-    rides: data.rides,
+  bookings.forEach(({ totalPrice, createdAt }) => {
+    const day = dayjs(createdAt).format("YYYY-MM-DD");
+    if (summary[day]) {
+      summary[day].revenue += Number(totalPrice || 0);
+      summary[day].rides += 1;
+    }
+  });
+
+  return Object.values(summary);
+};
+
+// Utility to group data by month (last 12 months)
+const getMonthlySummary = (bookings) => {
+  const summary = {};
+  const today = dayjs();
+  const last12Months = Array.from({ length: 12 }).map((_, i) =>
+    today.subtract(11 - i, "month").format("YYYY-MM")
+  );
+
+  last12Months.forEach((month) => {
+    summary[month] = { month, revenue: 0, rides: 0 };
+  });
+
+  bookings.forEach(({ totalPrice, createdAt }) => {
+    const month = dayjs(createdAt).format("YYYY-MM");
+    if (summary[month]) {
+      summary[month].revenue += Number(totalPrice || 0);
+      summary[month].rides += 1;
+    }
+  });
+
+  return Object.values(summary).map(({ month, revenue, rides }) => ({
+    month: dayjs(month).format("MMM YYYY"),
+    revenue,
+    rides,
   }));
 };
 
+// Utility to group data by year
+const getYearlySummary = (bookings) => {
+  const summary = {};
+
+  bookings.forEach(({ totalPrice, createdAt }) => {
+    const year = dayjs(createdAt).format("YYYY");
+    if (!summary[year]) {
+      summary[year] = { year, revenue: 0, rides: 0 };
+    }
+    summary[year].revenue += Number(totalPrice || 0);
+    summary[year].rides += 1;
+  });
+
+  return Object.entries(summary)
+    .sort(([a], [b]) => b.localeCompare(a)) // latest year first
+    .map(([year, data]) => ({
+      year,
+      revenue: data.revenue,
+      rides: data.rides,
+    }));
+};
+
+// Pie chart data by vehicle type
+const getVehicleTypeData = (bookings) => {
+  const summary = {};
+  bookings.forEach((b) => {
+    const type = b.vehicleType || b.selectedCar?.vehicleType || "Unknown";
+    summary[type] = (summary[type] || 0) + 1;
+  });
+
+  return Object.entries(summary).map(([name, value], i) => ({
+    name,
+    value,
+    color: COLORS[i % COLORS.length],
+  }));
+};
+
+// Pie chart data by transfer type
+const getTransferTypeData = (bookings) => {
+  const summary = {};
+  bookings.forEach((b) => {
+    const type = b.transferType || "Unknown";
+    summary[type] = (summary[type] || 0) + 1;
+  });
+
+  return Object.entries(summary).map(([name, value], i) => ({
+    name,
+    value,
+    color: COLORS[i % COLORS.length],
+  }));
+};
+
+// Pie chart data by booking status
+const getStatusData = (bookings) => {
+  const summary = {};
+  bookings.forEach((b) => {
+    const status = b.bookingStatus || "Unknown";
+    summary[status] = (summary[status] || 0) + 1;
+  });
+
+  return Object.entries(summary).map(([name, value], i) => ({
+    name,
+    value,
+    color: COLORS[i % COLORS.length],
+  }));
+};
+
+// Pie chart data by payment method
+const getPaymentMethodData = (bookings) => {
+  const summary = {};
+  bookings.forEach((b) => {
+    const method = b.paymentMethod || "Unknown";
+    summary[method] = (summary[method] || 0) + 1;
+  });
+
+  return Object.entries(summary).map(([name, value], i) => ({
+    name,
+    value,
+    color: COLORS[i % COLORS.length],
+  }));
+};
+
+const SummaryCard = ({ title, value, color }) => (
+  <div className="p-6 text-center bg-white border rounded-lg shadow-sm">
+    <p className={`text-2xl font-bold ${color}`}>{value}</p>
+    <p className="mt-1 text-sm text-gray-600">{title}</p>
+  </div>
+);
+
+const ChartCard = ({ title, children }) => (
+  <div className="p-6 bg-white border rounded-lg shadow-sm">
+    <h3 className="mb-4 text-lg font-semibold text-gray-800">{title}</h3>
+    <ResponsiveContainer width="100%" height={300}>
+      {children}
+    </ResponsiveContainer>
+  </div>
+);
+
+const PieChartCard = ({ title, data }) => (
+  <div className="p-6 bg-white border rounded-lg shadow-sm">
+    <h3 className="mb-4 text-lg font-semibold text-gray-800">{title}</h3>
+    <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value"
+        >
+          {data.map((entry, i) => (
+            <Cell key={`cell-${i}`} fill={entry.color} />
+          ))}
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+);
+
 const EarningOverview = () => {
-  const {
-    data: bookings = [],
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: bookings = [], isLoading, isError } = useQuery({
     queryKey: ["bookings-overview"],
     queryFn: fetchBookings,
   });
@@ -67,201 +218,106 @@ const EarningOverview = () => {
   if (isError)
     return <div className="p-6 text-red-500">Failed to load bookings.</div>;
 
-  // Process data for charts
-  const monthlyData = processBookingData(bookings);
-
-  // Calculate totals
-  const totalRevenue = bookings.reduce((sum, b) => sum + b.totalPrice, 0);
-  const commissionRate = 0.25;
-  const commissionEarned = totalRevenue * commissionRate;
+  // Summary calculations
+  const totalRevenue = bookings.reduce(
+    (sum, b) => sum + Number(b.totalPrice || 0),
+    0
+  );
   const totalRides = bookings.length;
+  const avgRevenuePerRide =
+    totalRides === 0 ? 0 : (totalRevenue / totalRides).toFixed(2);
+
+  // Highest earning day
+  const revenueByDay = {};
+  bookings.forEach(({ totalPrice, createdAt }) => {
+    const day = dayjs(createdAt).format("YYYY-MM-DD");
+    revenueByDay[day] = (revenueByDay[day] || 0) + Number(totalPrice || 0);
+  });
+  const highestDay = Object.entries(revenueByDay).reduce(
+    (max, curr) => (curr[1] > max[1] ? curr : max),
+    ["N/A", 0]
+  );
+
+  // Data for charts
+  const dailyData = getDailySummary(bookings);
+  const monthlyData = getMonthlySummary(bookings);
+  const yearlyData = getYearlySummary(bookings);
+  const vehicleTypeData = getVehicleTypeData(bookings);
+  const transferTypeData = getTransferTypeData(bookings);
+  const statusData = getStatusData(bookings);
+  const paymentMethodData = getPaymentMethodData(bookings);
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-8">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-        <div className="p-6 bg-white border rounded-lg shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${totalRevenue.toLocaleString()}
-              </p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 bg-white border rounded-lg shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">
-                Commission Earned
-              </p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${commissionEarned.toLocaleString()}
-              </p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 bg-white border rounded-lg shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Rides</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {totalRides.toLocaleString()}
-              </p>
-              <p className="text-sm text-green-600">+15% from last month</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-      
+        <SummaryCard
+          title="Total Revenue"
+          value={`$${totalRevenue.toLocaleString()}`}
+          color="text-blue-600"
+        />
+        <SummaryCard
+          title="Total Rides"
+          value={totalRides.toLocaleString()}
+          color="text-green-600"
+        />
+        <SummaryCard
+          title="Avg Revenue per Ride"
+          value={`$${avgRevenuePerRide}`}
+          color="text-purple-600"
+        />
+        <SummaryCard
+          title="Highest Earning Day"
+          value={`${dayjs(highestDay[0]).format("MMM D, YYYY")} ($${highestDay[1].toFixed(2)})`}
+          color="text-yellow-600"
+        />
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Monthly Revenue Chart */}
-        <div className="p-6 bg-white border rounded-lg shadow-sm">
-          <h3 className="mb-4 text-lg font-semibold text-gray-800">
-            Monthly Revenue Trend
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            {/* <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                stroke="#3B82F6"
-                strokeWidth={3}
-              />
-            </LineChart> */}
+      {/* Daily Revenue Chart (Last 30 days) */}
+      <ChartCard title="Daily Revenue (Last 30 days)">
+        <LineChart data={dailyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" tickFormatter={(d) => dayjs(d).format("MMM D")} />
+          <YAxis />
+          <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, "Revenue"]} />
+          <Line
+            type="monotone"
+            dataKey="revenue"
+            stroke="#3B82F6"
+            strokeWidth={3}
+            dot={false}
+          />
+        </LineChart>
+      </ChartCard>
 
-            <BarChart data={monthlyData}>
-  <CartesianGrid strokeDasharray="3 3" />
-  <XAxis dataKey="month" />
-  <YAxis yAxisId="left" />
-  <Tooltip />
-  <Bar yAxisId="left" dataKey="rides" fill="#10B981" name="Total Rides" />
-</BarChart>
-          </ResponsiveContainer>
-          
-        </div>
+      {/* Monthly Revenue Chart */}
+      <ChartCard title="Monthly Revenue (Last 12 months)">
+        <BarChart data={monthlyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis />
+          <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, "Revenue"]} />
+          <Bar dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ChartCard>
 
-        {/* Revenue Breakdown */}
-        <div className="p-6 bg-white border rounded-lg shadow-sm">
-          <h3 className="mb-4 text-lg font-semibold text-gray-800">
-            Revenue Breakdown
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={revenueBreakdown}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {revenueBreakdown.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => [`${value}%`, "Percentage"]} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-4 space-y-2">
-            {revenueBreakdown.map((item, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div
-                    className={`w-3 h-3 rounded-full mr-2`}
-                    style={{ backgroundColor: item.color }}
-                  ></div>
-                  <span className="text-sm text-gray-600">{item.name}</span>
-                </div>
-                <span className="text-sm font-medium">{item.value}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Yearly Revenue Chart */}
+      <ChartCard title="Yearly Revenue">
+        <BarChart data={yearlyData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="year" />
+          <YAxis />
+          <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, "Revenue"]} />
+          <Bar dataKey="revenue" fill="#F59E0B" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ChartCard>
 
-      {/* Rides and Drivers Chart */}
-      <div className="p-6 bg-white border rounded-lg shadow-sm">
-        <h3 className="mb-4 text-lg font-semibold text-gray-800">
-          Rides & Active Drivers Growth
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
-            <Tooltip />
-            <Bar
-              yAxisId="left"
-              dataKey="rides"
-              fill="#10B981"
-              name="Total Rides"
-            />
-            <Bar
-              yAxisId="right"
-              dataKey="drivers"
-              fill="#F59E0B"
-              name="Active Drivers"
-            />
-          </BarChart>
-        </ResponsiveContainer>
+      {/* Pie Charts Section */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <PieChartCard title="Bookings by Vehicle Type" data={vehicleTypeData} />
+        <PieChartCard title="Bookings by Transfer Type" data={transferTypeData} />
+        <PieChartCard title="Bookings by Status" data={statusData} />
+        <PieChartCard title="Bookings by Payment Method" data={paymentMethodData} />
       </div>
     </div>
   );
