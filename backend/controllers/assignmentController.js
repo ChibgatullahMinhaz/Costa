@@ -36,7 +36,10 @@ async function assignTrip(req, res) {
         };
 
         // Insert booking assignment
-        const result = await db.collection("assign-rids").insertOne(newAssignment);
+        await db.collection("assign-rids").insertOne(newAssignment);
+        const result = await db.collection("Bookings").updateOne({ bookingID: bookingId },
+            { $set: { bookingStatus: 'assigned' } }
+        );
         res.status(201).json(result);
     } catch (err) {
         console.error(err);
@@ -72,4 +75,71 @@ async function updateDriverBookings(req, res) {
     }
 }
 
-module.exports = { assignTrip, updateDriverBookings };
+
+
+async function getOwnAssingnedRides(req, res) {
+    try {
+        const db = getDB();
+        const driverId = req.params.driverId;
+        const rides = await db.collection("assign-rids")
+            .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } }).sort({ _id: -1 })
+            .toArray();
+
+        res.json(rides);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch assigned rides" });
+    }
+};
+
+
+
+
+async function updateRideStatusByDriver(req, res) {
+    const { rideId } = req.params;
+    const { status } = req.body;
+    console.log(req.body)
+
+    if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+    }
+    const db = getDB();
+    const assignCollection = await db.collection("assign-rids")
+    const bookingsCollection = await db.collection("Bookings")
+
+    try {
+
+        // Update Bookings collection (bookingStatus)
+        const updateBookingResult = await bookingsCollection.updateOne(
+            { bookingID: rideId },
+            { $set: { bookingStatus: status } }
+        );
+
+        // Update assign-rids collection (status)
+        const updateAssignRidesResult = await assignCollection.updateOne(
+            {
+                bookingId: rideId
+            },
+            { $set: { status: status } }
+        );
+
+        if (
+            updateBookingResult.matchedCount === 0 &&
+            updateAssignRidesResult.matchedCount === 0
+        ) {
+            return res.status(404).json({ error: "Ride not found in both collections" });
+        }
+
+        res.json({ message: "Status updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+
+module.exports = { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver };
+
+
+

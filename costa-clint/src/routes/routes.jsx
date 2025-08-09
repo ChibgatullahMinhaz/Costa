@@ -48,6 +48,8 @@ import InvoiceList from "../components/Invoice/InvoiceList";
 import NotificationDetails from "../Pages/pushNotification/NotificationDetails";
 import AddVehicleForm from "../Dashboard/Admin/Components/vehiclsemanagment/AddVehicale";
 import LiveChat from "../Layouts/CustomerLayout/components/LiveChat";
+import CompletedRides from "../Dashboard/Driver/CompletedRides";
+import AssignedRides from "../Dashboard/Driver/AssingedRids";
 
 // Dummy data
 
@@ -237,7 +239,7 @@ const routers = createBrowserRouter([
   {
     path: "/driver-dashboard",
     element: (
-      // <DriverRoute>
+// <DriverRoute>
       <DriverLayouts></DriverLayouts>
       // </DriverRoute>
     ),
@@ -249,6 +251,14 @@ const routers = createBrowserRouter([
       {
         path: "driver/flight",
         Component: FlightSearch,
+      },
+      {
+        path: "completed-rides",
+        Component: CompletedRides,
+      },
+      {
+        path: "assigned-rides",
+        Component: AssignedRides,
       },
     ],
   },

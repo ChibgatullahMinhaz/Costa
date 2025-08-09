@@ -3,8 +3,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import Swal from "sweetalert2";
+import useAuth from "../../Hooks/useAuth";
 
 const BeADriver = () => {
+  const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -18,7 +20,7 @@ const BeADriver = () => {
         "api/driver/create",
         formData
       );
-      console.log(response)
+      console.log(response);
       return response.data;
     },
 
@@ -28,7 +30,8 @@ const BeADriver = () => {
         title: "Application Submitted!",
         text: "Thank you. We will review your application shortly.",
         confirmButtonColor: "#22c55e",
-      }); // reset();
+      });
+      reset();
     },
     onError: (error) => {
       console.error("Submission failed:", error);
@@ -47,11 +50,11 @@ const BeADriver = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-3xl my-32 mx-auto p-4 space-y-6 bg-white shadow rounded"
+      className="max-w-3xl p-4 mx-auto my-32 space-y-6 bg-white rounded shadow"
     >
       <h2 className="text-xl font-semibold">Driver Application Form</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label>Full Name</label>
           <input
@@ -104,6 +107,7 @@ const BeADriver = () => {
             {...register("email", { required: true })}
             type="email"
             placeholder="Email"
+            value={user?.email}
             className="input"
           />
         </div>
@@ -306,7 +310,7 @@ const BeADriver = () => {
           <label>Preferred Payout Method</label>
           <select
             {...register("payoutMethod", { required: true })}
-            className="input z-10 p-2"
+            className="z-10 p-2 input"
           >
             <option value="">Select</option>
             <option value="Bank Transfer">Bank Transfer</option>
@@ -323,14 +327,14 @@ const BeADriver = () => {
         I agree to the Terms & Conditions
       </label>
       {errors.agreeTerms && (
-        <p className="text-red-500 text-sm">
+        <p className="text-sm text-red-500">
           You must agree before submitting.
         </p>
       )}
 
       <button
         type="submit"
-        className="px-4 py-2 bg-green-600 text-white rounded"
+        className="px-4 py-2 text-white bg-green-600 rounded"
       >
         Submit Application
       </button>

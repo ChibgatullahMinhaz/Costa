@@ -67,21 +67,14 @@ const DriverDashboard = () => {
               <LayoutDashboard size={18} /> Dashboard
             </NavLink>
             <NavLink
-              to="/dashboard/assigned-rides"
+              to="/driver-dashboard/assigned-rides"
               className={({ isActive }) =>
                 `${linkClass} ${isActive ? activeClass : ""}`
               }
             >
               <CalendarDays size={18} /> Assigned Rides
             </NavLink>
-            <NavLink
-              to="/dashboard/ride-map"
-              className={({ isActive }) =>
-                `${linkClass} ${isActive ? activeClass : ""}`
-              }
-            >
-              <MapPin size={18} /> Ride Map
-            </NavLink>
+         
             <NavLink
               to="/driver-dashboard/driver/flight"
               className={({ isActive }) =>
@@ -91,7 +84,7 @@ const DriverDashboard = () => {
               <Plane size={18} /> Flight Info
             </NavLink>
             <NavLink
-              to="/dashboard/completed-rides"
+              to="/driver-dashboard/completed-rides"
               className={({ isActive }) =>
                 `${linkClass} ${isActive ? activeClass : ""}`
               }
