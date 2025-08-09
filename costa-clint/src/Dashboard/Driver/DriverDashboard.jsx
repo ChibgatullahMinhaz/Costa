@@ -18,14 +18,14 @@ const DriverDashboard = () => {
   const activeClass = "bg-base-300 font-semibold";
 
   return (
-    <div className="drawer lg:drawer-open min-h-screen bg-base-100">
+    <div className="min-h-screen drawer lg:drawer-open bg-base-100">
       {/* Mobile Drawer Toggle */}
       <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
 
       {/* Page Content */}
-      <div className="drawer-content flex flex-col">
+      <div className="flex flex-col drawer-content">
         {/* Navbar */}
-        <div className="w-full navbar bg-base-300 shadow-md px-4">
+        <div className="w-full px-4 shadow-md navbar bg-base-300">
           <div className="flex-none lg:hidden">
             <label
               htmlFor="dashboard-drawer"
@@ -44,7 +44,7 @@ const DriverDashboard = () => {
         </main>
 
         {/* Footer */}
-        <footer className="bg-base-300 text-center py-4 mt-auto">
+        <footer className="py-4 mt-auto text-center bg-base-300">
           <p>© 2025 RideApp. All rights reserved.</p>
         </footer>
       </div>
@@ -55,11 +55,11 @@ const DriverDashboard = () => {
           htmlFor="dashboard-drawer"
           className="drawer-overlay lg:hidden"
         />
-        <aside className="w-64 bg-base-200 p-6 space-y-4 min-h-screen shadow-inner">
-          <h2 className="text-xl font-bold mb-2">Navigation</h2>
+        <aside className="w-64 min-h-screen p-6 space-y-4 shadow-inner bg-base-200">
+          <h2 className="mb-2 text-xl font-bold">Navigation</h2>
           <nav className="space-y-1">
             <NavLink
-              to="/dashboard"
+              to="/driver-dashboard"
               className={({ isActive }) =>
                 `${linkClass} ${isActive ? activeClass : ""}`
               }
@@ -83,7 +83,7 @@ const DriverDashboard = () => {
               <MapPin size={18} /> Ride Map
             </NavLink>
             <NavLink
-              to="/dashboard/flight-info"
+              to="/driver-dashboard/driver/flight"
               className={({ isActive }) =>
                 `${linkClass} ${isActive ? activeClass : ""}`
               }

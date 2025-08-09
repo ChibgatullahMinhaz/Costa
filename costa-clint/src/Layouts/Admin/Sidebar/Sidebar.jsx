@@ -11,6 +11,7 @@ import {
   DollarSign,
   BarChart3,
   Bell,
+  Plane,
 } from "lucide-react";
 
 const menuItems = [
@@ -24,6 +25,12 @@ const menuItems = [
     name: "Users",
     Icon: Users,
     path: "/admin-dashboard/userManagement",
+    useNavLink: true,
+  },
+  {
+    name: "My Flights",
+    Icon: Plane,
+    path: "/admin-dashboard/flights",
     useNavLink: true,
   },
   {

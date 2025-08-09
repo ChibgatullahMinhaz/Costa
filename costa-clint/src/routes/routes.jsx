@@ -99,6 +99,10 @@ const routers = createBrowserRouter([
         element: <Profile></Profile>,
       },
       {
+        path: "flights",
+        element: <FlightSearch />,
+      },
+      {
         path: "reports",
         element: <Reports />,
       },
@@ -241,6 +245,10 @@ const routers = createBrowserRouter([
       {
         index: true,
         Component: DriverDashboardHome,
+      },
+      {
+        path: "driver/flight",
+        Component: FlightSearch,
       },
     ],
   },
