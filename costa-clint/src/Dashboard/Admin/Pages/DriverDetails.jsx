@@ -16,6 +16,7 @@ const DriverDetails = () => {
     queryFn: () => fetchDriverById(id),
     enabled: !!id,
   });
+  console.log(driver)
 
 //   if (isLoading) return <p>Loading driver details...</p>;
 //   if (error) return <p>Error loading driver details.</p>;
@@ -23,8 +24,8 @@ const DriverDetails = () => {
 
 console.log(driver)
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded">
-      <h1 className="text-3xl font-bold mb-4">Driver Details</h1>
+    <div className="max-w-3xl p-6 mx-auto bg-white rounded shadow">
+      <h1 className="mb-4 text-3xl font-bold">Driver Details</h1>
       <div className="space-y-2">
         <p>
           <strong>Full Name:</strong> {driver?.fullName}
@@ -62,6 +63,9 @@ console.log(driver)
         <h2 className="text-xl font-semibold">Vehicle Info</h2>
         <p>
           <strong>Vehicle Type:</strong> {driver?.vehicleType}
+        </p>
+        <p>
+          <strong>Image URL:</strong> {driver?.imageUrl}
         </p>
         <p>
           <strong>Vehicle Model:</strong> {driver?.vehicleModel}
@@ -113,6 +117,9 @@ console.log(driver)
         <p>
           <strong>Created At:</strong> {new Date(driver?.createdAt).toLocaleString()}
         </p>
+      </div>
+      <div>
+        <img src={driver?.imageUrl} alt="car image" />
       </div>
     </div>
   );

@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Dropdown } from '../Dropdown/Dropdown';
-import { DropdownItem } from '../DropdownItem/DropdownItem';
-import useAuth from '../../../../Hooks/useAuth';
-
+import { Dropdown } from "../Dropdown/Dropdown";
+import { DropdownItem } from "../DropdownItem/DropdownItem";
+import useAuth from "../../../../Hooks/useAuth";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-const navigate = useNavigate();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { logout } = useAuth();
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -18,7 +18,7 @@ const navigate = useNavigate();
   function closeDropdown() {
     setIsOpen(false);
   }
- 
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -27,6 +27,7 @@ const navigate = useNavigate();
       console.error("Logout failed:", error);
     }
   };
+  console.log(user);
   return (
     <div className="relative">
       <button
@@ -34,10 +35,12 @@ const navigate = useNavigate();
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src="https://www.shutterstock.com/image-photo/man-portrait-smile-outdoor-selfie-260nw-2490416235.jpg" alt="User" />
+          <img src={user?.photoURL} alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">
+          {user?.displayName}
+        </span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -65,16 +68,18 @@ const navigate = useNavigate();
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {user?.displayName}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user?.email}
           </span>
         </div>
+        {/* <Link to={'/dashboard/user/profile/me'}>
+          <span className="">Profile</span>
+        </Link> */}
 
-        
         <button
-         onClick={handleLogout}
+          onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg

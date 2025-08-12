@@ -6,6 +6,7 @@ import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import { getMessaging, getToken } from "firebase/messaging";
 import { messaging } from "../../Service/Firebase/firebase.init";
 import Swal from "sweetalert2";
+import CookieConsentBanner from "../../components/CookieConsentBanner/CookieConsentBanner";
 
 const MainLayout = () => {
   const { pathname } = useLocation();
@@ -82,6 +83,7 @@ const MainLayout = () => {
       <footer>
         <Footer />
       </footer>
+      <CookieConsentBanner />
     </>
   );
 };

@@ -1,8 +1,8 @@
 import axios from "axios";
-      // baseURL: "https://backend-nu-orcin.vercel.app/"
-const axiosSecureInstance = axios.create({
-    baseURL: "http://localhost:5000/"
+//   baseURL: "http://localhost:5000/"
 
+const axiosSecureInstance = axios.create({
+    baseURL: "https://backend-nu-orcin.vercel.app/"
 });
 
 export default axiosSecureInstance;

@@ -51,6 +51,7 @@ import LiveChat from "../Layouts/CustomerLayout/components/LiveChat";
 import CompletedRides from "../Dashboard/Driver/CompletedRides";
 import AssignedRides from "../Dashboard/Driver/AssingedRids";
 import RideDetailsByDriver from "../Dashboard/Driver/Pages/RideDetailsByDriver";
+import PrivacyPolicy from "../Pages/PrivacyPolicy";
 
 
 const routers = createBrowserRouter([
@@ -81,6 +82,10 @@ const routers = createBrowserRouter([
       {
         path: "/notification",
         Component: NotificationDetails,
+      },
+      {
+        path: "/privacy-policy",
+        Component: PrivacyPolicy,
       },
     ],
   },
@@ -203,11 +208,11 @@ const routers = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <PrivateRoute>
-        <UserRoutes>
+      // <PrivateRoute>
+      //   <UserRoutes>
           <CustomerLayouts></CustomerLayouts>
-        </UserRoutes>
-      </PrivateRoute>
+      //   </UserRoutes>
+      // </PrivateRoute>
     ),
     children: [
       {

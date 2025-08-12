@@ -45,7 +45,7 @@ const Register = () => {
       const imageFile = data.photo?.[0];
       let imageUrl = "";
       if (imageFile) {
-        // imageUrl = await uploadImageToImgBB(imageFile);
+        imageUrl = await uploadImageToImgBB(imageFile);
       }
 
       const result = await createUser(data.email, data.password);
