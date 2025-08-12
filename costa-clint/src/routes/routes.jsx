@@ -52,7 +52,6 @@ import CompletedRides from "../Dashboard/Driver/CompletedRides";
 import AssignedRides from "../Dashboard/Driver/AssingedRids";
 import RideDetailsByDriver from "../Dashboard/Driver/Pages/RideDetailsByDriver";
 
-// Dummy data
 
 const routers = createBrowserRouter([
   {
