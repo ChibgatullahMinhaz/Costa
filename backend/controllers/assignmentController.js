@@ -4,14 +4,12 @@ const { getDB } = require("../Config/db");
 async function assignTrip(req, res) {
     try {
         const db = getDB();
-        const {
-            driverId,
-            bookingId,
-            pickupLocation,
-            dropoffLocation,
-            customerPhone,
-            notes,
-        } = req.body;
+        const driverId = req.body.driverId.trim()
+        const bookingId = req.body.bookingId.trim()
+        const pickupLocation = req.body.pickupLocation.trim()
+        const dropoffLocation = req.body.dropoffLocation.trim()
+        const customerPhone = req.body.customerPhone.trim()
+        const notes = req.body.notes.trim()
 
         if (!driverId || !bookingId) {
             return res.status(400).json({ message: "Driver ID and Booking ID required" });
@@ -125,7 +123,9 @@ async function updateRideStatusByDriver(req, res) {
 async function getOwnAssingnedRides(req, res) {
     try {
         const db = getDB();
+
         const driverId = req.params.driverId;
+        console.log(driverId)
         const rides = await db.collection("assign-rids")
             .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } }).sort({ _id: -1 })
             .toArray();
@@ -166,8 +166,8 @@ async function getLatestAssignedRides(req, res) {
         const driverId = req.params.driverId;
 
         const rides = await db.collection("assign-rids")
-            .find({ driverId: new ObjectId(driverId) ,status: { $ne: "completed" }})
-            .sort({ _id: -1 }) 
+            .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } })
+            .sort({ _id: -1 })
             .limit(2)
             .toArray();
 
@@ -183,6 +183,8 @@ async function getRideDetailsByBookingId(req, res) {
     try {
         const db = getDB();
         const { bookingId } = req.params;
+        const trimBookId = bookingId.trim()
+        
 
         if (!bookingId) {
             return res.status(400).json({ message: "Booking ID is required" });
@@ -215,7 +217,7 @@ async function getRideDetailsByBookingId(req, res) {
 
 
 
-module.exports = { assignTrip, updateDriverBookings, getOwnAssingnedRides, getCompletedAssignedRides, updateRideStatusByDriver,getLatestAssignedRides,getRideDetailsByBookingId };
+module.exports = { assignTrip, updateDriverBookings, getOwnAssingnedRides, getCompletedAssignedRides, updateRideStatusByDriver, getLatestAssignedRides, getRideDetailsByBookingId };
 
 
 

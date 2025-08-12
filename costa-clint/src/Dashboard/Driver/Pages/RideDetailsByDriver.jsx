@@ -6,6 +6,7 @@ import autoTable from "jspdf-autotable";
 
 const RideDetailsByDriver = () => {
   const { id } = useParams();
+  console.log(id);
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -34,6 +35,7 @@ const RideDetailsByDriver = () => {
     fetchRideDetails();
   }, [id]);
 
+  console.log(ride);
   // Generate Google Directions Map URL
   const generateMap = (pickup, dropoff) => {
     const base = "https://www.google.com/maps/embed/v1/directions";
@@ -44,7 +46,7 @@ const RideDetailsByDriver = () => {
     setMapUrl(url);
   };
 
-   // ✅ PDF Export Function
+  // ✅ PDF Export Function
   const exportPDF = () => {
     if (!ride) return;
     const doc = new jsPDF();
@@ -108,15 +110,22 @@ const RideDetailsByDriver = () => {
         <p>
           <strong>Status:</strong> {ride.status}
         </p>
-        <p>
-          <strong>Date & Time:</strong> {ride.date} at {ride.time}
-        </p>
-        <p>
-          <strong>From:</strong> {ride.from}
-        </p>
-        <p>
-          <strong>To:</strong> {ride.to}
-        </p>
+        {Object.entries(ride).map(([key, val]) => {
+          if (
+            (val && typeof val === "object") ||
+            key === "_id" ||
+            key === "dropoffLocation" ||
+            key === "pickupLocation" ||
+            val === ""
+          ) {
+            return null;
+          }
+          return (
+            <div key={key}>
+              <strong className="capitalize">{key}:</strong> {String(val)}
+            </div>
+          );
+        })}
       </div>
 
       {/* Map with Route */}
@@ -140,16 +149,22 @@ const RideDetailsByDriver = () => {
       <div className="p-4 space-y-4 bg-white rounded-lg shadow">
         {/* Passenger */}
         <div>
-          <h2 className="text-lg font-semibold">Passenger Info</h2>
-          <p>
-            <strong>Name:</strong> {ride.contactInfo?.name}
-          </p>
-          <p>
-            <strong>Email:</strong> {ride.contactInfo?.email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {ride.contactInfo?.phone}
-          </p>
+          {/*  */}
+
+          {Object.entries(ride?.contactInfo).map(([key, val]) => {
+            return (
+              <div key={key}>
+                <strong className="capitalize">{key}:</strong> {String(val)}
+              </div>
+            );
+          })}
+          {Object.entries(ride?.contactInfo?.phoneNumbers).map(([key, val]) => {
+            return (
+              <div key={key}>
+                <strong className="capitalize">{key}:</strong> {String(val)}
+              </div>
+            );
+          })}
         </div>
 
         {/* Vehicle */}

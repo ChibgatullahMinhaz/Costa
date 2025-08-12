@@ -88,7 +88,7 @@ exports.getAllBookings = async (req, res) => {
   try {
     const db = getDB();
     const bookingsCollection = db.collection("Bookings");
-    const allBookings = await bookingsCollection.find().toArray();
+    const allBookings = await bookingsCollection.find().sort({_id: -1}).toArray();
 
     res.status(200).json(allBookings);
   } catch (error) {

@@ -249,6 +249,7 @@ export default function BookingManagementAdvanced() {
                 <td className="p-3 space-x-2">
                   <select
                     value={b.bookingStatus}
+                    disabled={b.bookingStatus === "completed"}
                     onChange={async (e) => {
                       const newStatus = e.target.value;
                       if (newStatus === b.bookingStatus) return;
@@ -267,7 +268,12 @@ export default function BookingManagementAdvanced() {
                         });
                       }
                     }}
-                    className="p-2 text-sm border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                      b.bookingStatus.toLowerCase() === "completed"
+                        ? "cursor-not-allowed opacity-50"
+                        : "cursor-pointer"
+                    }`}
+                   
                   >
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
@@ -403,7 +409,6 @@ export default function BookingManagementAdvanced() {
               >
                 Close
               </button>
-             
             </div>
           </div>
         </div>

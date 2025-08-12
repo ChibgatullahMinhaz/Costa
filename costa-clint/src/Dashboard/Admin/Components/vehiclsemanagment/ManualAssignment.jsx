@@ -20,7 +20,6 @@ const ManualAssignment = () => {
       return res.data;
     },
   });
-  console.log(availableDrivers);
   // State
   const [selectedDriver, setSelectedDriver] = useState("");
   const [pickupLocation, setPickupLocation] = useState("");
