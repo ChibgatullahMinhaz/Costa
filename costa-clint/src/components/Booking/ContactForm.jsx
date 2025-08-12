@@ -1,14 +1,11 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Modal from "../UI/Modal/Modal";
 import PaymentForm from "../Payment/StripPayment";
 
-
-
 const ContactInformation = ({ onContinue }) => {
-   
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const {
@@ -21,17 +18,14 @@ const ContactInformation = ({ onContinue }) => {
 
   const isBookingForSomeoneElse = watch("bookingForSomeoneElse");
 
-
-
   // On successful validation, call onContinue
   const onValid = (data) => {
     if (onContinue) {
       onContinue(data);
     }
-        setShowPaymentModal(true);
-
+    setShowPaymentModal(true);
   };
- 
+
   return (
     <div className="space-y-6">
       <h1 className="font-bold">Contact Information</h1>
@@ -133,7 +127,7 @@ const ContactInformation = ({ onContinue }) => {
                 render={({ field }) => (
                   <PhoneInput
                     {...field}
-                    country={"bd"}
+                    country={"cr"}
                     enableSearch
                     inputStyle={{
                       width: "100%",
@@ -141,7 +135,7 @@ const ContactInformation = ({ onContinue }) => {
                       padding: "10px",
                     }}
                     containerStyle={{ width: "100%" }}
-                    onChange={(value) => field.onChange(value)}
+                    onChange={(value) => field.onChange(value ? `+${value}` : "")}
                     placeholder="Phone Number"
                   />
                 )}
@@ -254,7 +248,7 @@ const ContactInformation = ({ onContinue }) => {
               render={({ field }) => (
                 <PhoneInput
                   {...field}
-                  country={"bd"}
+                  country={"cr"} 
                   enableSearch
                   inputStyle={{
                     width: "100%",
@@ -262,7 +256,7 @@ const ContactInformation = ({ onContinue }) => {
                     padding: "10px",
                   }}
                   containerStyle={{ width: "100%" }}
-                  onChange={(value) => field.onChange(value)}
+                  onChange={(value) => field.onChange(value ? `+${value}` : "")}
                   placeholder={
                     idx === 0
                       ? "Phone Number"
@@ -292,12 +286,13 @@ const ContactInformation = ({ onContinue }) => {
           I agree to subscribe to Elife’s newsletter for the latest discounts,
           promotions, and updates.
         </span>
-        {errors?.agreeNewsletter && (
+       
+      </label>
+       {errors?.agreeNewsletter && (
           <p className="text-xs text-red-600">
             {errors.agreeNewsletter.message}
           </p>
         )}
-      </label>
       {/* Special Instructions (Optional) */}
       <div>
         <label
@@ -318,7 +313,7 @@ const ContactInformation = ({ onContinue }) => {
       <button
         className="w-full py-2 mt-2 text-xs font-semibold text-white bg-orange-400 rounded"
         type="submit"
-        onClick={  handleSubmit(onValid)}
+        onClick={handleSubmit(onValid)}
       >
         Continue to payment
       </button>

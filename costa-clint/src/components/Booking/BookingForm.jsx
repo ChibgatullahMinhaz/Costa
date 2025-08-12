@@ -268,19 +268,7 @@ const BookingForm = ({ onBooking, pricingConfig }) => {
                     </p>
                   )}
                 </div>
-                {/* <div>
-                  <label className="text-sm font-medium">Pickup Time *</label>
-                  <input
-                    type="time"
-                    className="w-full p-2 border rounded"
-                    {...register("time", { required: true })}
-                  />
-                  {errors.time && (
-                    <p className="mt-1 text-sm text-red-500">
-                      Time is required
-                    </p>
-                  )}
-                </div> */}
+               
 
                 <div>
                   <label className="text-sm font-medium">Pickup Time *</label>

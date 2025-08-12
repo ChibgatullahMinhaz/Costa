@@ -8,13 +8,10 @@ const defaultValues = {
   to: "",
   date: "",
   time: "",
-  passengers: "3",
-  flightNumber: "",
   vehicleType: "",
   contactInfo: {
     name: "",
     email: "",
-    phone: "",
   },
   paymentMethod: "",
 };

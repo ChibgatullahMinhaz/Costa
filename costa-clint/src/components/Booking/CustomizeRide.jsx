@@ -62,7 +62,7 @@ const CustomizeRide = ({ setStepPhase }) => {
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
-
+console.log(vehicles)
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>
@@ -222,11 +222,11 @@ const CustomizeRide = ({ setStepPhase }) => {
                         <div className="flex items-center mt-1 space-x-3">
                           <div className="flex items-center space-x-1">
                             <i className="text-gray-400 fas fa-user"></i>
-                            <span>Max. 3</span>
+                            <span>Max Seats. {car.seatCapacity}</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <i className="text-gray-400 fas fa-suitcase"></i>
-                            <span>Max. 3</span>
+                            <span>Max luggage. {car.luggageCapacity}</span>
                           </div>
                         </div>
                         <label className="inline-flex items-center mt-2 text-xs text-gray-500 cursor-pointer select-none">
