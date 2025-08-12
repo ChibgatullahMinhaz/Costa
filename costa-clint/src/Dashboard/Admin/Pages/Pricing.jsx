@@ -57,13 +57,13 @@ const Pricing = () => {
   if (isLoading) return <p>Loading...</p>;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
       <h2 className="text-xl font-semibold text-gray-800">Pricing Settings</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <InputField label="Base Fare ($)" name="baseFare" register={register} />
         <InputField label="Included Distance (km)" name="includedDistanceKm" register={register} />
-        <InputField label="Additional Distance Rate ($/km)" name="additionalPerKmRate" register={register} />
+        <InputField label="Additional Distance Rate ($/km)" name="additionalPerKmRate" register={register} type="text" />
         <InputField label="Free Passenger Limit" name="basePassengerLimit" register={register} />
         <InputField label="Extra Passenger Fee ($)" name="extraPassengerFee" register={register} />
         <InputField label="Night Surcharge Start Time (HH:mm)" name="nightSurcharge.startTime" register={register} type="time" />
@@ -95,7 +95,7 @@ const Pricing = () => {
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
       >
         {mutation.isPending ? "Saving..." : "Save Settings"}
       </button>
@@ -105,7 +105,7 @@ const Pricing = () => {
 
 const InputField = ({ label, name, register, type = "number" }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    <label className="block mb-2 text-sm font-medium text-gray-700">{label}</label>
     <input
       type={type}
       {...register(name, { valueAsNumber: type === "number" })}

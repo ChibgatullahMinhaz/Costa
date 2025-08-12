@@ -19,12 +19,11 @@ const CustomizeRide = ({ setStepPhase }) => {
   const origin = allValues?.from;
   const destination = allValues?.to;
   const [directions, setDirections] = useState(null);
-
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
- 
+
   useEffect(() => {
     if (!isLoaded) return;
 

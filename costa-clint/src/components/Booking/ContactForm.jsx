@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, {  useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import useStep from "../../Hooks/useStep";
 import Modal from "../UI/Modal/Modal";
 import PaymentForm from "../Payment/StripPayment";
 

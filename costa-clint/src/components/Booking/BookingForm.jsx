@@ -32,7 +32,7 @@ const getDistanceInKm = async (origin, destination) => {
   });
 };
 
-const BookingForm = ({ onBooking,pricingConfig }) => {
+const BookingForm = ({ onBooking, pricingConfig }) => {
   const [distanceKm, setDistanceKm] = useState(null);
 
   const { step, setStep } = useStep();
@@ -47,41 +47,113 @@ const BookingForm = ({ onBooking,pricingConfig }) => {
 
   const formData = watch();
   const transferType = watch("transferType");
+  const fromFlight = watch("fromFlight");
+  const toFlight = watch("toFlight");
   const PET_FEE = 10;
-
+  console.log(formData);
   const [subtotal, setSubtotal] = useState(0);
 
+  // useEffect(() => {
+  //   const calculatePrice = async () => {
+  //     const basePrice = pricingConfig?.baseFare || 30;
+  //     const extraPassengerPrice = pricingConfig?.extraPassengerFee || 5;
+  //     const perKmPrice = pricingConfig?.additionalPerKmRate || 1.5;
+  //     const petFee = pricingConfig?.petFee || PET_FEE;
+
+  //     const passengers =
+  //       parseInt(formData.adults || 0, 10) +
+  //       parseInt(formData.children || 0, 10);
+  //     const extraPassengers = Math.max(0, passengers - 3);
+
+  //     let total = basePrice + extraPassengers * extraPassengerPrice;
+
+  //     if (formData.from && formData.to) {
+  //       try {
+  //         const distance = await getDistanceInKm(formData.from, formData.to);
+  //         setDistanceKm(distance.toFixed(1));
+  //         const chargeableDistance = Math.max(0, distance - 10);
+  //         total += chargeableDistance * perKmPrice;
+  //       } catch (err) {
+  //         console.error(err);
+  //         setDistanceKm(null);
+  //       }
+  //     }
+
+  //     if (formData.pet === "yes") {
+  //       total += petFee;
+  //     }
+
+  //     // Night surcharge: add 20% if time is after 10 PM
+  //     if (formData.time) {
+  //       const [hourStr] = formData.time.split(":");
+  //       const hour = parseInt(hourStr, 10);
+  //       if (hour >= 22) {
+  //         total *= 1.2;
+  //       }
+  //     }
+
+  //     setSubtotal(Math.round(total));
+  //   };
+
+  //   calculatePrice();
+  // }, [
+  //   formData.from,
+  //   formData.to,
+  //   formData.adults,
+  //   formData.children,
+  //   formData.pet,
+  //   formData.time,
+  //   pricingConfig,
+  // ]);
 
   useEffect(() => {
     const calculatePrice = async () => {
-      // Fallback/default pricing if config missing
-      const basePrice = pricingConfig?.baseFare || 30;
-      const extraPassengerPrice = pricingConfig?.extraPassengerFee || 5;
-      const perKmPrice = pricingConfig?.additionalPerKmRate || 2;
-      const petFee = pricingConfig?.petFee || PET_FEE;
+      try {
+        const basePrice = pricingConfig?.baseFare || 30;
+        const extraPassengerPrice = pricingConfig?.extraPassengerFee || 5;
+        const perKmPrice = pricingConfig?.additionalPerKmRate || 1.5;
+        const petFee = pricingConfig?.petFee || PET_FEE;
 
-      const passengers =
-        parseInt(formData.adults || 0, 10) +
-        parseInt(formData.children || 0, 10);
-      const extraPassengers = Math.max(0, passengers - 3);
-      let total = basePrice + extraPassengers * extraPassengerPrice;
+        const adults = parseInt(formData.adults || 0, 10);
+        const children = parseInt(formData.children || 0, 10);
+        const passengers = adults + children;
+        const extraPassengers = Math.max(0, passengers - 3);
 
-      if (formData.from && formData.to) {
-        try {
+        let total = basePrice + extraPassengers * extraPassengerPrice;
+
+        if (formData.from && formData.to) {
           const distance = await getDistanceInKm(formData.from, formData.to);
           setDistanceKm(distance.toFixed(1));
-          total += distance * perKmPrice;
-        } catch (err) {
-          console.error(err);
+          const chargeableDistance = Math.max(0, distance - 10);
+          total += chargeableDistance * perKmPrice;
+        } else {
           setDistanceKm(null);
         }
-      }
 
-      if (formData.pet === "yes") {
-        total += petFee;
-      }
+        if (formData.pet === "yes") {
+          total += petFee;
+        }
 
-      setSubtotal(Math.round(total));
+        // Night surcharge after 10 PM (22:00)
+        if (formData.time && formData.amPm) {
+          let hour = parseInt(formData.time.split(":")[0], 10);
+          if (formData.amPm === "PM" && hour !== 12) {
+            hour += 12; // Convert PM to 24-hour format (except 12 PM)
+          }
+          if (formData.amPm === "AM" && hour === 12) {
+            hour = 0; // Midnight edge case
+          }
+          if (hour >= 22) {
+            total *= 1.2; // Night surcharge
+          }
+        }
+
+        setSubtotal(Math.round(total));
+      } catch (error) {
+        console.error("Price calculation error:", error);
+        setSubtotal(0);
+        setDistanceKm(null);
+      }
     };
 
     calculatePrice();
@@ -91,6 +163,8 @@ const BookingForm = ({ onBooking,pricingConfig }) => {
     formData.adults,
     formData.children,
     formData.pet,
+    formData.time,
+    formData.amPm,
     pricingConfig,
   ]);
 
@@ -194,7 +268,7 @@ const BookingForm = ({ onBooking,pricingConfig }) => {
                     </p>
                   )}
                 </div>
-                <div>
+                {/* <div>
                   <label className="text-sm font-medium">Pickup Time *</label>
                   <input
                     type="time"
@@ -204,6 +278,40 @@ const BookingForm = ({ onBooking,pricingConfig }) => {
                   {errors.time && (
                     <p className="mt-1 text-sm text-red-500">
                       Time is required
+                    </p>
+                  )}
+                </div> */}
+
+                <div>
+                  <label className="text-sm font-medium">Pickup Time *</label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]$"
+                      placeholder="hh:mm"
+                      className="w-24 p-2 border rounded"
+                      {...register("time", {
+                        required: true,
+                        pattern: /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
+                      })}
+                    />
+                    <select
+                      {...register("amPm", { required: true })}
+                      className="p-2 border rounded"
+                    >
+                      <option value="">AM/PM</option>
+                      <option value="AM">AM</option>
+                      <option value="PM">PM</option>
+                    </select>
+                  </div>
+                  {errors.time && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Valid time is required (hh:mm)
+                    </p>
+                  )}
+                  {errors.amPm && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Please select AM or PM
                     </p>
                   )}
                 </div>
@@ -344,7 +452,11 @@ const BookingForm = ({ onBooking,pricingConfig }) => {
               </button>
             </>
           ) : (
-            <ByTheHourForm onBooking={onBooking} setStep={setStep} pricingConfig={pricingConfig} />
+            <ByTheHourForm
+              onBooking={onBooking}
+              setStep={setStep}
+              pricingConfig={pricingConfig}
+            />
           )}
 
           <p className="mt-2 text-xs text-center text-gray-500">

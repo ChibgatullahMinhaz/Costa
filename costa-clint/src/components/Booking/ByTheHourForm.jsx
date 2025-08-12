@@ -51,6 +51,7 @@ const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
       <div>
         <label className="text-sm font-medium">Pickup Location *</label>
         <GoogleAutocompleteInput
+         fieldName="from"
           value={formData.from || ""}
           onPlaceSelect={(place) => setValue("from", place)}
           placeholder="Enter pickup location"

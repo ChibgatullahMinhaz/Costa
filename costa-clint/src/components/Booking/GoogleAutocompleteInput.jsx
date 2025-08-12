@@ -46,6 +46,7 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [suggestions, setSuggestions] = useState([]);
   const serviceRef = useRef(null);
+const { setValue } = useFormContext();
 
   // Flight-related states
   const [flightSuggestions, setFlightSuggestions] = useState([]);
@@ -160,10 +161,12 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
   };
 
   const handleFlightSelect = (flight) => {
-    setInputValue(flight.flightNumber); // Show only flight number
+    setInputValue(flight.flightNumber);
     setFlightSuggestions([]);
     setSelectedPlace(flight.flightNumber);
-    onPlaceSelect(flight.flightNumber); // Pass only flight number to parent
+    // onPlaceSelect(flight.flightNumber);
+      setValue("fromFlight", flight.flightNumber);
+
   };
 
   const handleDepartureFocus = () => {
@@ -178,7 +181,8 @@ const GoogleAutocompleteInput = ({ value, onPlaceSelect, placeholder }) => {
   const handleDepartureSelect = (flight) => {
     setDepartureInput(flight.flightNumber); // Store only flight number
     setShowDepartureSuggestions(false);
-    onPlaceSelect(flight.flightNumber);
+    // onPlaceSelect(flight.flightNumber);
+    setValue("toFlight", flight.flightNumber);
   };
 
   return (
