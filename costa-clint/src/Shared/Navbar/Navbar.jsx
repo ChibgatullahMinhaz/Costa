@@ -81,7 +81,9 @@ const Navbar = () => {
               <p className="text-xs text-gray-600">Costa Rica</p>
             </div>
 
-            <select
+           
+          </div>
+           <select
               name="language"
               value={i18n.language}
               onChange={handleChange}
@@ -89,7 +91,6 @@ const Navbar = () => {
               <option value="en">English</option>
               <option value="es">Español</option>
             </select>
-          </div>
 
           {/* Desktop Menu */}
           <div className="items-center hidden space-x-8 lg:flex">

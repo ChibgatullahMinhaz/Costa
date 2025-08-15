@@ -52,59 +52,6 @@ const BookingForm = ({ onBooking, pricingConfig }) => {
   const PET_FEE = 10;
   const [subtotal, setSubtotal] = useState(0);
 
-  // useEffect(() => {
-  //   const calculatePrice = async () => {
-  //     const basePrice = pricingConfig?.baseFare || 30;
-  //     const extraPassengerPrice = pricingConfig?.extraPassengerFee || 5;
-  //     const perKmPrice = pricingConfig?.additionalPerKmRate || 1.5;
-  //     const petFee = pricingConfig?.petFee || PET_FEE;
-
-  //     const passengers =
-  //       parseInt(formData.adults || 0, 10) +
-  //       parseInt(formData.children || 0, 10);
-  //     const extraPassengers = Math.max(0, passengers - 3);
-
-  //     let total = basePrice + extraPassengers * extraPassengerPrice;
-
-  //     if (formData.from && formData.to) {
-  //       try {
-  //         const distance = await getDistanceInKm(formData.from, formData.to);
-  //         setDistanceKm(distance.toFixed(1));
-  //         const chargeableDistance = Math.max(0, distance - 10);
-  //         total += chargeableDistance * perKmPrice;
-  //       } catch (err) {
-  //         console.error(err);
-  //         setDistanceKm(null);
-  //       }
-  //     }
-
-  //     if (formData.pet === "yes") {
-  //       total += petFee;
-  //     }
-
-  //     // Night surcharge: add 20% if time is after 10 PM
-  //     if (formData.time) {
-  //       const [hourStr] = formData.time.split(":");
-  //       const hour = parseInt(hourStr, 10);
-  //       if (hour >= 22) {
-  //         total *= 1.2;
-  //       }
-  //     }
-
-  //     setSubtotal(Math.round(total));
-  //   };
-
-  //   calculatePrice();
-  // }, [
-  //   formData.from,
-  //   formData.to,
-  //   formData.adults,
-  //   formData.children,
-  //   formData.pet,
-  //   formData.time,
-  //   pricingConfig,
-  // ]);
-
   useEffect(() => {
     const calculatePrice = async () => {
       try {
@@ -286,7 +233,6 @@ const BookingForm = ({ onBooking, pricingConfig }) => {
                       {...register("amPm", { required: true })}
                       className="p-2 border rounded"
                     >
-                      <option value="">AM/PM</option>
                       <option value="AM">AM</option>
                       <option value="PM">PM</option>
                     </select>

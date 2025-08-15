@@ -56,5 +56,13 @@
       { "title": "Special Event Transportation" },
       { "title": "Group Transfers" }
     ]
+  },"destinations_section": {
+    "title": "Popular Destinations",
+    "list": [
+      { "name": "Manuel Antonio", "airport_label": "Nearby Airport" },
+      { "name": "Tamarindo", "airport_label": "Nearby Airport" },
+      { "name": "La Fortuna", "airport_label": "Nearby Airport" },
+      { "name": "San José", "airport_label": "Nearby Airport" }
+    ]
   }
 }

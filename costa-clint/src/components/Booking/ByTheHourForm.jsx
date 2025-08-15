@@ -28,8 +28,32 @@ const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
       total += PET_FEE;
     }
 
+    // Night surcharge after 10 PM (22:00)
+    if (formData.time && formData.amPm) {
+      let hour = parseInt(formData.time.split(":")[0], 10);
+      if (formData.amPm === "PM" && hour !== 12) {
+        hour += 12; // Convert PM to 24-hour format (except 12 PM)
+      }
+      if (formData.amPm === "AM" && hour === 12) {
+        hour = 0; // Midnight edge case
+      }
+      if (hour >= 22) {
+        total *= 1.2; // Night surcharge
+      }
+    }
+
     setSubtotal(isNaN(total) ? 0 : total);
-  }, [formData.duration, formData.adults, formData.children, formData.pet,pricingConfig]);
+  }, [
+    formData.from,
+    formData.to,
+    formData.adults,
+    formData.children,
+    formData.pet,
+    formData.time,
+    formData.amPm,
+    pricingConfig,
+    formData.duration,
+  ]);
 
   const isDisabled =
     !formData.from ||
@@ -51,7 +75,7 @@ const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
       <div>
         <label className="text-sm font-medium">Pickup Location *</label>
         <GoogleAutocompleteInput
-         fieldName="from"
+          fieldName="from"
           value={formData.from || ""}
           onPlaceSelect={(place) => setValue("from", place)}
           placeholder="Enter pickup location"
@@ -76,7 +100,7 @@ const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
             <p className="mt-1 text-sm text-red-500">Date is required</p>
           )}
         </div>
-        <div>
+        {/* <div>
           <label className="text-sm font-medium">Pickup Time *</label>
           <input
             type="time"
@@ -86,10 +110,42 @@ const ByTheHourForm = ({ onBooking, setStep, pricingConfig }) => {
           {errors.time && (
             <p className="mt-1 text-sm text-red-500">Time is required</p>
           )}
+        </div> */}
+
+        <div>
+          <label className="text-sm font-medium">Pickup Time *</label>
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              pattern="^(0?[1-9]|1[0-2]):[0-5][0-9]$"
+              placeholder="hh:mm"
+              className="w-24 p-2 border rounded"
+              {...register("time", {
+                required: true,
+                pattern: /^(0?[1-9]|1[0-2]):[0-5][0-9]$/,
+              })}
+            />
+            <select
+              {...register("amPm", { required: true })}
+              className="p-2 border rounded"
+            >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+          {errors.time && (
+            <p className="mt-1 text-sm text-red-500">
+              Valid time is required (hh:mm)
+            </p>
+          )}
+          {errors.amPm && (
+            <p className="mt-1 text-sm text-red-500">Please select AM or PM</p>
+          )}
         </div>
       </div>
 
       {/* Duration */}
+
       <div>
         <label className="text-sm font-medium">Duration (hours) *</label>
         <input

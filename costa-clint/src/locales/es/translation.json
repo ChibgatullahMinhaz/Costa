@@ -73,5 +73,13 @@
                 "title": "Traslados en Grupo"
             }
         ]
-    }
+    }, "destinations_section": {
+    "title": "Destinos Populares",
+    "list": [
+      { "name": "Manuel Antonio", "airport_label": "Aeropuerto Cercano" },
+      { "name": "Tamarindo", "airport_label": "Aeropuerto Cercano" },
+      { "name": "La Fortuna", "airport_label": "Aeropuerto Cercano" },
+      { "name": "San José", "airport_label": "Aeropuerto Cercano" }
+    ]
+  }
 }
