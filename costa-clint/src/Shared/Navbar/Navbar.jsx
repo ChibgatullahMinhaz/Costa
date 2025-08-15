@@ -190,7 +190,7 @@ const Navbar = () => {
                 <button
                   key={link.key}
                   onClick={() => scrollToSection(link.path)}
-                  className="text-gray-700 transition-colors hover:text-tropical-600"
+                  className="text-white bg-gradient-to-r from-[#00b0bb] to-[#00afb9] hover:from-[#008a94] hover:to-[#00949e] focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-md font-medium rounded-lg text-sm px-5 py-2.5"
                 >
                   {t(link.key)}
                 </button>
@@ -199,14 +199,14 @@ const Navbar = () => {
 
               <NavLink
                 to="/beDriver"
-                className="text-white bg-gradient-to-r from-[#00b0bb] to-[#00afb9] hover:from-[#008a94] hover:to-[#00949e] focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-md font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="text-white bg-gradient-to-r from-[#00b0bb] to-[#00afb9] hover:from-[#008a94] hover:to-[#00949e] focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-md font-medium rounded-lg text-sm px-5 py-2.5"
               >
                 {t("nav.be_driver")}
               </NavLink>
 
               <button
                 onClick={goToDashboard}
-                className="flex items-center text-gray-700 hover:text-tropical-600"
+                className="flex items-center text-white bg-gradient-to-r from-[#00b0bb] to-[#00afb9] hover:from-[#008a94] hover:to-[#00949e] focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-md font-medium rounded-lg text-sm px-5 py-2.5"
               >
                 <User className="w-4 h-4 mr-2" />
                 {t("nav.dashboard")}

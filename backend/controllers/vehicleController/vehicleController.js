@@ -41,10 +41,22 @@ exports.createVehicle = async (req, res) => {
       ...data,
       createdAt: new Date()
     };
-    await db.collection("carType").insertOne({
-      type: data?.type,
-      price: data?.price
-    });
+
+    // 3️⃣ Check if carType exists, if not → insert
+    if (data?.type) {
+      const existingType = await db.collection("carType").findOne({
+        type: data.type,
+      });
+
+      if (!existingType) {
+        await db.collection("carType").insertOne({
+          type: data?.type,
+          price: data?.price,
+          createdAt: new Date(),
+        });
+      }
+    }
+
     const result = await db.collection("cars").insertOne(newVehicle);
     res.status(201).json(result);
   } catch (error) {
@@ -71,7 +83,6 @@ exports.updateVehicle = async (req, res) => {
       { $set: updateData },
       { returnDocument: "after" }
     );
-    console.log(result)
     if (!result) {
       return res.status(404).json({ message: "Vehicle not found" });
     }

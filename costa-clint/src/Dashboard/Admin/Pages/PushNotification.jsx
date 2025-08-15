@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import Swal from "sweetalert2";
-import instance from "../../../Service/APIs/AxiosSecure";
+import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
 
 export default function PushNotifications() {
   const [title, setTitle] = useState("");
@@ -21,7 +21,7 @@ export default function PushNotifications() {
     setLoading(true);
     try {
       // Step 1: Get tokens
-      const { data: tokenData } = await instance.get(
+      const { data: tokenData } = await axiosSecureInstance.get(
         `api/users/fcm-tokens?group=${targetGroup}`
       );
 
@@ -35,7 +35,7 @@ export default function PushNotifications() {
       }
 
       // Step 2: Send notification
-      const { data: sendData } = await instance.post("api/notifications/send", {
+      const { data: sendData } = await axiosSecureInstance.post("api/notifications/send", {
         tokens: tokenData.tokens,
         title,
         message,

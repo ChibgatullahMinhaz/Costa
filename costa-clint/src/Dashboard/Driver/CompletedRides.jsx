@@ -49,7 +49,6 @@ const CompletedRides = () => {
 
       refetch();
     } catch (error) {
-      console.log(error);
       Swal.fire("Error", "Failed to update status", "error");
     }
   };

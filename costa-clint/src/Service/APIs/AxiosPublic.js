@@ -1,10 +1,9 @@
 // src/utils/axiosSecure.js
 import axios from "axios";
-// baseURL: "http://localhost:5000/"
-
 
 const axiosSecurePublic = axios.create({
-    baseURL: "https://backend-nu-orcin.vercel.app/"
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+
 });
 
 export default axiosSecurePublic;

@@ -20,7 +20,6 @@ const MainLayout = () => {
           vapidKey: import.meta.env.VITE_VAPID_KEY,
         });
         if (token) {
-          console.log("FCM Token:", token);
           localStorage.setItem("notificationToken", token);
           // ✅ Success Alert
           Swal.fire({

@@ -1,7 +1,6 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import Swal from "sweetalert2";
 import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
 

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
@@ -14,6 +14,19 @@ const BeADriver = () => {
     reset,
     formState: { errors },
   } = useForm();
+
+  const {
+    data: existingApp,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["driverApplication", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecurePublic.get(`check/${user.email}`);
+      return res.data;
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: async (formData) => {
@@ -31,6 +44,7 @@ const BeADriver = () => {
         text: "Thank you. We will review your application shortly.",
         confirmButtonColor: "#22c55e",
       });
+      refetch();
       reset();
     },
     onError: (error) => {
@@ -62,6 +76,51 @@ const BeADriver = () => {
       });
     }
   };
+
+  // ===== 5️⃣ Conditional UI =====
+  if (isLoading) {
+    return (
+      <p className="mt-10 text-center">Checking your application status...</p>
+    );
+  }
+
+  if (
+    existingApp?.application_status &&
+    existingApp?.application_status === "pending"
+  ) {
+    return (
+      <div className="min-h-screen my-10 mt-20 text-center">
+        <h2 className="text-xl font-semibold">
+          Your application is under review.
+        </h2>
+        <p className="text-gray-600">Please wait until we respond.</p>
+      </div>
+    );
+  }
+
+  if (
+    existingApp?.application_status &&
+    existingApp?.application_status === "approved"
+  ) {
+    return (
+      <div className="my-10 mt-20 text-center">
+        <h2 className="text-xl font-semibold">You are already a driver 🎉</h2>
+        <p className="text-gray-600">No need to apply again.</p>
+      </div>
+    );
+  }
+
+  // If rejected → allow re-submit
+  if (
+    existingApp?.application_status &&
+    existingApp?.application_status === "rejected"
+  ) {
+    Swal.fire({
+      icon: "warning",
+      title: "Application Rejected",
+      text: "You can't reapply.",
+    });
+  }
 
   return (
     <form
@@ -350,181 +409,17 @@ const BeADriver = () => {
         </p>
       )}
 
-    <button
-  type="submit"
-  disabled={mutation.isLoading}
-  className={`px-4 py-2 text-white rounded ${
-    mutation.isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
-  }`}
->
-  {mutation.isLoading ? "Submitting..." : "Submit Application"}
-</button>
+      <button
+        type="submit"
+        disabled={mutation.isLoading}
+        className={`px-4 py-2 text-white rounded ${
+          mutation.isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
+        }`}
+      >
+        {mutation.isLoading ? "Submitting..." : "Submit Application"}
+      </button>
     </form>
   );
 };
 
 export default BeADriver;
-
-
-
-
-// extra code for enhace ui 
-
-// import { useMutation, useQuery } from "@tanstack/react-query";
-// import React, { useState } from "react";
-// import { useForm } from "react-hook-form";
-// import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
-// import Swal from "sweetalert2";
-// import useAuth from "../../Hooks/useAuth";
-// import { uploadImageToImgBB } from "../../utilities/uploadImageToImgBB";
-// import { useNavigate } from "react-router";
-
-// const BeADriver = () => {
-//   const navigation = useNavigate();
-//   const { user } = useAuth();
-//   const [allowResubmit, setAllowResubmit] = useState(false);
-
-//   // ===== 1️⃣ Check if user already applied =====
-//   const { data: existingApp, isLoading: checkingStatus } = useQuery({
-//     queryKey: ["driverApplication", user?.email],
-//     enabled: !!user?.email,
-//     queryFn: async () => {
-//       const res = await axiosSecurePublic.get(`/api/driver/check/${user.email}`);
-//       return res.data; // { exists: true, status: "pending"|"approved"|"rejected" }
-//     },
-//   });
-
-//   // ===== 2️⃣ Form hook =====
-//   const {
-//     register,
-//     handleSubmit,
-//     reset,
-//     formState: { errors },
-//   } = useForm();
-
-//   // ===== 3️⃣ Submit Mutation =====
-//   const mutation = useMutation({
-//     mutationFn: async (formData) => {
-//       const response = await axiosSecurePublic.post("api/driver/create", formData);
-//       return response.data;
-//     },
-//     onSuccess: () => {
-//       Swal.fire({
-//         icon: "success",
-//         title: "Application Submitted!",
-//         text: "Thank you. We will review your application shortly.",
-//         confirmButtonColor: "#22c55e",
-//       });
-//       reset();
-//       navigation("/dashboard");
-//     },
-//     onError: (error) => {
-//       console.error("Submission failed:", error);
-//     },
-//   });
-
-//   // ===== 4️⃣ On Submit =====
-//   const onSubmit = async (data) => {
-//     try {
-//       const imageFile = data.imageUrl?.[0];
-//       let imageUrl = "";
-//       if (imageFile) {
-//         imageUrl = await uploadImageToImgBB(imageFile);
-//       }
-
-//       const newDriver = {
-//         ...data,
-//         email: user?.email,
-//         imageUrl,
-//         createdAt: new Date(),
-//       };
-
-//       mutation.mutate(newDriver);
-//     } catch (error) {
-//       console.error("Image upload error:", error);
-//       Swal.fire({
-//         icon: "error",
-//         title: "Image Upload Failed",
-//         text: "Please try again.",
-//       });
-//     }
-//   };
-
-//   // ===== 5️⃣ Conditional UI =====
-//   if (checkingStatus) {
-//     return <p className="mt-10 text-center">Checking your application status...</p>;
-//   }
-
-//   if (existingApp?.exists && existingApp?.status === "pending") {
-//     return (
-//       <div className="mt-20 text-center">
-//         <h2 className="text-xl font-semibold">Your application is under review.</h2>
-//         <p className="text-gray-600">Please wait until we respond.</p>
-//       </div>
-//     );
-//   }
-
-//   if (existingApp?.exists && existingApp?.status === "approved") {
-//     return (
-//       <div className="mt-20 text-center">
-//         <h2 className="text-xl font-semibold">You are already a driver 🎉</h2>
-//         <p className="text-gray-600">No need to apply again.</p>
-//       </div>
-//     );
-//   }
-
-//   // If rejected → allow re-submit
-//   if (existingApp?.exists && existingApp?.status === "rejected") {
-//     Swal.fire({
-//       icon: "warning",
-//       title: "Application Rejected",
-//       text: "You can reapply now.",
-//     });
-//   }
-
-//   // ===== 6️⃣ Form =====
-//   return (
-//     <form
-//       onSubmit={handleSubmit(onSubmit)}
-//       className="max-w-3xl p-4 mx-auto my-32 space-y-6 bg-white rounded shadow"
-//     >
-//       <h2 className="text-xl font-semibold">Driver Application Form</h2>
-
-//       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-//         {/* All your previous input fields remain here exactly */}
-//         <div>
-//           <label>Full Name</label>
-//           <input {...register("fullName", { required: true })} placeholder="Full Name" className="input" />
-//         </div>
-
-//         <div>
-//           <label>Date of Birth</label>
-//           <input {...register("dateOfBirth", { required: true })} type="date" className="input" />
-//         </div>
-
-//         {/* ... Rest of your 20+ fields same as before */}
-//         {/* Keeping exactly as you had it in your original code */}
-//       </div>
-
-//       <label className="flex items-center gap-2 mt-4">
-//         <input type="checkbox" {...register("agreeTerms", { required: true })} />
-//         I agree to the Terms & Conditions
-//       </label>
-//       {errors.agreeTerms && (
-//         <p className="text-sm text-red-500">You must agree before submitting.</p>
-//       )}
-
-//       <button
-//         type="submit"
-//         disabled={mutation.isLoading}
-//         className={`px-4 py-2 text-white rounded ${
-//           mutation.isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
-//         }`}
-//       >
-//         {mutation.isLoading ? "Submitting..." : "Submit Application"}
-//       </button>
-//     </form>
-//   );
-// };
-
-// export default BeADriver;

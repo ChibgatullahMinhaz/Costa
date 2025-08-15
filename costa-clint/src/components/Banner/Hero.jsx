@@ -4,13 +4,12 @@ import { Plane, MapPin, Calendar, ArrowRight } from "lucide-react";
 import BookingForm from "../Booking/BookingForm";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 const Hero = ({ onBooking }) => {
+  const { t } = useTranslation();
+
   // Fetch pricing config
-  const {
-    data: pricingConfig,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: pricingConfig } = useQuery({
     queryKey: ["pricing-system"],
     queryFn: async () => {
       try {
@@ -24,7 +23,6 @@ const Hero = ({ onBooking }) => {
     },
   });
 
- 
   return (
     <section
       id="home"
@@ -45,16 +43,11 @@ const Hero = ({ onBooking }) => {
           {/* Left Content */}
           <div className="text-white animate-fade-in">
             <h1 className="mb-6 text-5xl font-bold leading-tight lg:text-6xl">
-              Premium Airport Transfers in
-              <span className="bg-tropical-gradient bg-clip-text">
-                {" "}
-                Costa Rica
-              </span>
+              {t("airport_transfers.title")}
+              <span className="bg-tropical-gradient bg-clip-text"> </span>
             </h1>
             <p className="mb-8 text-xl leading-relaxed text-gray-200">
-              Experience the Pura Vida lifestyle from the moment you land.
-              Reliable, comfortable, and professional transfers to all major
-              destinations in Costa Rica.
+              {t("airport_transfers.description")}
             </p>
 
             <div className="grid gap-6 mb-8 sm:grid-cols-3">
@@ -63,8 +56,12 @@ const Hero = ({ onBooking }) => {
                   <Plane className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold">3 Airports</p>
-                  <p className="text-sm text-gray-300">SJO, LIR, SYQ</p>
+                  <p className="font-semibold">
+                    {t("airport_transfers.airports")}
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    {t("airport_transfers.airport_codes")}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
@@ -72,8 +69,12 @@ const Hero = ({ onBooking }) => {
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold">All Provinces</p>
-                  <p className="text-sm text-gray-300">7 Destinations</p>
+                  <p className="font-semibold">
+                    {t("airport_transfers.all_provinces")}
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    {t("airport_transfers.destinations")}{" "}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
@@ -81,22 +82,26 @@ const Hero = ({ onBooking }) => {
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold">24/7 Service</p>
-                  <p className="text-sm text-gray-300">Always Available</p>
+                  <p className="font-semibold">
+                    {t("airport_transfers.service_hours")}
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    {t("airport_transfers.availability")}{" "}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row">
               <button className="rounded-xl p-3 bg-[#00b0bb] hover:bg-[#00afb9]  transition-all duration-200 flex items-center cursor-pointer">
-                Book Your Transfer
+                {t("airport_transfers.book_button")} 
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
               <button
                 // onClick={scrollToDestinations}
                 className="cursor-pointer rounded-xl p-3 border-white text-white bg-[#00b0bb] hover:bg-[#00afb9]"
               >
-                View Destinations
+                {t("airport_transfers.view_destinations")} 
               </button>
             </div>
           </div>

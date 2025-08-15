@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import instance from "../../../../Service/APIs/AxiosSecure";
 import Swal from "sweetalert2";
+import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
 
 const UserUpdated = () => {
   const { id } = useParams();
@@ -15,14 +15,14 @@ const UserUpdated = () => {
     error,
   } = useQuery({
     queryKey: ["user", id],
-    queryFn: () => instance.get(`api/userById/${id}`).then((res) => res.data),
+    queryFn: () => axiosSecureInstance.get(`api/userById/${id}`).then((res) => res.data),
     enabled: !!id,
   });
 
   const [formData, setFormData] = useState({});
   const mutation = useMutation({
     mutationFn: (updatedData) =>
-      instance.put(`api/user/update/${id}`, updatedData).then((res) => res.data),
+      axiosSecureInstance.put(`api/user/update/${id}`, updatedData).then((res) => res.data),
     onSuccess: (data) => {
       queryClient.setQueryData(["user", id], data);
       Swal.fire("Updated!", "User has been updated successfully.", "success");
@@ -64,31 +64,31 @@ const UserUpdated = () => {
 
   if (isLoading)
     return (
-      <div className="flex justify-center items-center h-40 text-blue-600 font-medium">
+      <div className="flex items-center justify-center h-40 font-medium text-blue-600">
         Loading user data...
       </div>
     );
 
   if (isError)
     return (
-      <div className="flex justify-center items-center h-40 text-red-500">
+      <div className="flex items-center justify-center h-40 text-red-500">
         Error: {error.message}
       </div>
     );
 
   if (!user)
     return (
-      <div className="flex justify-center items-center h-40 text-gray-500">
+      <div className="flex items-center justify-center h-40 text-gray-500">
         User not found.
       </div>
     );
 
   return (
-    <div className="max-w-xl mx-auto mt-12 px-6 py-8 bg-white shadow-md rounded-lg border">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Update User</h2>
+    <div className="max-w-xl px-6 py-8 mx-auto mt-12 bg-white border rounded-lg shadow-md">
+      <h2 className="mb-6 text-2xl font-bold text-gray-800">Update User</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-700">
             Full Name
           </label>
           <input
@@ -104,7 +104,7 @@ const UserUpdated = () => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">
             Email Address
           </label>
           <input

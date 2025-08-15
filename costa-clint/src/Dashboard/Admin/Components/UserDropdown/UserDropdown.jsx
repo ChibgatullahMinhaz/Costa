@@ -27,7 +27,6 @@ export default function UserDropdown() {
       console.error("Logout failed:", error);
     }
   };
-  console.log(user);
   return (
     <div className="relative">
       <button

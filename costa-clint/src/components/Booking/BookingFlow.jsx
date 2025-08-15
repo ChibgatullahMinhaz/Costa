@@ -70,14 +70,7 @@ const BookingFlow = ({setStepPhase}) => {
       )}
       {step === 4 && <div>Step 4 content: Thank you / Done</div>}
 
-      {/* Navigation */}
-      <div className="mt-6 ">
-        {step >1 && (
-          <button onClick={() => setStep(step - 1)} className="btn-primary">
-            Next
-          </button>
-        )}
-      </div>
+     
     </div>
   );
 };

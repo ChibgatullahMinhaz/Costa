@@ -2,8 +2,6 @@ import React from "react";
 import { Link } from "react-router";
 
 const DashboardHome = () => {
-  // Example array of upcoming bookings (replace with real API data)
-  const upcomingBookings = [];
 
   return (
     <div className="p-6 mx-auto space-y-10 max-w-7xl">

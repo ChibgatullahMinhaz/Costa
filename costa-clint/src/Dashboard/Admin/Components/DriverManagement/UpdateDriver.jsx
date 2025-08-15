@@ -3,7 +3,6 @@ import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import Swal from "sweetalert2";
-import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
 import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
 
 const fetchDriverById = async (id) => {
@@ -39,7 +38,7 @@ const UpdateDriver = () => {
       // Remove _id to avoid MongoDB update issues
       if ("_id" in formData) delete formData._id;
 
-      const response = await axiosSecurePublic.put(
+      const response = await axiosSecureInstance.put(
         `/api/driver/update/${id}`,
         formData
       );
@@ -68,7 +67,7 @@ const UpdateDriver = () => {
   };
 
   if (isLoading) {
-    return <p className="text-center py-10">Loading driver data...</p>;
+    return <p className="py-10 text-center">Loading driver data...</p>;
   }
 
   const formFields = [
@@ -136,18 +135,18 @@ const UpdateDriver = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-3xl my-32 mx-auto p-6 space-y-6 bg-white shadow rounded"
+      className="max-w-3xl p-6 mx-auto my-32 space-y-6 bg-white rounded shadow"
     >
       <h2 className="text-2xl font-bold text-center">Update Driver Information</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {formFields.map((field) => (
           <div key={field.name}>
             <label className="block mb-1 font-medium">{field.label}</label>
             {field.type === "select" ? (
               <select
                 {...register(field.name, { required: true })}
-                className="input w-full"
+                className="w-full input"
               >
                 <option value="">Select {field.label}</option>
                 {field.options.map((option) => (
@@ -161,11 +160,11 @@ const UpdateDriver = () => {
                 {...register(field.name, { required: true })}
                 type={field.type}
                 placeholder={field.label}
-                className="input w-full"
+                className="w-full input"
               />
             )}
             {errors[field.name] && (
-              <p className="text-red-500 text-sm">{field.label} is required.</p>
+              <p className="text-sm text-red-500">{field.label} is required.</p>
             )}
           </div>
         ))}
@@ -180,13 +179,13 @@ const UpdateDriver = () => {
           I agree to the Terms & Conditions
         </label>
         {errors.agreeTerms && (
-          <p className="text-red-500 text-sm">You must agree before submitting.</p>
+          <p className="text-sm text-red-500">You must agree before submitting.</p>
         )}
       </div>
 
       <button
         type="submit"
-        className="w-full py-2 mt-4 bg-green-600 hover:bg-green-700 text-white rounded"
+        className="w-full py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700"
         disabled={mutation.isLoading}
       >
         {mutation.isLoading ? "Updating..." : "Update Driver"}

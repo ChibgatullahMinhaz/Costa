@@ -4,12 +4,11 @@ import ServiceFeatures from "./ServiceFeatures";
 
 const TravelSummary = ({ methods }) => {
   const travelInfo = methods?.getValues() || {};
-  console.log(travelInfo);
   return (
-    <div className="flex gap-6 p-6 bg-white rounded-lg shadow-md max-w-4xl mx-auto">
+    <div className="flex max-w-4xl gap-6 p-6 mx-auto bg-white rounded-lg shadow-md">
       {/* Right side - Dummy Map */}
       <div className="flex-1">
-        <div className=" bg-gray-200 rounded-md flex items-center justify-center text-gray-500 font-semibold">
+        <div className="flex items-center justify-center font-semibold text-gray-500 bg-gray-200 rounded-md ">
           <span>Map placeholder</span>
         </div>
 
@@ -17,7 +16,7 @@ const TravelSummary = ({ methods }) => {
       </div>
       {/* Left side - Travel Info */}
       <div className="flex-1">
-        <h2 className="text-2xl font-bold mb-4">Travel Information</h2>
+        <h2 className="mb-4 text-2xl font-bold">Travel Information</h2>
         <div className="space-y-3 text-gray-700">
           {travelInfo.transferType && (
             <p>

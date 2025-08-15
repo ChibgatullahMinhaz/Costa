@@ -29,7 +29,6 @@ exports.createBooking = async (req, res) => {
       message: "Booking saved successfully.",
       bookingId: bookingResult.insertedId,
     });
-    console.log(bookingResult)
   } catch (error) {
     console.error("Error saving booking:", error);
     res.status(500).json({ message: "Failed to save booking." });
@@ -69,7 +68,6 @@ exports.getTotalCustomers = async (req, res) => {
 exports.getMyBookingsByEmail = async (req, res) => {
   try {
     const email = req.query.email;
-    console.log(email)
     if (!email) {
       return res.status(400).json({ message: "Email is required." });
     }

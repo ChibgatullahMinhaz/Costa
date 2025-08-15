@@ -12,20 +12,21 @@ import {
 } from "lucide-react";
 import axiosSecurePublic from "../../../Service/APIs/AxiosPublic";
 import { useQuery } from "@tanstack/react-query";
+import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
 
 const fetchTotalBookings = async () => {
-  const { data } = await axiosSecurePublic.get("api/totalBookings");
+  const { data } = await axiosSecureInstance.get("api/totalBookings");
   return data.totalBookings;
 };
 
 const getTotalCustomers = async () => {
-  const res = await axiosSecurePublic.get("api/booking/total-customers");
+  const res = await axiosSecureInstance.get("api/booking/total-customers");
   return res.data.totalCustomers;
 };
 
 const fetchActiveDriversCount = async () => {
-  const res = await axiosSecurePublic.get("api/drivers/total/active");
-  return res.data.activeDriversCount; // assuming backend returns { activeDriversCount: number }
+  const res = await axiosSecureInstance.get("api/drivers/total/active");
+  return res.data.activeDriversCount; 
 };
 
 const Content = () => {
@@ -33,7 +34,7 @@ const Content = () => {
     data: totalBookings,
     isPending,
     isError,
-    error,
+  
   } = useQuery({
     queryKey: ["total-bookings"],
     queryFn: fetchTotalBookings,
@@ -60,9 +61,9 @@ const Content = () => {
   return (
     <>
       {/* Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-4 py-8 mx-auto">
         {/* Stats Overview */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid gap-6 mb-8 md:grid-cols-4">
           <Card className="border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -80,7 +81,7 @@ const Content = () => {
                     <p className="text-2xl font-bold">{totalBookings}</p>
                   )}
                 </div>
-                <BarChart3 className="h-8 w-8 text-blue-600" />
+                <BarChart3 className="w-8 h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -101,21 +102,11 @@ const Content = () => {
                     <p className="text-2xl font-bold">{activeDriversCount}</p>
                   )}
                 </div>
-                <Car className="h-8 w-8 text-green-600" />
+                <Car className="w-8 h-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Revenue (Month)</p>
-                  <p className="text-2xl font-bold">$45,230</p>
-                </div>
-                <DollarSign className="h-8 w-8 text-yellow-600" />
-              </div>
-            </CardContent>
-          </Card>
+         
           <Card className="border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -131,7 +122,7 @@ const Content = () => {
                     <p className="text-2xl font-bold">{totalCustomers}</p>
                   )}
                 </div>
-                <Users className="h-8 w-8 text-purple-600" />
+                <Users className="w-8 h-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>

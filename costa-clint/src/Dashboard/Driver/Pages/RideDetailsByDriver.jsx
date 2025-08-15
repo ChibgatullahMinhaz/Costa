@@ -6,7 +6,6 @@ import autoTable from "jspdf-autotable";
 
 const RideDetailsByDriver = () => {
   const { id } = useParams();
-  console.log(id);
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -35,7 +34,6 @@ const RideDetailsByDriver = () => {
     fetchRideDetails();
   }, [id]);
 
-  console.log(ride);
   // Generate Google Directions Map URL
   const generateMap = (pickup, dropoff) => {
     const base = "https://www.google.com/maps/embed/v1/directions";

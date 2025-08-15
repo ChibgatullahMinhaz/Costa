@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import instance from "../../Service/APIs/AxiosSecure";
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 import axiosSecureInstance from "../../Service/APIs/AxiosInstance";
 import useAuth from "../../Hooks/useAuth";
@@ -65,7 +64,6 @@ function PaymentForm({ onSuccess }) {
       } else if (result.paymentIntent.status === "succeeded") {
         const bookingID = generateBookingId();
         setBookingID(bookingID);
-        console.log("bookingid", bookingID);
         Swal.fire("✅ Payment successful!").then(() => {
           navigate("/dashboard");
         });

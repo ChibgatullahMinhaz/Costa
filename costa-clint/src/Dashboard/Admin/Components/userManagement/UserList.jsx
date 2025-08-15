@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Search, MoreHorizontal, Eye, Edit, Ban, Trash } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import instance from "../../../../Service/APIs/AxiosSecure";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
-import axiosSecurePublic from "../../../../Service/APIs/AxiosPublic";
+import axiosSecureInstance from "../../../../Service/APIs/AxiosInstance";
 
 export default function UsersList() {
   const [openMenuUserId, setOpenMenuUserId] = useState(null);
@@ -19,7 +18,7 @@ export default function UsersList() {
     refetch,
   } = useQuery({
     queryKey: ["users"],
-    queryFn: () => instance.get("api/user").then((res) => res.data),
+    queryFn: () => axiosSecureInstance.get("api/user").then((res) => res.data),
   });
 
   const filteredUsers = users.filter(
@@ -49,7 +48,7 @@ export default function UsersList() {
 
     if (result.isConfirmed) {
       try {
-        await axiosSecurePublic.put(`api/ban/${user._id}`, {
+        await axiosSecureInstance.put(`api/ban/${user._id}`, {
           status: user.status === "banned" ? "active" : "banned",
         });
 
@@ -81,7 +80,7 @@ export default function UsersList() {
 
     if (result.isConfirmed) {
       try {
-        await instance.delete(`api/user/delete/${user._id}`);
+        await axiosSecureInstance.delete(`api/user/delete/${user._id}`);
         Swal.fire("Deleted!", "User has been deleted.", "success");
         setOpenMenuUserId(null);
         refetch();
@@ -96,18 +95,18 @@ export default function UsersList() {
   };
 
   return (
-    <div className="rounded-lg border bg-white text-gray-900 shadow-sm">
+    <div className="text-gray-900 bg-white border rounded-lg shadow-sm">
       <div className="flex flex-col space-y-1.5 p-6">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <h3 className="text-2xl font-semibold">User List</h3>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex h-10 w-80 rounded-md border border-gray-300 bg-white px-3 py-2 pl-10 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex h-10 px-3 py-2 pl-10 text-sm bg-white border border-gray-300 rounded-md w-80 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -118,17 +117,17 @@ export default function UsersList() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
-                <th className="h-12 px-4 text-left font-medium text-gray-500">
+                <th className="h-12 px-4 font-medium text-left text-gray-500">
                   User
                 </th>
 
-                <th className="h-12 px-4 text-left font-medium text-gray-500">
+                <th className="h-12 px-4 font-medium text-left text-gray-500">
                   Join Date
                 </th>
-                <th className="h-12 px-4 text-left font-medium text-gray-500">
+                <th className="h-12 px-4 font-medium text-left text-gray-500">
                   Status
                 </th>
-                <th className="h-12 px-4 text-left font-medium text-gray-500">
+                <th className="h-12 px-4 font-medium text-left text-gray-500">
                   Actions
                 </th>
               </tr>
@@ -136,13 +135,13 @@ export default function UsersList() {
             <tbody>
               {isLoading || isFetching ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-4 text-gray-500">
+                  <td colSpan="5" className="p-4 text-center text-gray-500">
                     Loading users...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-4 text-gray-500">
+                  <td colSpan="5" className="p-4 text-center text-gray-500">
                     No users found.
                   </td>
                 </tr>
@@ -151,15 +150,15 @@ export default function UsersList() {
                   <tr key={user._id} className="border-b hover:bg-gray-50">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden">
+                        <div className="w-10 h-10 overflow-hidden bg-gray-100 rounded-full">
                           {typeof user.avatar === "string" ? (
                             <img
                               src={user.avatar}
                               alt={user.name}
-                              className="h-10 w-10 object-cover rounded-full"
+                              className="object-cover w-10 h-10 rounded-full"
                             />
                           ) : (
-                            <span className="flex items-center justify-center h-full w-full text-blue-700 font-semibold">
+                            <span className="flex items-center justify-center w-full h-full font-semibold text-blue-700">
                               {user.name.charAt(0).toUpperCase()}
                             </span>
                           )}
@@ -176,40 +175,40 @@ export default function UsersList() {
                         : "N/A"}
                     </td>
                     <td className="p-4">{user.status}</td>
-                    <td className="p-2 relative">
+                    <td className="relative p-2">
                       <button
                         onClick={() => toggleDropdown(user._id)}
-                        className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex items-center justify-center rounded-md h-9 w-9 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className="w-4 h-4" />
                       </button>
 
                       {openMenuUserId === user._id && (
-                        <div className="absolute right-0 mt-2 z-50 w-40 rounded-md border border-gray-200 bg-white shadow-lg">
+                        <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-200 rounded-md shadow-lg">
                           <button
                             onClick={() => handleView(user)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm hover:bg-gray-100"
                           >
-                            <Eye className="h-4 w-4" /> View Details
+                            <Eye className="w-4 h-4" /> View Details
                           </button>
                           <button
                             onClick={() => handleEdit(user)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm hover:bg-gray-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm hover:bg-gray-100"
                           >
-                            <Edit className="h-4 w-4" /> Edit
+                            <Edit className="w-4 h-4" /> Edit
                           </button>
                           <button
                             onClick={() => handleBan(user)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-600 hover:bg-gray-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                           >
-                            <Ban className="h-4 w-4" />
+                            <Ban className="w-4 h-4" />
                             {user.status === "banned" ? "Unban" : "Ban"}
                           </button>
                           <button
                             onClick={() => handleDelete(user)}
-                            className="w-full px-4 py-2 flex items-center gap-2 text-sm text-red-700 hover:bg-red-100"
+                            className="flex items-center w-full gap-2 px-4 py-2 text-sm text-red-700 hover:bg-red-100"
                           >
-                            <Trash className="h-4 w-4" /> Delete
+                            <Trash className="w-4 h-4" /> Delete
                           </button>
                         </div>
                       )}

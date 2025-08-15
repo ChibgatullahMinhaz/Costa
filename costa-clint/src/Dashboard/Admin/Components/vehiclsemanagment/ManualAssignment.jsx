@@ -65,7 +65,6 @@ const ManualAssignment = () => {
       resetForm();
     },
     onError: (error) => {
-      console.log();
       Swal.fire({
         icon: "error",
         title: "Assignment Failed",

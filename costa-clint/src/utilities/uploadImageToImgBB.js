@@ -13,7 +13,6 @@ export const uploadImageToImgBB = async (imageFile) => {
     });
 
     const data = await response.json();
-    console.log(data)
     if (data.success) {
         return data.data.url; 
     } else {

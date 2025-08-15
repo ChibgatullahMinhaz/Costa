@@ -53,7 +53,6 @@ import AssignedRides from "../Dashboard/Driver/AssingedRids";
 import RideDetailsByDriver from "../Dashboard/Driver/Pages/RideDetailsByDriver";
 import PrivacyPolicy from "../Pages/PrivacyPolicy";
 
-
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -65,7 +64,11 @@ const routers = createBrowserRouter([
       },
       {
         path: "beDriver",
-        Component: BeADriver,
+        element: (
+          <PrivateRoute>
+            <BeADriver />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/aboutUs",
@@ -92,9 +95,9 @@ const routers = createBrowserRouter([
   {
     path: "/admin-dashboard",
     element: (
-      // <AdminRoutes>
-      <AdminLayout></AdminLayout>
-      // </AdminRoutes>
+      <AdminRoutes>
+        <AdminLayout></AdminLayout>
+      </AdminRoutes>
     ),
     children: [
       {
@@ -208,11 +211,11 @@ const routers = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      // <PrivateRoute>
-      //   <UserRoutes>
+      <PrivateRoute>
+        <UserRoutes>
           <CustomerLayouts></CustomerLayouts>
-      //   </UserRoutes>
-      // </PrivateRoute>
+        </UserRoutes>
+      </PrivateRoute>
     ),
     children: [
       {
@@ -244,9 +247,9 @@ const routers = createBrowserRouter([
   {
     path: "/driver-dashboard",
     element: (
-      // <DriverRoute>
-      <DriverLayouts></DriverLayouts>
-      // </DriverRoute>
+      <DriverRoute>
+        <DriverLayouts></DriverLayouts>
+      </DriverRoute>
     ),
     children: [
       {

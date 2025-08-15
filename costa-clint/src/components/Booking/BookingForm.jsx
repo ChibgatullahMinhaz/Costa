@@ -50,7 +50,6 @@ const BookingForm = ({ onBooking, pricingConfig }) => {
   const fromFlight = watch("fromFlight");
   const toFlight = watch("toFlight");
   const PET_FEE = 10;
-  console.log(formData);
   const [subtotal, setSubtotal] = useState(0);
 
   // useEffect(() => {

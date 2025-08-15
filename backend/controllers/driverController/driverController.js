@@ -37,6 +37,8 @@ exports.createDriver = async (req, res) => {
     const db = getDB();
     const typeCollection = db.collection('carType')
     const newDriver = req.body;
+
+
     const finalData = {
       ...newDriver,
       application_status: "pending"
@@ -60,6 +62,24 @@ exports.createDriver = async (req, res) => {
 
 
     const vehicleResult = await db.collection("cars").insertOne(vehicleData);
+
+
+    // 3️⃣ Check if carType exists, if not → insert
+    if (newDriver?.vehicleType) {
+      const existingType = await typeCollection.findOne({
+        type: newDriver.vehicleType,
+      });
+
+      if (!existingType) {
+        await typeCollection.insertOne({
+          type: newDriver.vehicleType,
+          price: parseFloat(newDriver?.price),
+          createdAt: new Date(),
+        });
+      }
+    }
+
+
 
     res.status(201).json(result);
   } catch (error) {
@@ -188,9 +208,9 @@ exports.updateDriverStatus = async (req, res) => {
   try {
     const db = getDB();
     const { id } = req.params;
-    const { status, email } = req.body;
+    const { status } = req.body;
 
-    if (!status || !email) {
+    if (!status) {
       return res.status(400).json({ message: "Status and email are required" });
     }
 
@@ -206,8 +226,9 @@ exports.updateDriverStatus = async (req, res) => {
 
     // If accepted, set role = driver in users collection
     if (status === "accepted") {
+      const findUser = await db.collection("drivers").findOne({ _id: new ObjectId(id) })
       await db.collection("users").updateOne(
-        { email: email },
+        { email: findUser.email },
         { $set: { role: "driver", driverId: new ObjectId(id) } }
       );
     }
@@ -218,3 +239,21 @@ exports.updateDriverStatus = async (req, res) => {
     res.status(500).json({ message: "Failed to update driver status" });
   }
 }
+
+
+exports.checkDriverApplication = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const db = getDB()
+    const existing = await db.collection('drivers').findOne({ email });
+
+    if (!existing) {
+      return res.json({ exists: false });
+    }
+
+    res.json(existing);
+  } catch (err) {
+    console.error("Error checking application:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};

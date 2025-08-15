@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useContext, useEffect, useState } from "react";
-import instance from "../../Service/APIs/AxiosSecure";
 import useStep from "../../Hooks/useStep";
 import {
   GoogleMap,
@@ -10,6 +9,7 @@ import {
 import { BookingFormContext } from "../../Service/Context/CreateContext/BookingFormContex";
 import { Baby, Briefcase, CalendarDays, User } from "lucide-react";
 import TimelineInfo from "./TimelineInfo";
+import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 
 const CustomizeRide = ({ setStepPhase }) => {
   const { methods } = useContext(BookingFormContext);
@@ -48,7 +48,7 @@ const CustomizeRide = ({ setStepPhase }) => {
   const { data: types = [] } = useQuery({
     queryKey: ["vehicles"],
     queryFn: () =>
-      instance.get("/api/getAllCarTypeWithPrices").then((res) => res.data),
+      axiosSecurePublic.get("/api/getAllCarTypeWithPrices").then((res) => res.data),
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
@@ -56,13 +56,12 @@ const CustomizeRide = ({ setStepPhase }) => {
   const { data: vehicles = [], isPending } = useQuery({
     queryKey: ["vehicles", selectedType],
     queryFn: () =>
-      instance
+      axiosSecurePublic
         .get(`api/getAllCarByType?type=${selectedType}`)
         .then((res) => res.data),
     keepPreviousData: true,
     staleTime: 5 * 60 * 1000,
   });
-console.log(vehicles)
   return (
     <div className="bg-[#f9f9f9] flex text-[#1a1a1a] font-[Inter]">
       <div>

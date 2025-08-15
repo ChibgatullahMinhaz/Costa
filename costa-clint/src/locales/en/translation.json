@@ -13,5 +13,48 @@
         "dashboard": "Dashboard"
     },
     "One Way": "One Way",
-    "By the Hour": "By the Hour"
+    "By the Hour": "By the Hour",
+    "airport_transfers": {
+        "title": "Premium Airport Transfers in Costa Rica",
+        "description": "Experience the Pura Vida lifestyle from the moment you land. Reliable, comfortable, and professional transfers to all major destinations in Costa Rica.",
+        "airports": "3 Airports",
+        "airport_codes": "SJO, LIR, SYQ",
+        "all_provinces": "All Provinces",
+        "destinations": "7 Destinations",
+        "service_hours": "24/7 Service",
+        "availability": "Always Available",
+        "book_button": "Book Your Transfer",
+        "view_destinations": "View Destinations"
+},
+    "booking_steps": {
+        "title": "3 Steps to Hassle-Free Booking",
+        "step1": {
+            "icon": "📝",
+            "heading": "Tell Us About Your Trip",
+            "description": "Enter your pickup location, destination, date, and time. We’ll take care of the logistics."
+        },
+        "step2": {
+            "icon": "🚗",
+            "heading": "Customize Your Ride",
+            "description": "Choose your preferred vehicle, add special requirements, and make it perfect for your journey."
+        },
+        "step3": {
+            "icon": "💳",
+            "heading": "Pay and Ready to Go!",
+            "description": "Complete your payment and you're all set. Sit back, relax, and enjoy the ride."
+        }
+    },"services_section": {
+    "section_title": "Our Services",
+    "list": [
+      { "title": "Airport Transfers" },
+      { "title": "Charter Bus Rental" },
+      { "title": "Limo Rental" },
+      { "title": "Global Tourism Transfers" },
+      { "title": "Business Travel Transfers" },
+      { "title": "Wheelchair Transportation" },
+      { "title": "Taxi Hailing – Point to Point" },
+      { "title": "Special Event Transportation" },
+      { "title": "Group Transfers" }
+    ]
+  }
 }

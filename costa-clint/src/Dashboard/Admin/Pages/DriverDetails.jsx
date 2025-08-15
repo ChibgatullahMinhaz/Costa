@@ -1,7 +1,6 @@
 import React from "react";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import axiosSecureInstance from "../../../Service/APIs/AxiosInstance";
 
 const fetchDriverById = async (id) => {
@@ -16,13 +15,7 @@ const DriverDetails = () => {
     queryFn: () => fetchDriverById(id),
     enabled: !!id,
   });
-  console.log(driver)
 
-//   if (isLoading) return <p>Loading driver details...</p>;
-//   if (error) return <p>Error loading driver details.</p>;
-//   if (!driver) return <p>Driver not found.</p>;
-
-console.log(driver)
   return (
     <div className="max-w-3xl p-6 mx-auto bg-white rounded shadow">
       <h1 className="mb-4 text-3xl font-bold">Driver Details</h1>

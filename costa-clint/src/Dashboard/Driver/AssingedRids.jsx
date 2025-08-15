@@ -55,7 +55,6 @@ const AssignedRides = () => {
       Swal.fire("Success", `Status updated to '${newStatus}'`, "success");
       refetch();
     } catch (error) {
-      console.log(error);
       Swal.fire("Error", "Failed to update status", "error");
     }
   };

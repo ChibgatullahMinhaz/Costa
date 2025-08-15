@@ -81,7 +81,6 @@ async function updateDriverBookings(req, res) {
 async function updateRideStatusByDriver(req, res) {
     const { rideId } = req.params;
     const { status } = req.body;
-    console.log(req.body)
 
     if (!status) {
         return res.status(400).json({ error: "Status is required" });
@@ -125,7 +124,6 @@ async function getOwnAssingnedRides(req, res) {
         const db = getDB();
 
         const driverId = req.params.driverId;
-        console.log(driverId)
         const rides = await db.collection("assign-rids")
             .find({ driverId: new ObjectId(driverId), status: { $ne: "completed" } }).sort({ _id: -1 })
             .toArray();

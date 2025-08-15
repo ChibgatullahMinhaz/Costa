@@ -11,5 +11,67 @@
         "be_driver": "Ser Conductor",
         "book_now": "Reservar ahora",
         "dashboard": "Panel"
+    },
+    "airport_transfers": {
+        "title": "Traslados Premium al Aeropuerto en Costa Rica",
+        "description": "Vive el estilo de vida Pura Vida desde el momento en que aterrizas. Traslados confiables, cómodos y profesionales a todos los principales destinos de Costa Rica.",
+        "airports": "3 Aeropuertos",
+        "airport_codes": "SJO, LIR, SYQ",
+        "all_provinces": "Todas las Provincias",
+        "destinations": "7 Destinos",
+        "service_hours": "Servicio 24/7",
+        "availability": "Siempre Disponible",
+        "book_button": "Reserva tu traslado",
+        "view_destinations": "Ver destinos"
+    },
+    "booking_steps": {
+        "title": "3 Pasos para una Reserva Sin Complicaciones",
+        "step1": {
+            "icon": "📝",
+            "heading": "Cuéntanos Sobre Tu Viaje",
+            "description": "Ingresa tu lugar de recogida, destino, fecha y hora. Nosotros nos encargamos de la logística."
+        },
+        "step2": {
+            "icon": "🚗",
+            "heading": "Personaliza Tu Vehículo",
+            "description": "Elige tu vehículo preferido, agrega requisitos especiales y hazlo perfecto para tu viaje."
+        },
+        "step3": {
+            "icon": "💳",
+            "heading": "¡Paga y Listo para Salir!",
+            "description": "Completa tu pago y estarás listo. Siéntate, relájate y disfruta del viaje."
+        }
+    },
+    "services_section": {
+        "section_title": "Nuestros Servicios",
+        "list": [
+            {
+                "title": "Traslados al Aeropuerto"
+            },
+            {
+                "title": "Alquiler de Autobuses Chárter"
+            },
+            {
+                "title": "Alquiler de Limusinas"
+            },
+            {
+                "title": "Traslados Turísticos Globales"
+            },
+            {
+                "title": "Traslados de Viajes de Negocios"
+            },
+            {
+                "title": "Transporte para Sillas de Ruedas"
+            },
+            {
+                "title": "Servicio de Taxi – Punto a Punto"
+            },
+            {
+                "title": "Transporte para Eventos Especiales"
+            },
+            {
+                "title": "Traslados en Grupo"
+            }
+        ]
     }
 }
