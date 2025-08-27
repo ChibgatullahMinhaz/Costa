@@ -63,7 +63,6 @@ const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
-console.log(userRole)
   const userInfo = {
     user,
     loading,

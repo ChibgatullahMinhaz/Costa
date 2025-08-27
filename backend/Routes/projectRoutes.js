@@ -10,7 +10,8 @@ const { getPricingSettings, updatePricingSettings } = require('../controllers/Pr
 const { getPricingConfig } = require('../controllers/pricingController');
 const { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver, getCompletedAssignedRides, getLatestAssignedRides, getRideDetailsByBookingId } = require('../controllers/assignmentController');
 const { verifyFirebaseJWT, requireAdmin } = require('../middleware/verifyToken');
-const {reapplyApplication} = require('../controllers/driver/driver')
+const {reapplyApplication} = require('../controllers/driver/driver');
+const { getFlightInfo } = require('../controllers/Flight/FlightSearch');
 const router = express.Router();
 
 
@@ -96,6 +97,7 @@ router.get("/api/driver/ride-details/:bookingId", getRideDetailsByBookingId);
 router.get("/check/:email", checkDriverApplication);
 router.put('/api/driver/reapply/:email', reapplyApplication)
 
+router.get("/api/flights/:flightNumber",getFlightInfo);
 
 
 module.exports = router;

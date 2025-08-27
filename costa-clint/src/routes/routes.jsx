@@ -82,10 +82,10 @@ const routers = createBrowserRouter([
         path: "/ourServices",
         Component: Services,
       },
-      {
-        path: "/notification",
-        Component: NotificationDetails,
-      },
+      // {
+      //   path: "/notification",
+      //   Component: NotificationDetails,
+      // },
       {
         path: "/privacy-policy",
         Component: PrivacyPolicy,

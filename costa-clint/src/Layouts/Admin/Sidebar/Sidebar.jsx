@@ -28,7 +28,7 @@ const menuItems = [
     useNavLink: true,
   },
   {
-    name: "My Flights",
+    name: "Flight Search",
     Icon: Plane,
     path: "/admin-dashboard/flights",
     useNavLink: true,

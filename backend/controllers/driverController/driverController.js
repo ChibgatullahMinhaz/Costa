@@ -88,9 +88,9 @@ exports.createDriver = async (req, res) => {
 
       if (!existingType) {
         await typeCollection.insertOne({
-          type: vehicleType, //  Save standardized vehicleType
-          price,             //  Absolute price
-          createdAt: new Date(), //  Record creation time
+          type: vehicleType, 
+          price,             
+          createdAt: new Date(),
         });
       }
     }

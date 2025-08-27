@@ -53,11 +53,12 @@ const MainLayout = () => {
       });
     }
   };
-
+  // Run once on app load → ask for permission
   useEffect(() => {
     getPermission().finally(() => setLoading(false));
   }, []);
 
+  // Show loading on route change
   useEffect(() => {
     setLoading(true);
 
@@ -68,6 +69,29 @@ const MainLayout = () => {
 
     return () => clearTimeout(timeout);
   }, [pathname]);
+
+  // Listen for push messages forwarded by service worker
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        console.log("📨 Message from SW:", event.data);
+
+        const { notification } = event.data;
+        if (notification) {
+          Swal.fire({
+            icon: "info",
+            title: notification.title || "New Notification",
+            text: notification.body || "",
+            timer: 60000, 
+            showConfirmButton: false, 
+            showCloseButton: true, 
+            toast: true,
+            position: "top-end",
+          });
+        }
+      });
+    }
+  }, []);
 
   return (
     <>
