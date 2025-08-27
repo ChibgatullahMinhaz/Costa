@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import axiosSecurePublic from "../../Service/APIs/AxiosPublic";
 import Swal from "sweetalert2";
@@ -7,6 +7,7 @@ import useAuth from "../../Hooks/useAuth";
 import { uploadImageToImgBB } from "../../utilities/uploadImageToImgBB";
 
 const BeADriver = () => {
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const {
     register,
@@ -80,7 +81,7 @@ const BeADriver = () => {
   // ===== 5️⃣ Conditional UI =====
   if (isLoading) {
     return (
-      <p className="mt-10 text-center">Checking your application status...</p>
+      <p className="text-center mt-30">Checking your application status...</p>
     );
   }
 
@@ -110,315 +111,353 @@ const BeADriver = () => {
     );
   }
 
-  // If rejected → allow re-submit
-  if (
-    existingApp?.application_status &&
-    existingApp?.application_status === "rejected"
-  ) {
-    Swal.fire({
-      icon: "warning",
-      title: "Application Rejected",
-      text: "You can't reapply.",
-    });
-  }
+  const handleReapply = async () => {
+    try {
+      setLoading(true);
+      await axiosSecurePublic.put(`api/driver/reapply/${user.email}`); // PUT API call
+      Swal.fire({
+        icon: "success",
+        title: "Reapply Successful!",
+        text: "Your application status has been set to pending. You can now update your form.",
+        confirmButtonColor: "#22c55e",
+      });
+      refetch();
+    } catch (error) {
+      console.error("Reapply failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Reapply",
+        text: "Please try again later.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-3xl p-4 mx-auto my-32 space-y-6 bg-white rounded shadow"
-    >
-      <h2 className="text-xl font-semibold">Driver Application Form</h2>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <label>Full Name</label>
-          <input
-            {...register("fullName", { required: true })}
-            placeholder="Full Name"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Date of Birth</label>
-          <input
-            {...register("dateOfBirth", { required: true })}
-            type="date"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Nationality</label>
-          <input
-            {...register("nationality", { required: true })}
-            placeholder="Nationality"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Gender</label>
-          <select {...register("gender", { required: true })} className="input">
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Phone Number</label>
-          <input
-            {...register("phone", { required: true })}
-            placeholder="Phone Number"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label className="block">Email</label>
-          <input
-            {...register("email", { required: true })}
-            type="email"
-            placeholder="Email"
-            value={user?.email}
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Address</label>
-          <input
-            {...register("address", { required: true })}
-            placeholder="Address"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Driver’s License Number</label>
-          <input
-            {...register("licenseNumber", { required: true })}
-            placeholder="License Number"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>License Expiry</label>
-          <input
-            {...register("licenseExpiry", { required: true })}
-            type="date"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Passport or ID Number</label>
-          <input
-            {...register("idNumber", { required: true })}
-            placeholder="ID Number"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Vehicle Type</label>
-          <input
-            {...register("vehicleType", { required: true })}
-            placeholder="e.g. SUV"
-            className="input"
-          />
-        </div>
-        <div>
-          <label className="block">Title</label>
-          <input
-            {...register("title", { required: true })}
-            placeholder="Title"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Subtitle</label>
-          <input
-            {...register("subtitle", { required: true })}
-            placeholder="Subtitle"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Image URL</label>
-          <input
-            type="file"
-            accept="image/*"
-            {...register("imageUrl", { required: true })}
-            placeholder="Upload your image "
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>base Price</label>
-          <input
-            {...register("price", { required: true })}
-            type="number"
-            placeholder="Price"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Vehicle Make & Model</label>
-          <input
-            {...register("vehicleModel", { required: true })}
-            placeholder="Make & Model"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Vehicle Year</label>
-          <input
-            {...register("vehicleYear", { required: true })}
-            placeholder="Year"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>License Plate</label>
-          <input
-            {...register("licensePlate", { required: true })}
-            placeholder="License Plate"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Vehicle Color</label>
-          <input
-            {...register("vehicleColor", { required: true })}
-            placeholder="Color"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Seating Capacity</label>
-          <input
-            {...register("seatCapacity", { required: true })}
-            type="number"
-            placeholder="Seats"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Luggage Capacity</label>
-          <input
-            {...register("luggageCapacity", { required: true })}
-            type="number"
-            placeholder="Luggage"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Preferred Regions</label>
-          <input
-            {...register("region", { required: true })}
-            placeholder="Region"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Available Hours</label>
-          <input
-            {...register("availableHours", { required: true })}
-            placeholder="e.g. 6AM - 10PM"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Willing to Accept Night Rides?</label>
-          <select
-            {...register("nightRides", { required: true })}
-            className="input"
+    <>
+      {existingApp?.application_status &&
+      existingApp?.application_status === "rejected" ? (
+        <div className="my-5 mt-20 space-y-4 text-center ">
+          <h2 className="text-xl font-semibold text-red-600">
+            Your application was rejected.
+          </h2>
+          <p className="text-gray-600">
+            You can click the button below to reapply.
+          </p>
+          <button
+            onClick={handleReapply}
+            className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
           >
-            <option value="">Select</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
+            {loading ? "Applying....." : "Reapply Now"}
+          </button>
         </div>
-
-        <div>
-          <label>Bank Name</label>
-          <input
-            {...register("bankName", { required: true })}
-            placeholder="Bank Name"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Account Holder Name</label>
-          <input
-            {...register("accountHolder", { required: true })}
-            placeholder="Account Holder"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Account Number / IBAN</label>
-          <input
-            {...register("accountNumber", { required: true })}
-            placeholder="Account Number"
-            className="input"
-          />
-        </div>
-
-        <div>
-          <label>Preferred Payout Method</label>
-          <select
-            {...register("payoutMethod", { required: true })}
-            className="z-10 p-2 input"
+      ) : (
+        <>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="max-w-3xl p-4 mx-auto my-32 space-y-6 bg-white rounded shadow"
           >
-            <option value="">Select</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-            <option value="PayPal">PayPal</option>
-          </select>
-        </div>
-      </div>
+            <h2 className="text-xl font-semibold">Driver Application Form</h2>
 
-      <label className="flex items-center gap-2 mt-4">
-        <input
-          type="checkbox"
-          {...register("agreeTerms", { required: true })}
-        />
-        I agree to the Terms & Conditions
-      </label>
-      {errors.agreeTerms && (
-        <p className="text-sm text-red-500">
-          You must agree before submitting.
-        </p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label>Full Name</label>
+                <input
+                  {...register("fullName", { required: true })}
+                  placeholder="Full Name"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Date of Birth</label>
+                <input
+                  {...register("dateOfBirth", { required: true })}
+                  type="date"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Nationality</label>
+                <input
+                  {...register("nationality", { required: true })}
+                  placeholder="Nationality"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Gender</label>
+                <select
+                  {...register("gender", { required: true })}
+                  className="input"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Phone Number</label>
+                <input
+                  {...register("phone", { required: true })}
+                  placeholder="Phone Number"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label className="block">Email</label>
+                <input
+                  {...register("email", { required: true })}
+                  type="email"
+                  placeholder="Email"
+                  value={user?.email}
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Address</label>
+                <input
+                  {...register("address", { required: true })}
+                  placeholder="Address"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Driver’s License Number</label>
+                <input
+                  {...register("licenseNumber", { required: true })}
+                  placeholder="License Number"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>License Expiry</label>
+                <input
+                  {...register("licenseExpiry", { required: true })}
+                  type="date"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Passport or ID Number</label>
+                <input
+                  {...register("idNumber", { required: true })}
+                  placeholder="ID Number"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Vehicle Type</label>
+                <input
+                  {...register("vehicleType", { required: true })}
+                  placeholder="e.g. SUV"
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block">Title</label>
+                <input
+                  {...register("title", { required: true })}
+                  placeholder="Title"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Subtitle</label>
+                <input
+                  {...register("subtitle", { required: true })}
+                  placeholder="Subtitle"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Image URL</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("imageUrl", { required: true })}
+                  placeholder="Upload your image "
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>base Price</label>
+                <input
+                  {...register("price", { required: true })}
+                  type="number"
+                  placeholder="Price"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Vehicle Make & Model</label>
+                <input
+                  {...register("vehicleModel", { required: true })}
+                  placeholder="Make & Model"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Vehicle Year</label>
+                <input
+                  {...register("vehicleYear", { required: true })}
+                  placeholder="Year"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>License Plate</label>
+                <input
+                  {...register("licensePlate", { required: true })}
+                  placeholder="License Plate"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Vehicle Color</label>
+                <input
+                  {...register("vehicleColor", { required: true })}
+                  placeholder="Color"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Seating Capacity</label>
+                <input
+                  {...register("seatCapacity", { required: true })}
+                  type="number"
+                  placeholder="Seats"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Luggage Capacity</label>
+                <input
+                  {...register("luggageCapacity", { required: true })}
+                  type="number"
+                  placeholder="Luggage"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Preferred Regions</label>
+                <input
+                  {...register("region", { required: true })}
+                  placeholder="Region"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Available Hours</label>
+                <input
+                  {...register("availableHours", { required: true })}
+                  placeholder="e.g. 6AM - 10PM"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Willing to Accept Night Rides?</label>
+                <select
+                  {...register("nightRides", { required: true })}
+                  className="input"
+                >
+                  <option value="">Select</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Bank Name</label>
+                <input
+                  {...register("bankName", { required: true })}
+                  placeholder="Bank Name"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Account Holder Name</label>
+                <input
+                  {...register("accountHolder", { required: true })}
+                  placeholder="Account Holder"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Account Number / IBAN</label>
+                <input
+                  {...register("accountNumber", { required: true })}
+                  placeholder="Account Number"
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label>Preferred Payout Method</label>
+                <select
+                  {...register("payoutMethod", { required: true })}
+                  className="z-10 p-2 input"
+                >
+                  <option value="">Select</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="PayPal">PayPal</option>
+                </select>
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 mt-4">
+              <input
+                type="checkbox"
+                {...register("agreeTerms", { required: true })}
+              />
+              I agree to the Terms & Conditions
+            </label>
+            {errors.agreeTerms && (
+              <p className="text-sm text-red-500">
+                You must agree before submitting.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={mutation.isLoading}
+              className={`px-4 py-2 text-white rounded ${
+                mutation.isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600"
+              }`}
+            >
+              {mutation.isLoading ? "Submitting..." : "Submit Application"}
+            </button>
+          </form>
+        </>
       )}
-
-      <button
-        type="submit"
-        disabled={mutation.isLoading}
-        className={`px-4 py-2 text-white rounded ${
-          mutation.isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
-        }`}
-      >
-        {mutation.isLoading ? "Submitting..." : "Submit Application"}
-      </button>
-    </form>
+    </>
   );
 };
 

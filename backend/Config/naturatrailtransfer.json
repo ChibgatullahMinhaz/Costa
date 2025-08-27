@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "naturatrailtransferscr",
+  "private_key_id": "5152e3af809dfc00ca4d9daf804211919d416d5d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQClNwqJQYltbGcG\n5dtEIHcbOOMsyDTb6DSy8a/XpkR2ppy4ShhdLTtDV8RCvRZztUHwv3fiPAPyK6in\n43QV+FpgJltHRIH8VWWC4snkvhpNdDnaGsEP3HtZFdoMweE+woAhqMjdL7ELiirP\nw9hY47K3xBr46YMQnxkIqLhuRTZR/hdZJcEuy3y1+NbOQ3YAzCNqj/M6+I+jlraC\na8vWbAmMx+yDj6o17ZZg9dljTrt+oWry7FSGoi+2IKKwTWBtAeDqGGou288RcnbG\n0D6+mJomkCSxZR42cgSfOx5cJZkx0/SR9b/gQWUvRuOo5xGyiVcFdIEAGR7i6Nzc\nbuvhbc3nAgMBAAECggEAJvN6FXAREW48QAETF9W7nvxjetxcsffl7MZUWbhGbd7M\nFhrJ8bXHQhJAICfqUi9Ks5LAleLmX0LxyVsztDZQQFjqrju1laMggqIrTTWQh/A9\n73DdUXr+zbr8JIPVMfGzObxMVvF2gSz6+O7IY/SS3wZqAYM0Nkf8I/F7QewpaVzo\ncVN5gyWZffuu65CkZYNexXuFxs/wKjP8rDmxLx8DwpJu9SYSTUSjcPsKybylqeze\nAvHHoGEDpwkhShhONqj8sh/jKzi8ce9UGq3y78bHBLWVAyt4GV2q3/ZbHuV/DlvH\nP5aNtWSh+VarFbIgAlbBNUDKCd7lf/7tLyjsmXTfMQKBgQDRToaa9oRYEZpoNVSP\nCl4q+uw4cAWIYJBUKu3vnaofGx87QSgpn06lixLJwJG7qrDX+9KjFwfma4vhvWhm\nFKWPQbMQ+qu/hXTqvNcrDpAlEWBEHDTAP9SI4+BpKtl8FYxsBz7YXT3+3Xx2c4JB\n6Q6zfZOnLApl/iueKn8wg5DxOQKBgQDKEnGBeAgbH0Esc6lMbPKt8k99tziRF8dT\nk2F4ux197Vbzgdg6Ga3CAKznB6qaBYEAt9hjHS4o4evh0Sau+cBJlksdmun/f1X4\n9c7mXFmpurrGkwbsvKVVMxuQVwv2E9UNLuliOBF6EdNd1/GmHAs5HHK7VNQ6sWcm\n5rjPsJ1YHwKBgQCU0ia3LCyxieKl0bWL9y05liw7fLsSWsaEcfm38/ywHVK5iPyL\ni7AZ2KbFONzl+NnA2FbOi2OcnD9bhJckbe3BzE8L9ZAEn1mgRiEfhj1Lfe1awEtp\nnnj51D0Nyd/VcGTlsskmgjXAb689cafeQV2oldNUe+Xw2yYcUc8ZqZJ3UQKBgFDV\n6fQ5+TwoV6EZr8sz9izhtyz6Y7WfRozHc4GhkN20WUlWUxKC/UCTlpdhOL0eoImS\nAg08Oh/+qKcQTSJIJMULS4dPVnZwEQtkAd2jafb9DQStAmMn4BfiNw+Z0t4g9uSs\nNI6nEU683Mo4vaGOrGqvV7Ja7/9+wl4MhDgJVhhPAoGBALCuCi1ItojHMr4Pd/6a\nAhbb1jdxir4xhiJI44If0o1FXaqU3BrUIn1HeP9AGMD53A4HX3v7htYR1POKclFh\nTYP/BSAguP1HwGsO07+dYXoHOqmo09+6n8l2vUXRks6Irhsnf7uxDHP9w+2bOAl/\nG/dK6ufim1fojbPDpbw0vF7v\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@naturatrailtransferscr.iam.gserviceaccount.com",
+  "client_id": "101629941555683207835",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40naturatrailtransferscr.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -10,6 +10,7 @@ const { getPricingSettings, updatePricingSettings } = require('../controllers/Pr
 const { getPricingConfig } = require('../controllers/pricingController');
 const { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver, getCompletedAssignedRides, getLatestAssignedRides, getRideDetailsByBookingId } = require('../controllers/assignmentController');
 const { verifyFirebaseJWT, requireAdmin } = require('../middleware/verifyToken');
+const {reapplyApplication} = require('../controllers/driver/driver')
 const router = express.Router();
 
 
@@ -57,7 +58,6 @@ router.get("/api/drivers/active", verifyFirebaseJWT, requireAdmin, getActiveDriv
 router.get("/api/drivers/total/active", verifyFirebaseJWT, requireAdmin, getTotalActiveDrivers);
 router.get("/api/drivers/total/status", verifyFirebaseJWT, requireAdmin, getDriversByStatus);
 router.put('/api/driver/ban/:id', verifyFirebaseJWT, requireAdmin, driverBanned)
-
 // Vehicles
 router.get("/api/vehicle", verifyFirebaseJWT, requireAdmin, getAllVehicles);
 router.get("/api/vehicleById/:id", verifyFirebaseJWT, requireAdmin, getVehicleById);
@@ -94,6 +94,7 @@ router.get("/api/driver/ride-details/:bookingId", getRideDetailsByBookingId);
 
 
 router.get("/check/:email", checkDriverApplication);
+router.put('/api/driver/reapply/:email', reapplyApplication)
 
 
 

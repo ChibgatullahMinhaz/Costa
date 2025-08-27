@@ -55,7 +55,7 @@ const CompletedRides = () => {
 
   if (isLoading) return <p>Loading...</p>;
   if (!rides || !Array.isArray(rides) || rides.length === 0)
-    return <p>No assigned rides found.</p>;
+    return <p>No Completed rides found.</p>;
   const handleNavigate = (bookingId) => {
     navigate(`/driver-dashboard/view-ride-details/${bookingId}`);
   };

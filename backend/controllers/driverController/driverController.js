@@ -35,50 +35,65 @@ exports.getDriverById = async (req, res) => {
 exports.createDriver = async (req, res) => {
   try {
     const db = getDB();
-    const typeCollection = db.collection('carType')
+    const typeCollection = db.collection('carType'); 
     const newDriver = req.body;
 
+    // 1️ Ensure price is a positive number (absolute number)
+    const price = Math.abs(parseFloat(newDriver?.price)) || 0;
+    // 🔹 parseFloat converts string to number, Math.abs ensures it's always positive
 
+    // 2️Standardize vehicle type
+    const capitalize = (str) =>
+      str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    //  Capitalizes first letter, rest lowercase → e.g. "suv" or "SUV" becomes "Suv"
+
+    const vehicleType = newDriver?.vehicleType
+      ? capitalize(newDriver.vehicleType.trim())
+      : "";
+    //  Trim removes spaces, capitalize standardizes format
+
+    // 3️ Insert driver data with standardized vehicleType
     const finalData = {
       ...newDriver,
-      application_status: "pending"
-    }
+      vehicleType, 
+      application_status: "pending", 
+    };
     const result = await db.collection("drivers").insertOne(finalData);
+
+    // 4️ Insert vehicle data
     const vehicleData = {
       fullName: newDriver?.fullName,
-      vehicleType: newDriver?.vehicleType,
+      vehicleType, //  Standardized vehicleType
       vehicleModel: newDriver?.vehicleModel,
       vehicleYear: newDriver?.vehicleYear,
       licensePlate: newDriver?.licenseNumber,
       vehicleColor: newDriver?.vehicleColor,
       seatCapacity: newDriver?.seatCapacity,
       luggageCapacity: newDriver?.luggageCapacity,
-      status: 'active',
+      status: 'active', //  Active by default
       title: newDriver?.title,
       subtitle: newDriver?.subtitle,
       imageUrl: newDriver?.imageUrl,
-      price: newDriver?.price
+      price, //  Absolute price
     };
-
 
     const vehicleResult = await db.collection("cars").insertOne(vehicleData);
 
-
-    // 3️⃣ Check if carType exists, if not → insert
-    if (newDriver?.vehicleType) {
+    // 5️⃣ Check if carType exists (case-insensitive)
+    if (vehicleType) {
       const existingType = await typeCollection.findOne({
-        type: newDriver.vehicleType,
+        type: { $regex: `^${vehicleType}$`, $options: "i" },
+        //  $regex with 'i' option → case-insensitive match to avoid duplicates like "Suv" vs "suv"
       });
 
       if (!existingType) {
         await typeCollection.insertOne({
-          type: newDriver.vehicleType,
-          price: parseFloat(newDriver?.price),
-          createdAt: new Date(),
+          type: vehicleType, //  Save standardized vehicleType
+          price,             //  Absolute price
+          createdAt: new Date(), //  Record creation time
         });
       }
     }
-
 
 
     res.status(201).json(result);

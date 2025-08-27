@@ -95,7 +95,7 @@ const FlightSearch = () => {
           </p>
           <p><strong>Aircraft:</strong> {flightDetails.aircraft?.registration || "N/A"} ({flightDetails.aircraft?.icao24 || "N/A"})</p>
 
-          {/* Optional Live Tracking */}
+          {/*Live Tracking */}
           {flightDetails.latitude && flightDetails.longitude && (
             <p><strong>Live Location:</strong> Lat {flightDetails.latitude}, Lon {flightDetails.longitude}</p>
           )}
