@@ -7,7 +7,7 @@ const FlightSearch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_KEY = import.meta.env.VITE_FLIGHT_API_KEY; 
+  const API_KEY = import.meta.env.VITE_FLIGHT_API_KEY;
 
   const handleSearch = async () => {
     if (!search.trim()) return;
@@ -16,15 +16,12 @@ const FlightSearch = () => {
     setFlightDetails(null);
 
     try {
-      const response = await axios.get(
-        `http://api.aviationstack.com/v1/flights`,
-        {
-          params: {
-            access_key: API_KEY,
-            flight_iata: search.trim(), 
-          },
-        }
-      );
+      const response = await axios.get(`http://api.aviationstack.com/v1/flights`, {
+        params: {
+          access_key: API_KEY,
+          flight_iata: search.trim(),
+        },
+      });
 
       if (response.data?.data?.length > 0) {
         setFlightDetails(response.data.data[0]);
@@ -38,11 +35,17 @@ const FlightSearch = () => {
     }
   };
 
+  const formatTime = (isoString) => {
+    return isoString
+      ? new Date(isoString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "N/A";
+  };
+
   return (
     <div className="max-w-3xl p-6 mx-auto">
-      <h1 className="mb-4 text-2xl font-bold">Search Flight by Number</h1>
+      <h1 className="mb-6 text-2xl font-bold text-center">Search Flight by Number</h1>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-6">
         <input
           type="text"
           placeholder="Enter flight number (e.g., AA100)"
@@ -55,39 +58,49 @@ const FlightSearch = () => {
         </button>
       </div>
 
-      {loading && <p>Loading flight details...</p>}
-      {error && <p className="text-red-600">{error}</p>}
+      {loading && <p className="text-center text-gray-600">Loading flight details...</p>}
+      {error && <p className="text-center text-red-600">{error}</p>}
 
       {flightDetails && (
-        <div className="p-6 rounded-md shadow-md bg-base-200">
-          <h2 className="mb-4 text-xl font-semibold">Flight Details</h2>
+        <div className="p-6 space-y-3 bg-white border border-gray-200 rounded-lg shadow-lg">
+          <h2 className="pb-2 mb-3 text-xl font-semibold border-b">Flight Details</h2>
+
+          {/* Original Fields */}
+          <p><strong>Flight Number:</strong> {flightDetails.flight?.iata || "N/A"}</p>
+          <p><strong>Airline:</strong> {flightDetails.airline?.name || "N/A"}</p>
           <p>
-            <strong>Flight Number:</strong> {flightDetails.flight?.iata || "N/A"}
-          </p>
-          <p>
-            <strong>Airline:</strong> {flightDetails.airline?.name || "N/A"}
-          </p>
-          <p>
-            <strong>Departure Airport:</strong>{" "}
-            {flightDetails.departure?.airport || "N/A"} (
+            <strong>Departure Airport:</strong> {flightDetails.departure?.airport || "N/A"} (
             {flightDetails.departure?.iata || "N/A"})
           </p>
           <p>
-            <strong>Arrival Airport:</strong>{" "}
-            {flightDetails.arrival?.airport || "N/A"} (
+            <strong>Arrival Airport:</strong> {flightDetails.arrival?.airport || "N/A"} (
             {flightDetails.arrival?.iata || "N/A"})
           </p>
+          <p><strong>Departure Time:</strong> {formatTime(flightDetails.departure?.scheduled)}</p>
+          <p><strong>Arrival Time:</strong> {formatTime(flightDetails.arrival?.scheduled)}</p>
+          <p><strong>Status:</strong> {flightDetails.flight_status || "N/A"}</p>
+
+          {/* New Fields Added */}
+          <p><strong>Estimated Departure:</strong> {formatTime(flightDetails.departure?.estimated)}</p>
+          <p><strong>Estimated Arrival:</strong> {formatTime(flightDetails.arrival?.estimated)}</p>
+          <p><strong>Departure Delay:</strong> {flightDetails.departure?.delay ?? "N/A"} min</p>
+          <p><strong>Arrival Delay:</strong> {flightDetails.arrival?.delay ?? "N/A"} min</p>
           <p>
-            <strong>Departure Time:</strong>{" "}
-            {flightDetails.departure?.scheduled || "N/A"}
+            <strong>Departure Terminal / Gate:</strong> {flightDetails.departure?.terminal || "N/A"} /{" "}
+            {flightDetails.departure?.gate || "N/A"}
           </p>
           <p>
-            <strong>Arrival Time:</strong>{" "}
-            {flightDetails.arrival?.scheduled || "N/A"}
+            <strong>Arrival Terminal / Gate:</strong> {flightDetails.arrival?.terminal || "N/A"} /{" "}
+            {flightDetails.arrival?.gate || "N/A"}
           </p>
-          <p>
-            <strong>Status:</strong> {flightDetails.flight_status || "N/A"}
-          </p>
+          <p><strong>Aircraft:</strong> {flightDetails.aircraft?.registration || "N/A"} ({flightDetails.aircraft?.icao24 || "N/A"})</p>
+
+          {/* Optional Live Tracking */}
+          {flightDetails.latitude && flightDetails.longitude && (
+            <p><strong>Live Location:</strong> Lat {flightDetails.latitude}, Lon {flightDetails.longitude}</p>
+          )}
+          {flightDetails.altitude && <p><strong>Altitude:</strong> {flightDetails.altitude} ft</p>}
+          {flightDetails.speed_horizontal && <p><strong>Speed:</strong> {flightDetails.speed_horizontal} km/h</p>}
         </div>
       )}
     </div>

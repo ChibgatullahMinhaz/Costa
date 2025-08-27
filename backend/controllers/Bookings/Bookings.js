@@ -86,7 +86,20 @@ exports.getAllBookings = async (req, res) => {
   try {
     const db = getDB();
     const bookingsCollection = db.collection("Bookings");
-    const allBookings = await bookingsCollection.find().sort({_id: -1}).toArray();
+    const allBookings = await bookingsCollection.find().sort({ _id: -1 }).toArray();
+
+    res.status(200).json(allBookings);
+  } catch (error) {
+    console.error("Error fetching all bookings:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+exports.getInvoiceData = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const db = getDB();
+    const bookingsCollection = db.collection("Bookings");
+    const allBookings = await bookingsCollection.find({ useEmail: email }).sort({ _id: -1 }).toArray();
 
     res.status(200).json(allBookings);
   } catch (error) {

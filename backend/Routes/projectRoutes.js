@@ -5,7 +5,7 @@ const { getAllVehicles, getVehicleById, createVehicle, updateVehicle, deleteVehi
 const { sendNotification, getAllNotifications, getUserToken } = require('../controllers/Notification/notification');
 const { getServer, getRecentActivity } = require('../controllers/projectController');
 const { processPayment } = require('../controllers/payment/payment');
-const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking } = require('../controllers/Bookings/Bookings');
+const { createBooking, getTotalBookings, getTotalCustomers, getMyBookingsByEmail, getAllBookings, deleteBooking, updateBookingByAdmin, updateBooking, getBookingById, cancelBooking, getInvoiceData } = require('../controllers/Bookings/Bookings');
 const { getPricingSettings, updatePricingSettings } = require('../controllers/Pricing/Pricing');
 const { getPricingConfig } = require('../controllers/pricingController');
 const { assignTrip, updateDriverBookings, getOwnAssingnedRides, updateRideStatusByDriver, getCompletedAssignedRides, getLatestAssignedRides, getRideDetailsByBookingId } = require('../controllers/assignmentController');
@@ -70,6 +70,7 @@ router.get("/api/totalBookings", verifyFirebaseJWT, requireAdmin, getTotalBookin
 router.get("/api/myBookings", getMyBookingsByEmail);
 router.put("/api/myBookings/update/:id", updateBooking);
 router.get("/all-bookings", verifyFirebaseJWT, getAllBookings);
+router.get("/invoice", verifyFirebaseJWT, getInvoiceData);
 router.delete("/api/booking/delete/:id", deleteBooking);
 router.patch("/api/booking/update/status/:id", updateBookingByAdmin);
 router.get('/api/bookingById/:id', getBookingById);
